@@ -3,7 +3,6 @@
 import { UserDataType } from "../_types/context_type";
 
 const getAuth = async () => {
-  // console.log(localStorage.getItem("token"));
   const token = localStorage.getItem("token");
   if (token != null) {
     const userInfo = await JSON.parse(token);
@@ -18,7 +17,7 @@ const getAuth = async () => {
       userData.id = decodedToken.id;
       userData.firstName = decodedToken.firstName;
       userData.role = decodedToken.role;
-      // console.log(userData)
+
       return userData;
     } else {
       return {
