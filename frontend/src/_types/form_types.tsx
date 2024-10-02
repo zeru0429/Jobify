@@ -9,3 +9,12 @@ export interface ErrorResponseType {
     success: boolean;
   };
 }
+
+export interface RegisterUserFormType {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  createdBy: number;
+}

@@ -1,26 +1,50 @@
-import { createApi } from "@reduxjs/toolkit/query";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import { axiosBaseQuery } from "../util/axios_base_query";
 import { BASE_URL } from "../util/secrete";
+import { RegisterUserFormType } from "../_types/form_types";
 
+// Create API service
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/user/` }),
-  endpoints(build) {
-    return {
-      getAll: build.query({ query: () => ({ url: "/", method: "GET" }) }),
-      getSingle: build.query({
-        query: (id: number) => ({ url: `/${id}`, method: "GET" }),
+  tagTypes: ["User"], // Tag for refetching when data is updated
+  endpoints: (builder) => ({
+    createUser: builder.mutation<any, RegisterUserFormType>({
+      query: (body: RegisterUserFormType) => ({
+        url: "/",
+        method: "POST",
+        data: body,
       }),
-      create: build.mutation({
-        query: (body: any) => ({ url: "/", method: "POST", body }),
+      invalidatesTags: ["User"],
+    }),
+    getAllUsers: builder.query({
+      query: () => ({
+        url: "/",
+        method: "GET",
       }),
-      update: build.mutation({
-        query: ({ body, param }: { body: any; param: number }) => ({
-          url: `/${param}`,
-          method: "PATCH",
-          body,
-        }),
+      providesTags: ["User"],
+    }),
+    getSingleUser: builder.query<any, string>({
+      query: (id: string) => ({
+        url: `/${id}`,
+        method: "GET",
       }),
-    };
-  },
+      providesTags: (result, error, id) => [{ type: "User", id }],
+    }),
+    deleteUser: builder.mutation<any, string>({
+      query: (id: string) => ({
+        url: `/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["User"],
+    }),
+  }),
 });
+
+// Hooks generated from the API service
+export const {
+  useCreateUserMutation,
+  useGetAllUsersQuery,
+  useGetSingleUserQuery,
+  useDeleteUserMutation,
+} = userApi;
