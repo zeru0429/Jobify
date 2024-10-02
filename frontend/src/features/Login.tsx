@@ -1,5 +1,4 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { DevTool } from "@hookform/devtools";
 import { useEffect, useState } from "react";
 import LogoContainer from "../component/LogoContainer";
 import { useThemeData } from "../context/them_context";
@@ -7,37 +6,28 @@ import { MdNightlight, MdLightMode, MdBrightnessAuto } from "react-icons/md";
 import IconContainer from "../component/icon/Icon_container";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-// import { useLoginUserMutation } from '../services/user_service';
 import { useToast } from "../context/ToastContext";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useLoginMutation } from "../services/public_service";
+import { ErrorResponseType, LoginFormType } from "../_types/form_types";
 
-type FormValues = {
-  email: string;
-  password: string;
+// Define the LoginResponseType type
+type LoginResponseType = {
+  token?: string;
 };
-
-// Define the LoginResponse type
-// type LoginResponse = {
-//   success: boolean;
-//   token?: string;
-//   role?: string;
-//   message?: string;
-// };
 
 function Login() {
   const {
     register,
-    control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>();
+  } = useForm<LoginFormType>();
   const [showPassword, setShowPassword] = useState(false);
   const { themeData, setThemeData } = useThemeData();
-  const { userData } = useAuth();
-  // const [login, { isLoading }] = useLoginUserMutation();
+  const { userData, fetchData } = useAuth();
+  const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
-  const { toastData } = useToast();
-  console.log(toastData);
+  const { setToastData } = useToast();
 
   useEffect(() => {
     if (userData.token != null) {
@@ -45,77 +35,32 @@ function Login() {
         case "ADMIN":
           navigate("/admin");
           break;
-        case "DEPARTMENT_HEAD":
-          navigate("/department-head");
-          break;
-        case "LOGESTIC_SUPERVISER":
-          navigate("/logestics");
-          break;
-        case "FINANCE":
-          navigate("/finance");
-          break;
-        case "GENERAL_MANAGER":
-          navigate("/manager");
-          break;
-        case "STORE_KEEPER":
-          navigate("/warehouse");
-          break;
-        case "EMPLOYEE":
-          navigate("/employee");
+        case "SUPER_ADMIN":
+          navigate("/admin");
           break;
         default:
-          navigate("/"); // Redirect to homepage or default route if role is unknown
+          navigate("/admin");
           break;
       }
     }
   }, [userData]);
 
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    console.log(data);
-    // try {
-    //   const response: LoginResponse = await login(data).unwrap();
-    //   console.log('API Response:', response); // Log the entire response
-    //   setToastData({
-    //     message: response.message || "",
-    //     success: response.success,
-    //   });
-    //   if (response.success) {
-    //     localStorage.setItem("token", JSON.stringify({ token: response.token }));
-    //     fetchData();
-    //     // Redirect based on user role
-    //     switch (response.role) {
-    //       case 'ADMIN':
-    //         navigate("/admin");
-    //         break;
-    //       case 'DEPARTMENT_HEAD':
-    //         navigate("/department-head");
-    //         break;
-    //       case 'LOGESTIC_SUPERVISER':
-    //         navigate("/logestics");
-    //         break;
-    //       case 'FINANCE':
-    //         navigate("/finance");
-    //         break;
-    //       case 'GENERAL_MANAGER':
-    //         navigate("/manager");
-    //         break;
-    //       case 'STORE_KEEPER':
-    //         navigate("/warehouse");
-    //         break;
-    //       case 'EMPLOYEE':
-    //         navigate("/employee");
-    //         break;
-    //       default:
-    //         navigate('/'); // Redirect to homepage or default route if role is unknown
-    //         break;
-    //     }
-    //   }
-    // } catch (error: any) {
-    //   setToastData({
-    //     message: error.message,
-    //     success: error.success,
-    //   });
-    // }
+  const onSubmit: SubmitHandler<LoginFormType> = async (data) => {
+    try {
+      const response: LoginResponseType = await login(data).unwrap();
+      localStorage.setItem("token", JSON.stringify(response));
+      fetchData();
+      setToastData({
+        message: "login successful",
+        success: true,
+      });
+    } catch (error: any) {
+      const res: ErrorResponseType = error;
+      setToastData({
+        message: res.data.message,
+        success: res.data.success,
+      });
+    }
   };
 
   const getThemeIcon = () => {
@@ -209,7 +154,18 @@ function Login() {
                 id="password"
                 placeholder="Password"
                 className="w-full px-10 py-2 rounded-md text-black outline-none"
-                {...register("password", { required: "Password is required" })}
+                {...register("password", {
+                  required: "Password is required",
+                  pattern: {
+                    value:
+                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]).{8,}$/,
+                    message: "Invalid password format",
+                  },
+                  validate: {
+                    notAdmin: (fieldValue) =>
+                      fieldValue !== "admin" || "Enter a different password",
+                  },
+                })}
               />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -237,13 +193,11 @@ function Login() {
               type="submit"
               className="bg-[#002A47]  w-full py-2 text-white rounded-md hover:bg-[#112737] dark:bg-[#071218] hover:dark:bg-[#0c1920]   transition duration-300"
             >
-              login
-              {/* {isLoading ? <p>Loading</p> : <p>Login</p>} */}
+              {isLoading ? <p>Loading</p> : <p>Login</p>}
             </button>
           </form>
         </div>
       </div>
-      <DevTool control={control} />
     </>
   );
 }

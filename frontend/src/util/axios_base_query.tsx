@@ -23,9 +23,12 @@ export const axiosBaseQuery =
         params,
         headers,
       });
-      return { data: result };
+      return { data: result.data };
     } catch (axiosError: any) {
-      const err = axiosError;
+      const err: any = axiosError as {
+        response?: { status?: number; data?: any };
+      };
+
       return {
         error: {
           status: err.response?.status,

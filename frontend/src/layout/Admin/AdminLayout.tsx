@@ -29,16 +29,18 @@ export const AdminLayout = () => {
     setOpen(false);
   };
 
-  if (isAdmin) {
+  if (!isAdmin) {
     return (
       <>
         <Box
           sx={{
-            marginLeft: open ? "20%" : "0",
+            marginLeft: open ? `${drawerWidth}px` : "0",
+            height: "100vh", // Full screen height
+            display: "flex",
+            flexDirection: "column", // Makes sure content below header is stacked
           }}
         >
           <CssBaseline />
-          {/* <MenuIcon /> */}
           <Header setOpen={setOpen} />
           <Divider />
           <Drawer
@@ -80,9 +82,18 @@ export const AdminLayout = () => {
             <Bottem />
           </Drawer>
 
-          <div className={`mt-24 h-screen px-10`}>
-            <Outlet />
-          </div>
+          {/* Main content area */}
+          <Box
+            sx={{
+              flex: 1, // Ensure it takes all remaining space
+              overflowY: "auto", // Scrollable content
+              width: open ? `calc(100vw - ${drawerWidth}px)` : "100vw", // Adjust for sidebar
+            }}
+          >
+            <div className={`mt-24 px-10`}>
+              <Outlet />
+            </div>
+          </Box>
         </Box>
       </>
     );
