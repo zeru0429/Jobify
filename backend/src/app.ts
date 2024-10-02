@@ -18,6 +18,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 import appRouter from "./router/index.js";
+import userController from "./api/user/user_controller.js";
+//public
+app.post("/login", (req: Request, res: Response) => {
+  userController.login(req, res);
+});
+//api
 app.use("/api", isAuth, appRouter);
 app.get("/", (req: Request, res: Response) => {
   res.send(`Express + TypeScript Server `);

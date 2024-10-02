@@ -25,6 +25,7 @@ const jobSchema: Schema<JobType> = new Schema({
   createdAt: {
     required: true,
     type: Date,
+    default: Date.now,
   },
   salary: {
     required: true,
@@ -39,6 +40,11 @@ const jobSchema: Schema<JobType> = new Schema({
     required: true,
     type: String,
     trim: true,
+  },
+  createdBy: {
+    required: true,
+    type: mongoose.Schema.Types.ObjectId, // Use ObjectId for referencing
+    ref: "User", // Reference to the User model
   },
 });
 

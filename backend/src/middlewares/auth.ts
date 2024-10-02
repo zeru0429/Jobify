@@ -85,5 +85,21 @@ const isSuperAdmin = async (
     }
   }
 };
+const isAdminOrSuperAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  if (req.user && req.user.role) {
+    if (req.user.role === Role.ADMIN || req.user.role === Role.SUPER_ADMIN) {
+      next();
+    } else {
+      res.status(403).json({
+        success: false,
+        message: "Not authorized",
+      });
+    }
+  }
+};
 
-export { isAuth, isAdmin, isSuperAdmin };
+export { isAuth, isAdmin, isSuperAdmin, isAdminOrSuperAdmin };

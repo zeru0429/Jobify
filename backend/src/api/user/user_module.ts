@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { UserType } from "../../types/user_type.js";
+import bcrypt from "bcrypt";
 
 const userSchema: Schema<UserType> = new Schema({
   firstName: {
@@ -12,7 +13,6 @@ const userSchema: Schema<UserType> = new Schema({
     type: String,
     trim: true,
   },
-
   role: {
     required: true,
     type: String,
@@ -40,14 +40,27 @@ const userSchema: Schema<UserType> = new Schema({
     trim: true,
     validate: {
       validator: (value: string) => {
-        const re =
-          /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
+        const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,15}$/;
         return re.test(String(value));
       },
       message: (props: { value: string }) =>
         `${props.value} is not a valid password`,
     },
   },
+});
+
+// Hash the password before saving the user
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    return;
+  }
 });
 
 const User = mongoose.model<UserType>("User", userSchema);
