@@ -1,8 +1,30 @@
 import express from "express";
+import { Request, Response } from "express";
 import jobController from "./job_controller.js";
+
 const jobRouter = express.Router();
-//
-jobRouter.post("/", jobController.createJob);
+
+// Create a new job
+jobRouter.post("/", (req: Request, res: Response) => {
+  jobController.createJob;
+});
+
+// Get all jobs
 jobRouter.get("/", jobController.getAllJob);
-jobRouter.get("/:id", jobController.getSingleJob);
+
+// Get a single job by ID
+jobRouter.get("/:id", (req: Request, res: Response) => {
+  jobController.getSingleJob;
+});
+
+// Update a job by ID
+jobRouter.put("/:id", (req: Request, res: Response) => {
+  jobController.updateJob;
+});
+
+// Delete a job by ID
+jobRouter.delete("/:id", (req: Request, res: Response) => {
+  jobController.deleteJob;
+});
+
 export default jobRouter;
