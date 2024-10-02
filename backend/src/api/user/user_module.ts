@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { UserType } from "../../types/user_type.js";
+import { Role, UserType } from "../../types/user_type.js";
 import bcrypt from "bcrypt";
 
 const userSchema: Schema<UserType> = new Schema({
@@ -16,7 +16,9 @@ const userSchema: Schema<UserType> = new Schema({
   role: {
     required: true,
     type: String,
+    enum: [Role.ADMIN, Role.SUPER_ADMIN],
     trim: true,
+    default: Role.ADMIN,
   },
   email: {
     required: true,
@@ -46,6 +48,14 @@ const userSchema: Schema<UserType> = new Schema({
       message: (props: { value: string }) =>
         `${props.value} is not a valid password`,
     },
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

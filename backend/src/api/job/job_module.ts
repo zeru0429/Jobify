@@ -31,11 +31,6 @@ const jobSchema: Schema<JobType> = new Schema({
     required: true,
     type: Number,
   },
-  company: {
-    required: true,
-    type: String,
-    trim: true,
-  },
   contactEmail: {
     required: true,
     type: String,
@@ -43,10 +38,20 @@ const jobSchema: Schema<JobType> = new Schema({
   },
   createdBy: {
     required: true,
-    type: mongoose.Schema.Types.ObjectId, // Use ObjectId for referencing
-    ref: "User", // Reference to the User model
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  company: {
+    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Company",
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
+// Create and export the Job model
 const Job = mongoose.model<JobType>("Job", jobSchema);
 export default Job;
