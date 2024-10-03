@@ -1,6 +1,6 @@
 import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
-import { dataset, valueFormatter } from "./weather";
+import { dataset, valueFormatter } from "../../demo/weather";
 
 const chartSetting = {
   yAxis: [

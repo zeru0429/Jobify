@@ -4,11 +4,11 @@ import {
   Route,
 } from "react-router-dom";
 import { AdminLayout } from "../layout/Admin/AdminLayout";
-import Login from "../features/Login";
-import ConfirmPassword from "../features/ConfirmPassword";
-import ForgetPassword from "../features/ForgetPassword";
-import Profile from "../features/Profile";
-import NotFound from "../features/NotFound";
+import Login from "../features/public/Login";
+import ConfirmPassword from "../features/public/ConfirmPassword";
+import ForgetPassword from "../features/public/ForgetPassword";
+import Profile from "../features/public/Profile";
+import NotFound from "../features/public/NotFound";
 import UserList from "../features/admin/user/UserList";
 import AddUser from "../features/admin/user/AddUser";
 import DashBoard from "../features/admin/DashBoard";
@@ -25,7 +25,7 @@ export const router = createBrowserRouter(
       {/* admin section */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route
-          path="/admin/dashbord"
+          path="/admin/"
           element={
             <>
               <DashBoard />

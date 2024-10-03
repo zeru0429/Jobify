@@ -10,16 +10,25 @@ const UserList = () => {
     navigator("/admin/add-user");
   };
   return (
-    <>
+    <div>
+      <Box>
+        <Button
+          className="dark:text-white dark:bg-slate-600 text-white bg-[#011e32] "
+          onClick={handleClick}
+          variant="contained"
+        >
+          Add admin
+        </Button>
+        <br />
+        <br />
+        <br />
+      </Box>
       <Box>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <UsersListTable />
         </LocalizationProvider>
       </Box>
-      <Box>
-        <Button onClick={handleClick}>Add User</Button>
-      </Box>
-    </>
+    </div>
   );
 };
 

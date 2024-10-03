@@ -1,5 +1,5 @@
 import { PieChart, pieArcLabelClasses } from "@mui/x-charts/PieChart";
-import { desktopOS, valueFormatter } from "./webUsageStats";
+import { desktopOS, valueFormatter } from "../../demo/webUsageStats";
 
 export default function PieArcLabel() {
   return (

@@ -15,10 +15,7 @@ const AdminSidebar = () => {
         >
           <ul className="space-y-1.5">
             <li>
-              <Link
-                to="/admin/dashbord"
-                onClick={() => handleToggleView("dashbord")}
-              >
+              <Link to="/admin/" onClick={() => handleToggleView("dashbord")}>
                 <a
                   className="flex items-center gap-x-3.5 py-[5px] px-2.5 text-sm text-gray-700 rounded-lg hover:bg-[#002A47] hover:text-white dark:bg-neutral-700 dark:text-white"
                   href="#"

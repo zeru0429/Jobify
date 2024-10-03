@@ -1,5 +1,5 @@
 // import { useNavigate } from "react-router-dom";
-import LogoContainer from "../component/LogoContainer";
+import LogoContainer from "../../component/LogoContainer";
 // import { useGetMyQuery } from "../services/user_service";
 // import Loader from "../component/Loading";
 

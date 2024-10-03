@@ -1,15 +1,15 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useEffect, useState } from "react";
-import LogoContainer from "../component/LogoContainer";
-import { useThemeData } from "../context/them_context";
+import LogoContainer from "../../component/LogoContainer";
+import { useThemeData } from "../../context/them_context";
 import { MdNightlight, MdLightMode, MdBrightnessAuto } from "react-icons/md";
-import IconContainer from "../component/icon/Icon_container";
-import { useAuth } from "../context/AuthContext";
+import IconContainer from "../../component/icon/Icon_container";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "../context/ToastContext";
+import { useToast } from "../../context/ToastContext";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useLoginMutation } from "../services/public_service";
-import { ErrorResponseType, LoginFormType } from "../_types/form_types";
+import { useLoginMutation } from "../../services/public_service";
+import { ErrorResponseType, LoginFormType } from "../../_types/form_types";
 
 // Define the LoginResponseType type
 type LoginResponseType = {
@@ -48,7 +48,7 @@ function Login() {
   const onSubmit: SubmitHandler<LoginFormType> = async (data) => {
     try {
       const response: LoginResponseType = await login(data).unwrap();
-      localStorage.setItem("token", JSON.stringify(response));
+      localStorage.setItem("token", "JSON.stringify(response)");
       fetchData();
       setToastData({
         message: "login successful",
