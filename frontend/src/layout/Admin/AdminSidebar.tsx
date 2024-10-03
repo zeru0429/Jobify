@@ -4,13 +4,14 @@ import List from "@mui/material/List";
 
 const AdminSidebar = () => {
   const [currentView, setCurrentView] = useState("");
-  const activeClass = "bg-[#002A47] text-white";
+  const activeClass =
+    "bg-[#002A47] text-white dark:bg-[#005577] dark:text-white"; // Active class for dark mode
 
   const handleToggleView = (view: string) => {
     setCurrentView(currentView === view ? "" : view);
   };
 
-  const buttonClass = `flex w-full items-center gap-x-3.5 py-[5px] px-2.5 text-sm rounded-lg hover:bg-[#002A47] dark:hover:bg-[#002A47] dark:hover:text-[#dbe3e9] text-gray-700 hover:text-white dark:bg-neutral-700 dark:text-white`;
+  const buttonClass = `flex w-full items-center gap-x-3.5 py-[5px] px-2.5 text-sm rounded-lg hover:bg-[#002A47] dark:hover:bg-[#005577] text-gray-700 hover:text-white dark:bg-neutral-700 dark:text-white`;
 
   return (
     <>
@@ -82,7 +83,7 @@ const AdminSidebar = () => {
               </Link>
             </li>
             {/* Company */}
-            <li className="hs-accordion" id="users-accordion">
+            <li className="hs-accordion" id="company-accordion">
               <Link
                 to="/admin/company"
                 onClick={() => handleToggleView("company")}
@@ -93,7 +94,7 @@ const AdminSidebar = () => {
                     currentView === "company" ? activeClass : ""
                   }`}
                   aria-expanded="true"
-                  aria-controls="users-accordion"
+                  aria-controls="company-accordion"
                 >
                   {/* SVG for Company */}
                   <svg
@@ -113,7 +114,7 @@ const AdminSidebar = () => {
               </Link>
             </li>
             {/* Jobs */}
-            <li className="hs-accordion" id="users-accordion">
+            <li className="hs-accordion" id="jobs-accordion">
               <Link to="/admin/job" onClick={() => handleToggleView("job")}>
                 <button
                   type="button"
@@ -121,7 +122,7 @@ const AdminSidebar = () => {
                     currentView === "job" ? activeClass : ""
                   }`}
                   aria-expanded="true"
-                  aria-controls="users-accordion"
+                  aria-controls="jobs-accordion"
                 >
                   {/* SVG for Jobs */}
                   <svg
@@ -141,7 +142,7 @@ const AdminSidebar = () => {
               </Link>
             </li>
             {/* Applications */}
-            <li className="hs-accordion" id="users-accordion">
+            <li className="hs-accordion" id="applications-accordion">
               <Link
                 to="/admin/applicants"
                 onClick={() => handleToggleView("applicants")}
@@ -152,7 +153,7 @@ const AdminSidebar = () => {
                     currentView === "applicants" ? activeClass : ""
                   }`}
                   aria-expanded="true"
-                  aria-controls="users-accordion"
+                  aria-controls="applications-accordion"
                 >
                   {/* SVG for Applications */}
                   <svg
@@ -172,7 +173,7 @@ const AdminSidebar = () => {
               </Link>
             </li>
             {/* Report */}
-            <li className="hs-accordion" id="users-accordion">
+            <li className="hs-accordion" id="report-accordion">
               <Link
                 to="/admin/report"
                 onClick={() => handleToggleView("report")}
@@ -183,7 +184,7 @@ const AdminSidebar = () => {
                     currentView === "report" ? activeClass : ""
                   }`}
                   aria-expanded="true"
-                  aria-controls="users-accordion"
+                  aria-controls="report-accordion"
                 >
                   {/* SVG for Report */}
                   <svg
