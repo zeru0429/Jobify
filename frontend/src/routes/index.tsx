@@ -11,6 +11,7 @@ import Profile from "../features/Profile";
 import NotFound from "../features/NotFound";
 import UserList from "../features/admin/user/UserList";
 import AddUser from "../features/admin/user/AddUser";
+import DashBoard from "../features/admin/DashBoard";
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -27,7 +28,7 @@ export const router = createBrowserRouter(
           path="/admin/dashbord"
           element={
             <>
-              <h1>dashbord</h1>
+              <DashBoard />
             </>
           }
         />
