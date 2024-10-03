@@ -2,6 +2,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import ApplicantListTable from "./ApplicantListTable";
 
 const ApplicantsList = () => {
   const navigator = useNavigate();
@@ -24,7 +25,7 @@ const ApplicantsList = () => {
       </Box>
       <Box>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          {/* <UsersListTable /> */}
+          <ApplicantListTable />
         </LocalizationProvider>
       </Box>
     </div>
