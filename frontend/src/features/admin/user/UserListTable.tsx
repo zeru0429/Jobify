@@ -16,7 +16,7 @@ import { Box, Button, ListItemIcon, MenuItem, lighten } from "@mui/material";
 import { AccountCircle, Send } from "@mui/icons-material";
 
 // Mock Data
-import { data } from "../../../demo/demo"; // Ensure this matches your data structure
+import { data } from "../../../demo/demo_users"; // Ensure this matches your data structure
 
 export type UserListType = {
   firstName: string;
