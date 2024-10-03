@@ -7,15 +7,19 @@ import CustomInputField from "../../component/CustomInputField";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { useCreateJobMutation } from "../../services/job_service";
+import { useRequestGeminiMutation } from "../../services/ai_service";
+import CustomTextArea from "../../component/CustomeTextArea";
 
 const AddJob = () => {
   const { setToastData } = useToast();
   const { userData } = useAuth();
   const [createJob, { isLoading }] = useCreateJobMutation();
-
+  const [createAiRequest, { isLoading: aiIsLoading, isError: aiIsError }] =
+    useRequestGeminiMutation();
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<RegisterJobFormType>();
 
@@ -35,6 +39,46 @@ const AddJob = () => {
         message: res.data.message,
         success: res.data.success,
       });
+    }
+  };
+  const handleFocus = async () => {
+    if (!aiIsLoading && !aiIsError) {
+      const title = getValues("title");
+      const type = getValues("type");
+      const description = getValues("description");
+      const location = getValues("location");
+      const salary = getValues("salary");
+      const contactEmail = getValues("contactEmail");
+
+      if (title.length > 3) {
+        // Prepare a detailed prompt for the AI
+        const prompt = `Generate a job description for a ${title} position. 
+      Job Type: ${type}. 
+      Job Description: ${description}. 
+      Location: ${location}. 
+      Salary: ${salary}. 
+      Contact Email: ${contactEmail}. 
+      Please include key responsibilities, qualifications, and any additional requirements.`;
+        console.log(prompt);
+        const response = await createAiRequest({
+          contents: [
+            {
+              parts: [
+                { text: prompt }, // Use the prepared prompt
+              ],
+            },
+          ],
+        }).unwrap();
+
+        console.log(response);
+      }
+    }
+  };
+
+  const handleBlur = () => {
+    console.log("Text area blurred");
+    if (aiIsLoading) {
+    } else if (aiIsError) {
     }
   };
 
@@ -65,10 +109,11 @@ const AddJob = () => {
           />
 
           {/* Job Description Field */}
-          <CustomInputField
-            id="description"
-            type="text"
+          <CustomTextArea
+            id="jobDescription"
             placeholder="Job Description"
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             register={register("description", {
               required: "Job description is required",
             })}

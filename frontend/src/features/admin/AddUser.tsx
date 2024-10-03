@@ -2,12 +2,12 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import {
   ErrorResponseType,
   RegisterUserFormType,
-} from "../../../_types/form_types";
-import { useAuth } from "../../../context/AuthContext";
-import { useToast } from "../../../context/ToastContext";
-import { useCreateUserMutation } from "../../../services/user_service";
-import CustomInputField from "../../../component/CustomInputField";
-import CustomPasswordInput from "../../../component/CustomPasswordInput";
+} from "../../_types/form_types";
+import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
+import { useCreateUserMutation } from "../../services/user_service";
+import CustomInputField from "../../component/CustomInputField";
+import CustomPasswordInput from "../../component/CustomPasswordInput";
 
 const AddUser = () => {
   const { setToastData } = useToast();

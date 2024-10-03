@@ -9,13 +9,13 @@ import ConfirmPassword from "../features/public/ConfirmPassword";
 import ForgetPassword from "../features/public/ForgetPassword";
 import Profile from "../features/public/Profile";
 import NotFound from "../features/public/NotFound";
-import UserList from "../features/admin/user/UserList";
+import UserList from "../features/admin/UserList";
 import DashBoard from "../features/admin/DashBoard";
 import CompanyList from "../features/company/Company_list";
 import JobList from "../features/job/JobList";
-import ApplicantsList from "../features/applicants/Applicants_list";
+import ApplicantsList from "../features/applicants/ApplicantsList";
 import AddCompany from "../features/company/AddCompany";
-import AddUser from "../features/admin/user/AddUser";
+import AddUser from "../features/admin/AddUser";
 import AddJob from "../features/job/AddJob";
 import AddApplication from "../features/applicants/AddApplicant";
 export const router = createBrowserRouter(
