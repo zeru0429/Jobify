@@ -6,30 +6,25 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 const drawerWidth = 240;
-import { Outlet, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
+import { useState } from "react";
 import LogoContainer from "../../component/LogoContainer";
 import AdminSidebar from "./AdminSidebar";
 import { useAuth } from "../../context/AuthContext";
 import UnauthorizedPage from "../../component/UnauthorizedPage";
 import LogOutButton from "../LogOutButton";
+import Login from "../../features/public/Login";
 export const AdminLayout = () => {
   const [open, setOpen] = useState(false);
   const { isAdmin, userData } = useAuth();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (userData == null) {
-      navigate("/login");
-    } else if (userData.token == null) {
-      navigate("/login");
-    }
-  }, [userData]);
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-  if (!isAdmin) {
+  if (userData != null) {
+    return <Login />;
+  }
+  if (isAdmin) {
     return (
       <>
         <Box
