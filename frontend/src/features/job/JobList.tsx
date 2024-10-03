@@ -1,13 +1,12 @@
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import UsersListTable from "./UserListTable";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-const UserList = () => {
+const JobList = () => {
   const navigator = useNavigate();
   const handleClick = () => {
-    navigator("/admin/add-user");
+    navigator("/admin/add-job");
   };
   return (
     <div>
@@ -17,7 +16,7 @@ const UserList = () => {
           onClick={handleClick}
           variant="contained"
         >
-          Add admin
+          Add Job
         </Button>
         <br />
         <br />
@@ -25,11 +24,11 @@ const UserList = () => {
       </Box>
       <Box>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <UsersListTable />
+          {/* <UsersListTable /> */}
         </LocalizationProvider>
       </Box>
     </div>
   );
 };
 
-export default UserList;
+export default JobList;

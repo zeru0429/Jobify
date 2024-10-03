@@ -4,13 +4,20 @@ import {
   Route,
 } from "react-router-dom";
 import { AdminLayout } from "../layout/Admin/AdminLayout";
-import Login from "../features/Login";
-import ConfirmPassword from "../features/ConfirmPassword";
-import ForgetPassword from "../features/ForgetPassword";
-import Profile from "../features/Profile";
-import NotFound from "../features/NotFound";
+import Login from "../features/public/Login";
+import ConfirmPassword from "../features/public/ConfirmPassword";
+import ForgetPassword from "../features/public/ForgetPassword";
+import Profile from "../features/public/Profile";
+import NotFound from "../features/public/NotFound";
 import UserList from "../features/admin/user/UserList";
+import DashBoard from "../features/admin/DashBoard";
+import CompanyList from "../features/company/Company_list";
+import JobList from "../features/job/JobList";
+import ApplicantsList from "../features/applicants/Applicants_list";
+import AddCompany from "../features/company/AddCompany";
 import AddUser from "../features/admin/user/AddUser";
+import AddJob from "../features/job/AddJob";
+import AddApplication from "../features/applicants/AddApplicant";
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -24,15 +31,24 @@ export const router = createBrowserRouter(
       {/* admin section */}
       <Route path="/admin" element={<AdminLayout />}>
         <Route
-          path="/admin/dashbord"
+          path="/admin/"
           element={
             <>
-              <h1>dashbord</h1>
+              <DashBoard />
             </>
           }
         />
         <Route path="/admin/user" element={<UserList />} />
         <Route path="/admin/add-user" element={<AddUser />} />
+        <Route path="/admin/company" element={<CompanyList />} />
+        <Route path="/admin/add-company" element={<AddCompany />} />
+
+        <Route path="/admin/job" element={<JobList />} />
+        <Route path="/admin/add-job" element={<AddJob />} />
+
+        <Route path="/admin/applicants" element={<ApplicantsList />} />
+        <Route path="/admin/add-applicant" element={<AddApplication />} />
+
         <Route
           path="/admin/report"
           element={
