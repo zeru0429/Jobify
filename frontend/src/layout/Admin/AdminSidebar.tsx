@@ -70,8 +70,8 @@ const AdminSidebar = () => {
             </li>
             <li className="hs-accordion" id="users-accordion">
               <Link
-                to="/admin/category"
-                onClick={() => handleToggleView("category")}
+                to="/admin/company"
+                onClick={() => handleToggleView("company")}
               >
                 <button
                   type="button"
@@ -96,9 +96,33 @@ const AdminSidebar = () => {
               </Link>
             </li>
             <li className="hs-accordion" id="users-accordion">
+              <Link to="/admin/job" onClick={() => handleToggleView("job")}>
+                <button
+                  type="button"
+                  className="hs-accordion-toggle hs-accordion-active:text-[#002a47] hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-[5px] px-2.5 text-sm text-gray-700 rounded-lg hover:bg-[#002A47] hover:text-white focus:outline-none  dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
+                  aria-expanded="true"
+                  aria-controls="users-accordion"
+                >
+                  <svg
+                    className="size-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={24}
+                    height={24}
+                    viewBox="0 0 32 32"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M26 6v4H6V6zm0-2H6a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2M10 16v10H6V16zm0-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V16a2 2 0 0 0-2-2m16 2v10H16V16zm0-2H16a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V16a2 2 0 0 0-2-2"
+                    ></path>
+                  </svg>
+                  Jobs
+                </button>
+              </Link>
+            </li>
+            <li className="hs-accordion" id="users-accordion">
               <Link
-                to="/admin/sub-category"
-                onClick={() => handleToggleView("subcategory")}
+                to="/admin/applicants"
+                onClick={() => handleToggleView("applicants")}
               >
                 <button
                   type="button"
@@ -122,33 +146,7 @@ const AdminSidebar = () => {
                 </button>
               </Link>
             </li>
-            <li className="hs-accordion" id="users-accordion">
-              <Link
-                to="/admin/template"
-                onClick={() => handleToggleView("template")}
-              >
-                <button
-                  type="button"
-                  className="hs-accordion-toggle hs-accordion-active:text-[#002a47] hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-[5px] px-2.5 text-sm text-gray-700 rounded-lg hover:bg-[#002A47] hover:text-white focus:outline-none  dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
-                  aria-expanded="true"
-                  aria-controls="users-accordion"
-                >
-                  <svg
-                    className="size-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={24}
-                    height={24}
-                    viewBox="0 0 32 32"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M26 6v4H6V6zm0-2H6a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2M10 16v10H6V16zm0-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V16a2 2 0 0 0-2-2m16 2v10H16V16zm0-2H16a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V16a2 2 0 0 0-2-2"
-                    ></path>
-                  </svg>
-                  Jobs
-                </button>
-              </Link>
-            </li>
+
             <li className="hs-accordion" id="users-accordion">
               <Link
                 to="/admin/report"

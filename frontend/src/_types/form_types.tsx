@@ -18,3 +18,9 @@ export interface RegisterUserFormType {
   confirmPassword: string;
   createdBy: number;
 }
+
+export interface RegisterCompanyFormType {
+  name: string;
+  logo?: string;
+  adminId?: number;
+}

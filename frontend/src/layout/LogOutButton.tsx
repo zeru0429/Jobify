@@ -1,7 +1,7 @@
 import { Divider } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-const Bottem = () => {
+const LogOutButton = () => {
   const navigator = useNavigate();
   const { setUserData } = useAuth();
 
@@ -53,4 +53,4 @@ const Bottem = () => {
   );
 };
 
-export default Bottem;
+export default LogOutButton;

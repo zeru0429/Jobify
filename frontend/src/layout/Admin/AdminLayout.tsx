@@ -10,9 +10,9 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LogoContainer from "../../component/LogoContainer";
 import AdminSidebar from "./AdminSidebar";
-import Bottem from "../Bottem";
 import { useAuth } from "../../context/AuthContext";
 import UnauthorizedPage from "../../component/UnauthorizedPage";
+import LogOutButton from "../LogOutButton";
 export const AdminLayout = () => {
   const [open, setOpen] = useState(false);
   const { isAdmin, userData } = useAuth();
@@ -79,7 +79,7 @@ export const AdminLayout = () => {
             <Divider />
             <AdminSidebar />
             <Divider />
-            <Bottem />
+            <LogOutButton />
           </Drawer>
 
           {/* Main content area */}

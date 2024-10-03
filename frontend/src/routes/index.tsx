@@ -10,8 +10,11 @@ import ForgetPassword from "../features/public/ForgetPassword";
 import Profile from "../features/public/Profile";
 import NotFound from "../features/public/NotFound";
 import UserList from "../features/admin/user/UserList";
-import AddUser from "../features/admin/user/AddUser";
 import DashBoard from "../features/admin/DashBoard";
+import CompanyList from "../features/company/Company_list";
+import JobList from "../features/job/JobList";
+import ApplicantsList from "../features/applicants/Applicants_list";
+import AddCompany from "../features/company/AddCompany";
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -33,7 +36,13 @@ export const router = createBrowserRouter(
           }
         />
         <Route path="/admin/user" element={<UserList />} />
-        <Route path="/admin/add-user" element={<AddUser />} />
+        <Route path="/admin/company" element={<CompanyList />} />
+        <Route path="/admin/add-company" element={<AddCompany />} />
+
+        <Route path="/admin/job" element={<JobList />} />
+
+        <Route path="/admin/applicants" element={<ApplicantsList />} />
+
         <Route
           path="/admin/report"
           element={
