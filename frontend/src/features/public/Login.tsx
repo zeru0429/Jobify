@@ -48,6 +48,7 @@ function Login() {
   const onSubmit: SubmitHandler<LoginFormType> = async (data) => {
     try {
       const response: LoginResponseType = await login(data).unwrap();
+      console.log(response);
       localStorage.setItem("token", "JSON.stringify(response)");
       fetchData();
       setToastData({

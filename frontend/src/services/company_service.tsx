@@ -29,7 +29,7 @@ export const companyApi = createApi({
         url: `/${id}`,
         method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: "company", id }],
+      providesTags: (_result, _error, id) => [{ type: "company", id }],
     }),
     deleteCompany: builder.mutation<any, string>({
       query: (id: string) => ({

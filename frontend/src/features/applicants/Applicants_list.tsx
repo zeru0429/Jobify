@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const ApplicantsList = () => {
   const navigator = useNavigate();
   const handleClick = () => {
-    navigator("/admin/add-applicants");
+    navigator("/admin/add-applicant");
   };
   return (
     <div>

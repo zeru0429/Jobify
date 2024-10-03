@@ -29,7 +29,7 @@ export const userApi = createApi({
         url: `/${id}`,
         method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: "User", id }],
+      providesTags: (_result, _error, id) => [{ type: "User", id }],
     }),
     deleteUser: builder.mutation<any, string>({
       query: (id: string) => ({
