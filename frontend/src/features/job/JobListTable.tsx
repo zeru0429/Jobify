@@ -14,72 +14,44 @@ import { Box, Button, ListItemIcon, MenuItem, lighten } from "@mui/material";
 
 // Icons Imports
 import { AccountCircle, Send } from "@mui/icons-material";
-
 // Mock Data
-import { data } from "../../../demo/demo_users"; // Ensure this matches your data structure
+import { jobData } from "../../demo/demo_job";
 
-export type UserListType = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  jobTitle: string;
+export type JobListType = {
+  title: string;
+  type: string;
+  description: string;
+  location: string;
+  createdAt: string;
   salary: number;
-  startDate: string;
-  avatar: string;
+  contactEmail: string;
+  createdBy: string;
+  company: string;
+  updatedAt: string;
 };
 
-const UsersListTable = () => {
-  const columns = useMemo<MRT_ColumnDef<UserListType>[]>(
+const JobListTable = () => {
+  const columns = useMemo<MRT_ColumnDef<JobListType>[]>(
     () => [
       {
-        id: "employee", //id used to define `group` column
-        header: "Employee",
+        id: "job",
+        header: "Job Details",
         columns: [
           {
-            accessorFn: (row) => `${row.firstName} ${row.lastName}`, //accessorFn used to join multiple data into a single cell
-            id: "name", //id is still required when using accessorFn instead of accessorKey
-            header: "Name",
+            accessorKey: "title",
+            header: "Job Title",
             size: 250,
-            Cell: ({ renderedCellValue, row }) => (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "1rem",
-                }}
-              >
-                <img
-                  alt="avatar"
-                  height={30}
-                  src={row.original.avatar}
-                  loading="lazy"
-                  style={{ borderRadius: "50%", width: "50px", height: "50px" }}
-                />
-                {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
-                <span>{renderedCellValue}</span>
-              </Box>
-            ),
           },
           {
-            accessorKey: "email", //accessorKey used to define `data` column. `id` gets set to accessorKey automatically
-            enableClickToCopy: true,
-            filterVariant: "autocomplete",
-            header: "Email",
-            size: 300,
+            accessorKey: "location",
+            header: "Location",
+            size: 200,
           },
-        ],
-      },
-      {
-        id: "id",
-        header: "Job Info",
-        columns: [
           {
             accessorKey: "salary",
-            // filterVariant: 'range', //if not using filter modes feature, use this instead of filterFn
             filterFn: "between",
             header: "Salary",
-            size: 200,
-            //custom conditional format and styling
+            size: 150,
             Cell: ({ cell }) => (
               <Box
                 component="span"
@@ -97,7 +69,7 @@ const UsersListTable = () => {
                   p: "0.25rem",
                 })}
               >
-                {cell.getValue<number>()?.toLocaleString?.("en-US", {
+                {cell.getValue<number>()?.toLocaleString("en-US", {
                   style: "currency",
                   currency: "USD",
                   minimumFractionDigits: 0,
@@ -107,24 +79,31 @@ const UsersListTable = () => {
             ),
           },
           {
-            accessorKey: "jobTitle", //hey a simple column for once
-            header: "Job Title",
-            size: 350,
+            accessorKey: "type",
+            header: "Job Type",
+            size: 150,
           },
+        ],
+      },
+      {
+        id: "additionalInfo",
+        header: "Additional Info",
+        columns: [
           {
-            accessorFn: (row) => new Date(row.startDate), //convert to Date for sorting and filtering
-            id: "startDate",
-            header: "Start Date",
+            accessorFn: (row) => new Date(row.createdAt), // convert to Date for sorting and filtering
+            id: "createdAt",
+            header: "Created At",
             filterVariant: "date",
             filterFn: "lessThan",
             sortingFn: "datetime",
-            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(), //render Date as a string
-            Header: ({ column }) => <em>{column.columnDef.header}</em>, //custom header markup
-            muiFilterTextFieldProps: {
-              sx: {
-                minWidth: "250px",
-              },
-            },
+            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(), // render Date as a string
+          },
+          {
+            accessorKey: "contactEmail",
+            enableClickToCopy: true,
+            filterVariant: "autocomplete",
+            header: "Contact Email",
+            size: 300,
           },
         ],
       },
@@ -134,7 +113,7 @@ const UsersListTable = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data,
+    data: jobData,
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -143,7 +122,6 @@ const UsersListTable = () => {
     enableRowActions: true,
     enableRowSelection: true,
     initialState: {
-      // showColumnFilters: true,
       showGlobalFilter: true,
       columnPinning: {
         left: ["mrt-row-expand", "mrt-row-select"],
@@ -158,7 +136,7 @@ const UsersListTable = () => {
     },
     muiPaginationProps: {
       color: "secondary",
-      rowsPerPageOptions: [10, 20, 30],
+      rowsPerPageOptions: [5, 10, 20, 30],
       shape: "rounded",
       variant: "outlined",
     },
@@ -167,7 +145,7 @@ const UsersListTable = () => {
       <MenuItem
         key={0}
         onClick={() => {
-          // View profile logic...
+          // View job details logic...
           closeMenu();
         }}
         sx={{ m: 0 }}
@@ -175,7 +153,7 @@ const UsersListTable = () => {
         <ListItemIcon>
           <AccountCircle />
         </ListItemIcon>
-        View Profile
+        View Job Details
       </MenuItem>,
       <MenuItem
         key={1}
@@ -194,19 +172,13 @@ const UsersListTable = () => {
     renderTopToolbar: ({ table }) => {
       const handleDeactivate = () => {
         table.getSelectedRowModel().flatRows.map((row) => {
-          alert("deactivating " + row.getValue("name"));
+          alert("deactivating job " + row.getValue("title"));
         });
       };
 
       const handleActivate = () => {
         table.getSelectedRowModel().flatRows.map((row) => {
-          alert("activating " + row.getValue("name"));
-        });
-      };
-
-      const handleContact = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert("contact " + row.getValue("name"));
+          alert("activating job " + row.getValue("title"));
         });
       };
 
@@ -221,7 +193,6 @@ const UsersListTable = () => {
           })}
         >
           <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            {/* import MRT sub-components */}
             <MRT_GlobalFilterTextField table={table} />
             <MRT_ToggleFiltersButton table={table} />
           </Box>
@@ -243,14 +214,6 @@ const UsersListTable = () => {
               >
                 Activate
               </Button>
-              <Button
-                color="info"
-                disabled={!table.getIsSomeRowsSelected()}
-                onClick={handleContact}
-                variant="contained"
-              >
-                Contact
-              </Button>
             </Box>
           </Box>
         </Box>
@@ -261,4 +224,4 @@ const UsersListTable = () => {
   return <MaterialReactTable table={table} />;
 };
 
-export default UsersListTable;
+export default JobListTable;
