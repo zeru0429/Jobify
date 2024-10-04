@@ -8,6 +8,7 @@
     "test2": "npm run build && npm run start2"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.7",
