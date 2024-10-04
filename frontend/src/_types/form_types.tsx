@@ -14,6 +14,7 @@ export interface RegisterUserFormType {
   firstName: string;
   lastName: string;
   email: string;
+  role: "admin" | "super_admin";
   password: string;
   confirmPassword: string;
   createdBy: number;

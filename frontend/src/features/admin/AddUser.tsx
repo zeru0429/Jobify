@@ -8,6 +8,7 @@ import { useToast } from "../../context/ToastContext";
 import { useCreateUserMutation } from "../../services/user_service";
 import CustomInputField from "../../component/CustomInputField";
 import CustomPasswordInput from "../../component/CustomPasswordInput";
+import CustomDropdownField from "../../component/CustomDropDown";
 
 const AddUser = () => {
   const { setToastData } = useToast();
@@ -24,18 +25,18 @@ const AddUser = () => {
   const onSubmit: SubmitHandler<RegisterUserFormType> = async (data) => {
     try {
       data.createdBy = userData?.id;
-      console.log(data);
+
       const response: ResponseType = await createUser(data).unwrap();
       console.log(response);
       setToastData({
-        message: "login successful",
+        message: "user created successfully",
         success: true,
       });
     } catch (error: any) {
       const res: ErrorResponseType = error;
       setToastData({
         message: res.data.message,
-        success: res.data.success,
+        success: false,
       });
     }
   };
@@ -72,6 +73,7 @@ const AddUser = () => {
                 },
               })}
               error={errors.firstName}
+              iconPath="M12 2L3.5 6.5v5.8c0 4.7 3.2 9.3 8.5 10.7 5.3-1.4 8.5-6 8.5-10.7V6.5L12 2z"
             />
 
             {/* Last Name Field */}
@@ -88,6 +90,20 @@ const AddUser = () => {
               })}
               error={errors.lastName}
             />
+            <CustomDropdownField
+              id="role"
+              options={[
+                { value: "admin", label: "ADMIN" },
+                { value: "super_admin", label: "SUPER_ADMIN" },
+              ]}
+              placeholder="Select an option"
+              register={register("role", {
+                required: "This field is required",
+              })}
+              error={errors.role}
+              iconPath="M12 2L3.5 6.5v5.8c0 4.7 3.2 9.3 8.5 10.7 5.3-1.4 8.5-6 8.5-10.7V6.5L12 2z"
+            />
+
             {/* Password Field */}
             <CustomPasswordInput
               register={register}

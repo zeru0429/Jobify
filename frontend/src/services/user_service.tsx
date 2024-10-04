@@ -6,7 +6,7 @@ import { RegisterUserFormType } from "../_types/form_types";
 // Create API service
 export const userApi = createApi({
   reducerPath: "userApi",
-  baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/user/` }),
+  baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/api/user` }),
   tagTypes: ["User"], // Tag for refetching when data is updated
   endpoints: (builder) => ({
     createUser: builder.mutation<any, RegisterUserFormType>({

@@ -9,7 +9,7 @@ export const publicApi = createApi({
   endpoints: (builder) => ({
     login: builder.mutation<any, LoginFormType>({
       query: (body: LoginFormType) => ({
-        url: `/api/user/login`,
+        url: `/login`,
         method: "POST",
         data: body,
       }),

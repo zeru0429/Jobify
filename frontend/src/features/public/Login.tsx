@@ -32,14 +32,13 @@ function Login() {
   useEffect(() => {
     if (userData.token != null) {
       switch (userData.role) {
-        case "ADMIN":
+        case "admin":
           navigate("/admin");
           break;
-        case "SUPER_ADMIN":
+        case "super_admin":
           navigate("/admin");
           break;
         default:
-          navigate("/admin");
           break;
       }
     }
@@ -48,8 +47,7 @@ function Login() {
   const onSubmit: SubmitHandler<LoginFormType> = async (data) => {
     try {
       const response: LoginResponseType = await login(data).unwrap();
-      console.log(response);
-      localStorage.setItem("token", "JSON.stringify(response)");
+      localStorage.setItem("token", JSON.stringify({ token: response.token }));
       fetchData();
       setToastData({
         message: "login successful",

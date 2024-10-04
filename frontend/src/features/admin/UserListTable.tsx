@@ -16,52 +16,28 @@ import { Box, Button, ListItemIcon, MenuItem, lighten } from "@mui/material";
 import { AccountCircle, Send } from "@mui/icons-material";
 
 // Mock Data
-import { data } from "../../demo/demo_users"; // Ensure this matches your data structure
+import { UserListType } from "../../_types/user_table";
 
-export type UserListType = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  jobTitle: string;
-  salary: number;
-  startDate: string;
-  avatar: string;
+// Define user list table props type
+type UserListTableProps = {
+  users: UserListType[];
 };
 
-const UsersListTable = () => {
+const UsersListTable = ({ users }: UserListTableProps) => {
   const columns = useMemo<MRT_ColumnDef<UserListType>[]>(
     () => [
       {
-        id: "employee", //id used to define `group` column
+        id: "employee",
         header: "Employee",
         columns: [
           {
-            accessorFn: (row) => `${row.firstName} ${row.lastName}`, //accessorFn used to join multiple data into a single cell
-            id: "name", //id is still required when using accessorFn instead of accessorKey
+            accessorFn: (row) => `${row.firstName} ${row.lastName}`,
+            id: "name",
             header: "Name",
             size: 250,
-            Cell: ({ renderedCellValue, row }) => (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "1rem",
-                }}
-              >
-                <img
-                  alt="avatar"
-                  height={30}
-                  src={row.original.avatar}
-                  loading="lazy"
-                  style={{ borderRadius: "50%", width: "50px", height: "50px" }}
-                />
-                {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
-                <span>{renderedCellValue}</span>
-              </Box>
-            ),
           },
           {
-            accessorKey: "email", //accessorKey used to define `data` column. `id` gets set to accessorKey automatically
+            accessorKey: "email",
             enableClickToCopy: true,
             filterVariant: "autocomplete",
             header: "Email",
@@ -70,25 +46,21 @@ const UsersListTable = () => {
         ],
       },
       {
-        id: "id",
-        header: "Job Info",
+        id: "details",
+        header: "Details",
         columns: [
           {
-            accessorKey: "salary",
-            // filterVariant: 'range', //if not using filter modes feature, use this instead of filterFn
-            filterFn: "between",
-            header: "Salary",
+            accessorKey: "role",
+            header: "Role",
             size: 200,
-            //custom conditional format and styling
             Cell: ({ cell }) => (
               <Box
                 component="span"
                 sx={(theme) => ({
                   backgroundColor:
-                    cell.getValue<number>() < 50_000
+                    cell.getValue<String>() == "admin"
                       ? theme.palette.error.dark
-                      : cell.getValue<number>() >= 50_000 &&
-                        cell.getValue<number>() < 75_000
+                      : cell.getValue<String>() == "admin"
                       ? theme.palette.warning.dark
                       : theme.palette.success.dark,
                   borderRadius: "0.25rem",
@@ -107,24 +79,20 @@ const UsersListTable = () => {
             ),
           },
           {
-            accessorKey: "jobTitle", //hey a simple column for once
-            header: "Job Title",
-            size: 350,
+            accessorFn: (row) => new Date(row.createdAt),
+            id: "createdAt",
+            header: "Created At",
+            filterVariant: "date",
+            sortingFn: "datetime",
+            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(), // Render Date as string
           },
           {
-            accessorFn: (row) => new Date(row.startDate), //convert to Date for sorting and filtering
-            id: "startDate",
-            header: "Start Date",
+            accessorFn: (row) => new Date(row.updatedAt),
+            id: "updatedAt",
+            header: "Updated At",
             filterVariant: "date",
-            filterFn: "lessThan",
             sortingFn: "datetime",
-            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(), //render Date as a string
-            Header: ({ column }) => <em>{column.columnDef.header}</em>, //custom header markup
-            muiFilterTextFieldProps: {
-              sx: {
-                minWidth: "250px",
-              },
-            },
+            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(), // Render Date as string
           },
         ],
       },
@@ -134,7 +102,7 @@ const UsersListTable = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data,
+    data: users, // Assuming the users prop contains the data
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -143,7 +111,6 @@ const UsersListTable = () => {
     enableRowActions: true,
     enableRowSelection: true,
     initialState: {
-      // showColumnFilters: true,
       showGlobalFilter: true,
       columnPinning: {
         left: ["mrt-row-expand", "mrt-row-select"],
@@ -158,11 +125,10 @@ const UsersListTable = () => {
     },
     muiPaginationProps: {
       color: "secondary",
-      rowsPerPageOptions: [10, 20, 30],
+      rowsPerPageOptions: [5, 10, 20, 30],
       shape: "rounded",
       variant: "outlined",
     },
-
     renderRowActionMenuItems: ({ closeMenu }) => [
       <MenuItem
         key={0}
@@ -194,19 +160,19 @@ const UsersListTable = () => {
     renderTopToolbar: ({ table }) => {
       const handleDeactivate = () => {
         table.getSelectedRowModel().flatRows.map((row) => {
-          alert("deactivating " + row.getValue("name"));
+          alert("Deactivating " + row.getValue("name"));
         });
       };
 
       const handleActivate = () => {
         table.getSelectedRowModel().flatRows.map((row) => {
-          alert("activating " + row.getValue("name"));
+          alert("Activating " + row.getValue("name"));
         });
       };
 
       const handleContact = () => {
         table.getSelectedRowModel().flatRows.map((row) => {
-          alert("contact " + row.getValue("name"));
+          alert("Contacting " + row.getValue("name"));
         });
       };
 
@@ -221,7 +187,6 @@ const UsersListTable = () => {
           })}
         >
           <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            {/* import MRT sub-components */}
             <MRT_GlobalFilterTextField table={table} />
             <MRT_ToggleFiltersButton table={table} />
           </Box>
@@ -262,3 +227,10 @@ const UsersListTable = () => {
 };
 
 export default UsersListTable;
+
+/*
+
+ 
+
+
+ */
