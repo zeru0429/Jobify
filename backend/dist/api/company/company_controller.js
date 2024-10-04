@@ -7,12 +7,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import mongoose from "mongoose";
+import User from "../user/user_module.js";
 import Company from "./company_module.js"; // Adjust the path as needed
 const companyController = {
     // Create a new company
     createCompany: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const { name, logo, admin } = req.body;
+            const { name, admin } = req.body;
             // Check if all required fields are provided
             if (!name || !admin) {
                 return res.status(400).json({
@@ -20,10 +22,49 @@ const companyController = {
                     message: "Name and admin are required fields.",
                 });
             }
-            // Create and save the company
-            const company = new Company({ name, logo, admin });
+            console.log(admin);
+            // Check if the admin ID is valid
+            if (!mongoose.Types.ObjectId.isValid(admin)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid admin ID.",
+                });
+            }
+            //check if the name exist before
+            const companyExist = yield Company.findOne({ name });
+            if (companyExist) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Company already exists.",
+                });
+            }
+            // check if the file path exist
+            if (!req.filePath) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Logo file is required.",
+                });
+            }
+            var logoPath = req.filePath; // Get the path of the uploaded file
+            // Check if the file was uploaded
+            if (!logoPath) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Logo file is required.",
+                });
+            }
+            //check if the admin exist
+            const user = yield User.findById(admin);
+            if (!user) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Admin not found.",
+                });
+            }
+            // Create and save the company, using the logo path
+            const company = new Company({ name, logo: logoPath, admin });
             yield company.save();
-            res.status(201).json({
+            return res.status(201).json({
                 success: true,
                 message: "Company created successfully.",
                 data: company,

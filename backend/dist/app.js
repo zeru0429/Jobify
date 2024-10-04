@@ -1,8 +1,12 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 import { MONGO_URI, PORT } from "./config/secrete.js";
-import { isAuth } from "./middlewares/auth.js";
 const app = express();
 // middle ware
 const corsOptions = {
@@ -14,6 +18,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 import appRouter from "./router/index.js";
 import userController from "./api/user/user_controller.js";
 //public
@@ -21,7 +26,7 @@ app.post("/login", (req, res) => {
     userController.login(req, res);
 });
 //api
-app.use("/api", isAuth, appRouter);
+app.use("/api", appRouter);
 app.get("/", (req, res) => {
     res.send(`Express + TypeScript Server `);
 });
