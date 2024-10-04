@@ -1,11 +1,14 @@
+import mongoose from "mongoose";
+import User from "../user/user_module.js";
 import Company from "./company_module.js"; // Adjust the path as needed
 import { Request, Response } from "express";
+import { BASE_URL } from "../../config/secrete.js";
 
 const companyController = {
   // Create a new company
   createCompany: async (req: Request, res: Response) => {
     try {
-      const { name, logo, admin } = req.body;
+      const { name, admin } = req.body;
 
       // Check if all required fields are provided
       if (!name || !admin) {
@@ -14,12 +17,53 @@ const companyController = {
           message: "Name and admin are required fields.",
         });
       }
+      console.log(admin);
 
-      // Create and save the company
-      const company = new Company({ name, logo, admin });
+      // Check if the admin ID is valid
+      if (!mongoose.Types.ObjectId.isValid(admin)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid admin ID.",
+        });
+      }
+      //check if the name exist before
+      const companyExist = await Company.findOne({ name });
+      if (companyExist) {
+        return res.status(400).json({
+          success: false,
+          message: "Company already exists.",
+        });
+      }
+      // check if the file path exist
+      if (!req.filePath) {
+        return res.status(400).json({
+          success: false,
+          message: "Logo file is required.",
+        });
+      }
+      var logoPath = req.filePath; // Get the path of the uploaded file
+      // Check if the file was uploaded
+      if (!logoPath) {
+        return res.status(400).json({
+          success: false,
+          message: "Logo file is required.",
+        });
+      }
+
+      //check if the admin exist
+      const user = await User.findById(admin);
+      if (!user) {
+        return res.status(400).json({
+          success: false,
+          message: "Admin not found.",
+        });
+      }
+
+      // Create and save the company, using the logo path
+      const company = new Company({ name, logo: logoPath, admin });
       await company.save();
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: "Company created successfully.",
         data: company,
@@ -32,7 +76,6 @@ const companyController = {
       });
     }
   },
-
   // Get all companies
   getAllCompanies: async (req: Request, res: Response) => {
     try {
