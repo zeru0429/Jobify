@@ -21,10 +21,11 @@ export const AdminLayout = () => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  if (userData != null) {
+
+  if (userData == null) {
     return <Login />;
   }
-  if (isAdmin) {
+  if (!isAdmin) {
     return (
       <>
         <Box
