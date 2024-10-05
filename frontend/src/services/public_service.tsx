@@ -1,5 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react"; // Ensure you're importing from the correct path
-import { axiosBaseQuery } from "../util/axios_base_query";
+import { axiosBaseQuery } from "../util/axios/axios_base_query";
 import { BASE_URL } from "../util/secrete";
 import { LoginFormType } from "../_types/form_types";
 

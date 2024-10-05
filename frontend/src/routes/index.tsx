@@ -14,7 +14,6 @@ import DashBoard from "../features/admin/DashBoard";
 import CompanyList from "../features/company/Company_list";
 import JobList from "../features/job/JobList";
 import ApplicantsList from "../features/applicants/ApplicantsList";
-import AddCompany from "../features/company/AddCompany";
 import AddJob from "../features/job/AddJob";
 import AddApplication from "../features/applicants/AddApplicant";
 export const router = createBrowserRouter(
@@ -39,7 +38,6 @@ export const router = createBrowserRouter(
         />
         <Route path="/admin/user" element={<UserList />} />
         <Route path="/admin/company" element={<CompanyList />} />
-        <Route path="/admin/add-company" element={<AddCompany />} />
 
         <Route path="/admin/job" element={<JobList />} />
         <Route path="/admin/add-job" element={<AddJob />} />

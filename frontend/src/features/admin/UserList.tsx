@@ -1,7 +1,7 @@
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import UsersListTable from "./UserListTable";
-import { Box, Button, Dialog } from "@mui/material";
+import { Box, Dialog } from "@mui/material";
 import { useGetAllUsersQuery } from "../../services/user_service";
 import { useState } from "react";
 import AddUser from "./forms/AddUser";

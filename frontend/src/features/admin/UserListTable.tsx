@@ -204,8 +204,6 @@ const UsersListTable = ({ users }: UserListTableProps) => {
     ],
 
     renderTopToolbar: ({ table }) => {
-      console.log(table);
-
       return (
         <Box
           sx={(theme) => ({

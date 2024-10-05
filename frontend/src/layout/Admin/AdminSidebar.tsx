@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import List from "@mui/material/List";
+import { useAuth } from "../../context/AuthContext";
 
 const AdminSidebar = () => {
+  const { isSuperAdmin } = useAuth();
   const [currentView, setCurrentView] = useState("");
   const activeClass =
-    "bg-[#002A47] text-white dark:bg-[#005577] dark:text-white"; // Active class for dark mode
+    "bg-[#002A47] text-white dark:bg-[#005577] dark:text-white";
 
   const handleToggleView = (view: string) => {
     setCurrentView(currentView === view ? "" : view);
@@ -50,38 +52,40 @@ const AdminSidebar = () => {
               </Link>
             </li>
             {/* Admin */}
-            <li className="hs-accordion" id="users-accordion">
-              <Link to="/admin/user" onClick={() => handleToggleView("user")}>
-                <button
-                  type="button"
-                  className={`${buttonClass} ${
-                    currentView === "user" ? activeClass : ""
-                  }`}
-                  aria-expanded="true"
-                  aria-controls="users-accordion"
-                >
-                  {/* SVG for Admin */}
-                  <svg
-                    className="size-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+            {isSuperAdmin && (
+              <li className="hs-accordion" id="users-accordion">
+                <Link to="/admin/user" onClick={() => handleToggleView("user")}>
+                  <button
+                    type="button"
+                    className={`${buttonClass} ${
+                      currentView === "user" ? activeClass : ""
+                    }`}
+                    aria-expanded="true"
+                    aria-controls="users-accordion"
                   >
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
-                  Admin
-                </button>
-              </Link>
-            </li>
+                    {/* SVG for Admin */}
+                    <svg
+                      className="size-4"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    Admin
+                  </button>
+                </Link>
+              </li>
+            )}
             {/* Company */}
             <li className="hs-accordion" id="company-accordion">
               <Link

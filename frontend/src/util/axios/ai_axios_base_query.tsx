@@ -1,4 +1,5 @@
-import AiAxiosInstance from "./axios";
+import AiAxiosInstance from "./ai_axios";
+
 const AiAxiosBaseQuery =
   ({ baseUrl }: { baseUrl?: string } = {}) =>
   async ({

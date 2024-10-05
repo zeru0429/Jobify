@@ -19,11 +19,10 @@ export interface RegisterUserFormType {
   confirmPassword: string;
   createdBy: number;
 }
-
 export interface RegisterCompanyFormType {
+  adminId?: string;
   name: string;
-  logo?: string;
-  adminId?: number;
+  logo?: File | null;
 }
 
 export interface RegisterJobFormType {

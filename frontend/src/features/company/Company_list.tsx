@@ -1,33 +1,49 @@
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { Box, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Box, Dialog } from "@mui/material";
 import CompanyListTable from "./CompanyListTable";
+import RectangularButton from "../../component/ui/RectangularButton";
+import AddCompany from "./form/AddCompany";
+import { useState } from "react";
 
 const CompanyList = () => {
-  const navigator = useNavigate();
+  const [open, setOpen] = useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const handleClick = () => {
-    navigator("/admin/add-company");
+    handleClickOpen();
   };
   return (
     <div>
-      <Box>
-        <Button
-          className="dark:text-white dark:bg-slate-600 text-white bg-[#011e32] "
-          onClick={handleClick}
-          variant="contained"
-        >
+      <Box
+        sx={{
+          width: "200px",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "end",
+          placeItems: "end",
+        }}
+      >
+        <RectangularButton type="primary" onClick={handleClick}>
           Add Company
-        </Button>
-        <br />
-        <br />
-        <br />
+        </RectangularButton>
       </Box>
+      <br />
+
       <Box>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <CompanyListTable />
         </LocalizationProvider>
       </Box>
+      {/* Dialog for Adding User */}
+      <Dialog open={open}>
+        <AddCompany handleClose={handleClose} />
+      </Dialog>
     </div>
   );
 };

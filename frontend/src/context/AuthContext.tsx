@@ -6,21 +6,18 @@ import { AuthContextType, UserDataType } from "../_types/context_type";
 const AuthContext = createContext<AuthContextType | null>(null);
 
 // // prepare auth provider
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [userData, setUserData] = useState<UserDataType>({
     firstName: "",
     id: 0,
     role: "",
-    token: null
+    token: null,
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isEmployee, setIsEmployee] = useState(false);
-  const [isDH, setIsDH] = useState(false);
-  const [isLS, setIsLS] = useState(false);
-  const [isFinance, setIsFinance] = useState(false);
-  const [isGM, setIsGM] = useState(false);
-  const [isStoreKeeper, setIsStoreKeeper] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -32,43 +29,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loggedInUser.then((response) => {
       if (response != null && response.token != null) {
         setIsLoggedIn(true);
-        if (response.role === "ADMIN") {
+        if (response.role === "admin") {
           setIsAdmin(true);
-        } else if (response.role === "EMPLOYEE") {
-          setIsEmployee(true);
-        } else if (response.role === "DEPARTMENT_HEAD") {
-          setIsDH(true);
-        } else if (response.role === "LOGESTIC_SUPERVISER") {
-          setIsLS(true);
-        } else if (response.role === "FINANCE") {
-          setIsFinance(true);
-        } else if (response.role === "GENERAL_MANAGER") {
-          setIsGM(true);
-        } else if (response.role === "STORE_KEEPER") {
-          setIsStoreKeeper(true);
+        } else if (response.role === "super_admin") {
+          setIsSuperAdmin(true);
         }
         setUserData(response);
       }
-
     });
   };
 
   const values = {
     isAdmin,
-    isDH,
-    isLS,
-    isFinance,
-    isGM,
-    isEmployee,
-    isStoreKeeper,
+    isSuperAdmin,
     userData,
     setUserData,
+    setIsSuperAdmin,
     setIsAdmin,
-    setIsDH,
-    setIsFinance,
-    setIsGM,
-    setIsLS,
-    setIsStoreKeeper,
     fetchData,
     setIsLoggedIn,
     isLoggedIn,
@@ -76,7 +53,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
 };
-
 
 // useAuth
 export const useAuth = () => {
@@ -86,4 +62,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

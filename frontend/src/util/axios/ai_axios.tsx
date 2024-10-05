@@ -3,24 +3,22 @@ import axios, {
   AxiosHeaders,
   AxiosResponse,
 } from "axios";
-import { getToken } from "./getToken";
-import { BASE_URL } from "./secrete";
+import { API_KEY, GEMINI_BASE_URL } from "../secrete";
 
-const instance = axios.create({
-  baseURL: BASE_URL,
+const AiAxiosInstance = axios.create({
+  baseURL: GEMINI_BASE_URL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Set the token in the request headers
-instance.interceptors.request.use(
+// Set the API key in the request headers
+AiAxiosInstance.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    const token = await getToken();
-    if (token) {
+    if (API_KEY) {
       const headers = AxiosHeaders.from(config.headers); // Create an AxiosHeaders instance
-      headers.set("Authorization", `Bearer ${token}`); // Set the Authorization header
+      headers.set("key", API_KEY); // Set the API key header
       config.headers = headers; // Assign the modified headers back to config
     }
     return config; // Return the modified config
@@ -29,7 +27,8 @@ instance.interceptors.request.use(
     return Promise.reject(error); // Handle the error
   }
 );
-instance.interceptors.response.use(
+
+AiAxiosInstance.interceptors.response.use(
   (response: AxiosResponse) => {
     return response.data;
   },
@@ -38,4 +37,4 @@ instance.interceptors.response.use(
   }
 );
 
-export default instance;
+export default AiAxiosInstance;

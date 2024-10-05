@@ -1,19 +1,18 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { axiosBaseQuery } from "../util/axios_base_query";
+import { axiosBaseQuery } from "../util/axios/axios_base_query";
 import { BASE_URL } from "../util/secrete";
-import { RegisterCompanyFormType } from "../_types/form_types";
 
 // Create API service
 export const companyApi = createApi({
   reducerPath: "companyApi",
-  baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/company/` }),
+  baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/api/company` }),
   tagTypes: ["company"],
   endpoints: (builder) => ({
-    createCompany: builder.mutation<any, RegisterCompanyFormType>({
-      query: (body: RegisterCompanyFormType) => ({
+    createCompany: builder.mutation<any, FormData>({
+      query: (formData) => ({
         url: "/",
         method: "POST",
-        data: body,
+        body: formData,
       }),
       invalidatesTags: ["company"],
     }),
