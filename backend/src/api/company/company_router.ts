@@ -1,14 +1,13 @@
 import express from "express";
 import { Request, Response } from "express";
 import companyController from "./company_controller.js";
-import uploadOriginal from "../../config/multer.js";
+import { upload } from "../../config/multer.js";
 const companyRouter = express.Router();
-const uploadDestination = "dist/uploads/company-logo";
 
 // Create a new company
 companyRouter.post(
   "/",
-  uploadOriginal(uploadDestination),
+  upload.single("file"),
   (req: Request, res: Response) => {
     companyController.createCompany(req, res);
   }

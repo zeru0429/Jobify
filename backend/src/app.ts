@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from "express";
+import { v2 as cloudinary } from "cloudinary";
 import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
 import mongoose from "mongoose";
@@ -9,7 +10,13 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-import { MONGO_URI, PORT } from "./config/secrete.js";
+import {
+  CLOUD_API_KEY,
+  CLOUD_API_SECRET,
+  CLOUD_NAME,
+  MONGO_URI,
+  PORT,
+} from "./config/secrete.js";
 import cacheMiddleware from "./config/catch.js";
 const app: Express = express();
 
@@ -47,7 +54,7 @@ app.use(limiter);
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(errorHandlerMiddleware);
 app.use(
   helmet({
     contentSecurityPolicy: csp,
@@ -62,9 +69,16 @@ app.use(
     xssFilter: false,
   })
 );
+cloudinary.config({
+  cloud_name: CLOUD_NAME,
+  api_key: CLOUD_API_KEY,
+  api_secret: CLOUD_API_SECRET,
+});
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 import appRouter from "./router/index.js";
 import userController from "./api/user/user_controller.js";
+import errorHandlerMiddleware from "./config/errorHandlerMiddleware.js";
 
 //public
 app.post("/login", (req: Request, res: Response) => {

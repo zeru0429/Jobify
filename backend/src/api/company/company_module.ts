@@ -3,7 +3,8 @@ import { CompanyType } from "../../types/company_type.js";
 
 const companySchema: Schema<CompanyType> = new Schema({
   name: { type: String, required: true, unique: true },
-  logo: { type: String },
+  avatar: { type: String },
+  avatarPublicId: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   admin: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

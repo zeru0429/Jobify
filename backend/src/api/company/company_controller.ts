@@ -1,20 +1,26 @@
 import mongoose from "mongoose";
 import User from "../user/user_module.js";
-import Company from "./company_module.js"; // Adjust the path as needed
+import Company from "./company_module.js";
 import { Request, Response } from "express";
-import { BASE_URL } from "../../config/secrete.js";
-
+import { v2 as cloudinary } from "cloudinary";
+import { formatImage } from "../../config/multer.js";
 const companyController = {
   // Create a new company
   createCompany: async (req: Request, res: Response) => {
     try {
       const { name, admin } = req.body;
-
       // Check if all required fields are provided
       if (!name || !admin) {
         return res.status(400).json({
           success: false,
           message: "Name and admin are required fields.",
+        });
+      }
+      // check if the file path exist
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "Logo file is required.",
         });
       }
 
@@ -33,19 +39,12 @@ const companyController = {
           message: "Company already exists.",
         });
       }
-      // check if the file path exist
-      if (!req.filePath) {
+      // format image
+      const file = formatImage(req.file);
+      if (!file) {
         return res.status(400).json({
           success: false,
-          message: "Logo file is required.",
-        });
-      }
-      var logoPath = req.filePath; // Get the path of the uploaded file
-      // Check if the file was uploaded
-      if (!logoPath) {
-        return res.status(400).json({
-          success: false,
-          message: "Logo file is required.",
+          message: "Invalid image file.",
         });
       }
 
@@ -57,9 +56,11 @@ const companyController = {
           message: "Admin not found.",
         });
       }
-
-      // Create and save the company, using the logo path
-      const company = new Company({ name, logo: logoPath, admin });
+      // Upload the logo to Cloudinary
+      const cloudinaryResponse = await cloudinary.uploader.upload(file);
+      const company = new Company({ name, admin });
+      company.avatar = cloudinaryResponse.secure_url;
+      company.avatarPublicId = cloudinaryResponse.public_id;
       await company.save();
 
       return res.status(201).json({
@@ -120,7 +121,7 @@ const companyController = {
   // Update a company by ID
   updateCompany: async (req: Request, res: Response) => {
     try {
-      const { name, logo } = req.body;
+      const { name } = req.body;
 
       // Check if company exists
       const company = await Company.findById(req.params.id);
@@ -133,8 +134,7 @@ const companyController = {
 
       // Update company fields
       company.name = name !== undefined ? name : company.name;
-      company.logo = logo !== undefined ? logo : company.logo;
-      company.updatedAt = new Date(); // Create a new Date object
+      company.updatedAt = new Date();
 
       await company.save();
 
