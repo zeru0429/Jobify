@@ -12,7 +12,8 @@ export const companyApi = createApi({
       query: (formData) => ({
         url: "/",
         method: "POST",
-        body: formData,
+
+        data: formData,
       }),
       invalidatesTags: ["company"],
     }),

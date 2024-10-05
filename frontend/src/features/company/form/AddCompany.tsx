@@ -26,11 +26,9 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
 
   const onSubmit: SubmitHandler<RegisterCompanyFormType> = async (data) => {
     try {
-      data.adminId = userData?.id.toString();
-
       // Create a FormData object for file uploads
       const formData = new FormData();
-      formData.append("admin", data.adminId);
+      formData.append("admin", userData?.id.toString() || "");
       formData.append("name", data.name);
 
       // Append logo if present
@@ -44,6 +42,7 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
         message: "Company created successfully",
         success: true,
       });
+      handleClose();
     } catch (error: any) {
       const res: ErrorResponseType = error;
       setToastData({
