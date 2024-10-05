@@ -5,10 +5,10 @@ export interface JobType extends Document {
   type: string;
   description: string;
   location: string;
-  createdAt: Date; // Date of creation
-  salary: number; // Salary for the job
-  contactEmail: string; // Email for contact
-  createdBy: Types.ObjectId; // Reference to the User who created the job
-  company: Types.ObjectId; // Reference to the Company (changed to ObjectId)
-  updatedAt: Date; // Date of last update
+  createdAt: Date;
+  salary: number;
+  contactEmail: string;
+  createdBy: Types.ObjectId;
+  company: Types.ObjectId;
+  updatedAt: Date;
 }

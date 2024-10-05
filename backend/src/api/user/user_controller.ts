@@ -141,20 +141,20 @@ const userController = {
   // Change Password
   resetPassword: async (req: Request, res: Response) => {
     try {
-      const { confirmPassword, newPassword } = req.body;
-      console.log(newPassword);
-      // check if the user id is valid object
+      const { confirmPassword, password } = req.body;
+      const trimmedConfirmPassword = confirmPassword.trim();
+      const trimmedPassword = password.trim();
+      if (trimmedConfirmPassword !== trimmedPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "Passwords do not match",
+        });
+      }
+      // / check if the user id is valid object
       if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
         return res.status(400).json({
           success: false,
           message: "Invalid user ID",
-        });
-      }
-      // check config and new password match
-      if (confirmPassword !== newPassword) {
-        return res.status(400).json({
-          success: false,
-          message: "Passwords do not match",
         });
       }
       // Check if the user exists
@@ -169,18 +169,17 @@ const userController = {
       // Validate new password
       const passwordRegex =
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]).{8,}$/;
-      console.log(!passwordRegex.test(newPassword));
-
-      // if (!passwordRegex.test(newPassword)) {
-      //   return res.status(400).json({
-      //     success: false,
-      //     message: "New password does not meet requirements",
-      //   });
-      // }
+      if (!passwordRegex.test(password)) {
+        return res.status(400).json({
+          success: false,
+          message: "New password does not meet requirements",
+        });
+      }
 
       // Hash new password and update
       const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(newPassword, salt);
+      user.password = await bcrypt.hash(password, salt);
+
       await user.save();
 
       res.status(200).json({
@@ -247,6 +246,21 @@ const userController = {
   // Delete User
   deleteUser: async (req: Request, res: Response) => {
     try {
+      //check if the id is valid object
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid user ID",
+        });
+      }
+      // check if user exist
+      const isUserExist = await User.findById(req.params.id);
+      if (!isUserExist) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
       const user = await User.findByIdAndDelete(req.params.id);
       if (!user) {
         return res.status(404).json({

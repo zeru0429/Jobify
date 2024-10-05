@@ -17,7 +17,6 @@ const companyController = {
           message: "Name and admin are required fields.",
         });
       }
-      console.log(admin);
 
       // Check if the admin ID is valid
       if (!mongoose.Types.ObjectId.isValid(admin)) {

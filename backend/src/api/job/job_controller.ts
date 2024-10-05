@@ -1,11 +1,13 @@
+import mongoose from "mongoose";
 import Job from "./job_module.js";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import User from "../user/user_module.js";
+import Company from "../company/company_module.js";
 
 const jobController = {
-  createJob: async (req: Request, res: Response) => {
+  createJob: async (req: Request, res: Response, next: NextFunction) => {
     try {
       req.body.createdBy = req.user?.id;
-
       if (
         !req.body.title ||
         !req.body.type ||
@@ -14,8 +16,6 @@ const jobController = {
         !req.body.salary ||
         !req.body.company ||
         !req.body.contactEmail ||
-        !req.body.contactName ||
-        !req.body.contactNumber ||
         !req.body.createdBy
       ) {
         return res.status(400).json({
@@ -23,8 +23,38 @@ const jobController = {
           message: "All fields are required",
         });
       }
-
+      // check company is valid object id
+      if (!mongoose.Types.ObjectId.isValid(req.body.company)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid company ID",
+        });
+      }
+      //check createdBy id is Valid object
+      if (!mongoose.Types.ObjectId.isValid(req.body.createdBy)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid user ID",
+        });
+      }
+      // check user exist this id
+      const user = await User.findById(req.body.createdBy);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+      // check if company  exist
+      const company = await Company.findById(req.body.company);
+      if (!company) {
+        return res.status(404).json({
+          success: false,
+          message: "Company not found",
+        });
+      }
       const job = new Job(req.body);
+
       await job.save();
       res.status(201).json({
         success: true,
@@ -55,8 +85,15 @@ const jobController = {
     }
   },
 
-  getSingleJob: async (req: Request, res: Response) => {
+  getSingleJob: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      //check if the id is valid object id
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid job ID",
+        });
+      }
       const job = await Job.findById(req.params.id);
       if (!job) {
         return res.status(404).json({
@@ -78,6 +115,53 @@ const jobController = {
 
   updateJob: async (req: Request, res: Response) => {
     try {
+      // check if all body fields are provided
+      if (
+        !req.body.title ||
+        !req.body.type ||
+        !req.body.description ||
+        !req.body.location ||
+        !req.body.salary ||
+        !req.body.company ||
+        !req.body.contactEmail ||
+        !req.body.createdBy
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "All fields are required",
+        });
+      }
+
+      // check company is valid object id
+      if (!mongoose.Types.ObjectId.isValid(req.body.company)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid company ID",
+        });
+      }
+      //check createdBy id is Valid object
+      if (!mongoose.Types.ObjectId.isValid(req.body.createdBy)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid user ID",
+        });
+      }
+      // check user exist this id
+      const user = await User.findById(req.body.createdBy);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+      // check if company  exist
+      const company = await Company.findById(req.body.company);
+      if (!company) {
+        return res.status(404).json({
+          success: false,
+          message: "Company not found",
+        });
+      }
       const job = await Job.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
