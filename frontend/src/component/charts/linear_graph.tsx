@@ -1,11 +1,10 @@
 import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
-import { dataset, valueFormatter } from "../../demo/weather";
 
 const chartSetting = {
   yAxis: [
     {
-      label: "rainfall (mm)",
+      label: "Number of Users",
     },
   ],
   width: 500,
@@ -17,17 +16,23 @@ const chartSetting = {
   },
 };
 
-export default function BarsDataset() {
+export default function BarsDataset({
+  dataset,
+  dataKeys,
+}: {
+  dataset: {
+    [key: string]: number | string;
+  }[];
+  dataKeys: { key: string; label: string }[];
+}) {
   return (
     <BarChart
       dataset={dataset}
-      xAxis={[{ scaleType: "band", dataKey: "month" }]}
-      series={[
-        { dataKey: "london", label: "London", valueFormatter },
-        { dataKey: "paris", label: "Paris", valueFormatter },
-        { dataKey: "newYork", label: "New York", valueFormatter },
-        { dataKey: "seoul", label: "Seoul", valueFormatter },
-      ]}
+      xAxis={[{ scaleType: "band", dataKey: "company" }]}
+      series={dataKeys.map(({ key, label }) => ({
+        dataKey: key,
+        label: label,
+      }))}
       {...chartSetting}
     />
   );

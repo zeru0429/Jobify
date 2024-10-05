@@ -1,15 +1,24 @@
 import { PieChart, pieArcLabelClasses } from "@mui/x-charts/PieChart";
-import { desktopOS, valueFormatter } from "../../demo/webUsageStats";
+import { valueFormatter } from "../../demo/pi_chart_static_demo_data";
 
-export default function PieArcLabel() {
+export default function PieArcLabel({
+  statistic,
+}: {
+  statistic: { label: string; value: number }[];
+}) {
   return (
     <PieChart
       series={[
         {
+          data: statistic.map((item) => ({
+            id: item.label,
+            value: item.value,
+            label: item.label,
+          })),
           arcLabel: (item) => `${item.value}%`,
           arcLabelMinAngle: 35,
           arcLabelRadius: "60%",
-          ...data,
+          valueFormatter, // Apply the custom value formatter
         },
       ]}
       sx={{
@@ -25,9 +34,4 @@ export default function PieArcLabel() {
 const size = {
   width: 400,
   height: 200,
-};
-
-const data = {
-  data: desktopOS,
-  valueFormatter,
 };

@@ -1,15 +1,15 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { GEMINI_BASE_URL } from "../util/secrete";
-import AiAxiosBaseQuery from "../util/axios/ai_axios_base_query";
-import { AiApiRequestType } from "../_types/ai_request_type";
+import { BASE_URL } from "../util/secrete";
+import { axiosBaseQuery } from "../util/axios/axios_base_query";
+import { RegisterJobFormType } from "../_types/form_types";
 
 export const AiApi = createApi({
   reducerPath: "AiApi",
-  baseQuery: AiAxiosBaseQuery({ baseUrl: GEMINI_BASE_URL }),
+  baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/api/ai` }),
   endpoints: (builder) => ({
-    requestGemini: builder.mutation<any, AiApiRequestType>({
-      query: (body: AiApiRequestType) => ({
-        url: `/`,
+    requestGemini: builder.mutation<any, RegisterJobFormType>({
+      query: (body: RegisterJobFormType) => ({
+        url: `/generate-job-description`,
         method: "POST",
         data: body,
       }),

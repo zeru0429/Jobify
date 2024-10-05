@@ -5,6 +5,7 @@ import { userApi } from "../services/user_service";
 import { companyApi } from "../services/company_service";
 import { jobApi } from "../services/job_service";
 import { applicantApi } from "../services/applicants_service";
+import { AiApi } from "../services/ai_service";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     [companyApi.reducerPath]: companyApi.reducer,
     [jobApi.reducerPath]: jobApi.reducer,
     [applicantApi.reducerPath]: applicantApi.reducer,
+    [AiApi.reducerPath]: AiApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -20,7 +22,8 @@ export const store = configureStore({
       .concat(userApi.middleware)
       .concat(companyApi.middleware)
       .concat(jobApi.middleware)
-      .concat(applicantApi.middleware),
+      .concat(applicantApi.middleware)
+      .concat(AiApi.middleware),
 });
 setupListeners(store.dispatch);
 

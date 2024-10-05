@@ -3,7 +3,7 @@ import { BarChart } from "@mui/x-charts/BarChart";
 
 const otherSetting = {
   height: 300,
-  yAxis: [{ label: "rainfall (mm)" }],
+  yAxis: [{ label: "Number of Applicants" }],
   grid: { horizontal: true },
   sx: {
     [`& .${axisClasses.left} .${axisClasses.label}`]: {
@@ -12,96 +12,61 @@ const otherSetting = {
   },
 };
 
+// New dataset representing the number of applicants per month
 const dataset = [
   {
-    london: 59,
-    paris: 57,
-    newYork: 86,
-    seoul: 21,
     month: "January",
+    applicants: 120,
   },
   {
-    london: 50,
-    paris: 52,
-    newYork: 78,
-    seoul: 28,
     month: "February",
+    applicants: 150,
   },
   {
-    london: 47,
-    paris: 53,
-    newYork: 106,
-    seoul: 41,
     month: "March",
+    applicants: 175,
   },
   {
-    london: 54,
-    paris: 56,
-    newYork: 92,
-    seoul: 73,
     month: "April",
+    applicants: 200,
   },
   {
-    london: 57,
-    paris: 69,
-    newYork: 92,
-    seoul: 99,
     month: "May",
+    applicants: 225,
   },
   {
-    london: 60,
-    paris: 63,
-    newYork: 103,
-    seoul: 144,
     month: "June",
+    applicants: 250,
   },
   {
-    london: 59,
-    paris: 60,
-    newYork: 105,
-    seoul: 319,
     month: "July",
+    applicants: 300,
   },
   {
-    london: 65,
-    paris: 60,
-    newYork: 106,
-    seoul: 249,
     month: "August",
+    applicants: 280,
   },
   {
-    london: 51,
-    paris: 51,
-    newYork: 95,
-    seoul: 131,
     month: "September",
+    applicants: 240,
   },
   {
-    london: 60,
-    paris: 65,
-    newYork: 97,
-    seoul: 55,
     month: "October",
+    applicants: 260,
   },
   {
-    london: 67,
-    paris: 64,
-    newYork: 76,
-    seoul: 48,
     month: "November",
+    applicants: 300,
   },
   {
-    london: 61,
-    paris: 70,
-    newYork: 103,
-    seoul: 25,
     month: "December",
+    applicants: 230,
   },
 ];
 
-const valueFormatter = (value: number | null) => `${value}mm`;
+const valueFormatter = (value: number | null) => `${value} applicants`;
 
-export default function FormatterDemoNoSnap() {
+export default function ApplicantStats() {
   return (
     <BarChart
       dataset={dataset}
@@ -115,7 +80,13 @@ export default function FormatterDemoNoSnap() {
               : `${month} 2023`,
         },
       ]}
-      series={[{ dataKey: "seoul", label: "Seoul rainfall", valueFormatter }]}
+      series={[
+        {
+          dataKey: "applicants",
+          label: "Number of Applicants",
+          valueFormatter,
+        },
+      ]}
       {...otherSetting}
     />
   );
