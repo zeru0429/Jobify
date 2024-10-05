@@ -5,9 +5,19 @@ import CompanyListTable from "./CompanyListTable";
 import RectangularButton from "../../component/ui/RectangularButton";
 import AddCompany from "./form/AddCompany";
 import { useState } from "react";
+import { useGetAllCompanyQuery } from "../../services/company_service";
+import Loader from "../../component/Loading";
 
 const CompanyList = () => {
   const [open, setOpen] = useState(false);
+  const {
+    isError,
+    isLoading,
+    isSuccess,
+    data: companies,
+    error,
+  } = useGetAllCompanyQuery("companyApi");
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -34,12 +44,20 @@ const CompanyList = () => {
         </RectangularButton>
       </Box>
       <br />
+      {isError && <Box>Error occurred {error.toString()}</Box>}
+      {isLoading && (
+        <Box>
+          <Loader />
+        </Box>
+      )}
+      {isSuccess && (
+        <Box>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <CompanyListTable companies={companies} />
+          </LocalizationProvider>
+        </Box>
+      )}
 
-      <Box>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <CompanyListTable />
-        </LocalizationProvider>
-      </Box>
       {/* Dialog for Adding User */}
       <Dialog open={open}>
         <AddCompany handleClose={handleClose} />

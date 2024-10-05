@@ -14,19 +14,22 @@ import { Box, ListItemIcon, MenuItem, lighten } from "@mui/material";
 
 // Icons Imports
 import { AccountCircle, Send } from "@mui/icons-material";
-import { companyData } from "../../demo/demo_company";
 
 // Mock Data
 
 export type CompanyListType = {
+  _id: string;
   name: string;
   logo: string;
-  createdAt: Date;
-  updatedAt: Date;
   admin: string;
+  createdAt: string; // Change to string to match the actual data
+  updatedAt: string; // Change to string to match the actual data
 };
+interface CompanyListTableProps {
+  companies: CompanyListType[];
+}
 
-const CompanyListTable = () => {
+const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
   const columns = useMemo<MRT_ColumnDef<CompanyListType>[]>(
     () => [
       {
@@ -42,13 +45,21 @@ const CompanyListTable = () => {
             accessorKey: "logo",
             header: "Logo",
             size: 100,
-            Cell: ({ cell }) => (
-              <img
-                src={cell.getValue<string>()}
-                alt="Company Logo"
-                style={{ width: "50px", height: "50px", borderRadius: "4px" }}
-              />
-            ),
+            Cell: ({ cell }) => {
+              const logoUrl = cell.getValue<string>();
+              const isValidUrl = logoUrl && !logoUrl.includes("undefined");
+              return (
+                <img
+                  src={
+                    isValidUrl
+                      ? logoUrl
+                      : "https://via.placeholder.com/50x50?text=No+Logo"
+                  }
+                  alt="Company Logo"
+                  style={{ width: "50px", height: "50px", borderRadius: "4px" }}
+                />
+              );
+            },
           },
         ],
       },
@@ -57,13 +68,12 @@ const CompanyListTable = () => {
         header: "Additional Info",
         columns: [
           {
-            accessorFn: (row) => new Date(row.createdAt), // Convert to Date for sorting and filtering
-            id: "createdAt",
+            accessorKey: "createdAt",
             header: "Created At",
             filterVariant: "date",
-            filterFn: "lessThan",
             sortingFn: "datetime",
-            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(), // Render Date as a string
+            Cell: ({ cell }) =>
+              new Date(cell.getValue<string>()).toLocaleDateString(),
           },
           {
             accessorKey: "admin",
@@ -78,7 +88,7 @@ const CompanyListTable = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data: companyData,
+    data: companies,
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
