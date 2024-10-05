@@ -3,11 +3,12 @@ import {
   RegisterUserFormType,
   ErrorResponseType,
 } from "../../../_types/form_types";
-import CustomDropdownField from "../../../component/CustomDropDown";
-import CustomInputField from "../../../component/CustomInputField";
+import CustomDropdownField from "../../../component/ui/CustomDropDown";
+import CustomInputField from "../../../component/ui/CustomInputField";
 import { useToast } from "../../../context/ToastContext";
 import { useUpdateUserProfileMutation } from "../../../services/user_service";
 import { UserListType } from "../../../_types/user_table";
+import CustomButton from "../../../component/ui/CustomButton";
 
 interface EditProfileProps {
   handleClose: () => void;
@@ -127,12 +128,13 @@ const EditProfile: React.FC<EditProfileProps> = ({
             error={errors.role}
             iconPath="M12 2L3.5 6.5v5.8c0 4.7 3.2 9.3 8.5 10.7 5.3-1.4 8.5-6 8.5-10.7V6.5L12 2z"
           />
-          <button
+          <CustomButton
             type="submit"
-            className="bg-[#002A47] w-full py-2 text-white rounded-md hover:bg-[#112737] dark:bg-[#071218] hover:dark:bg-[#0c1920] transition duration-300"
+            isLoading={isLoading}
+            onClick={() => console.log("Button Clicked")}
           >
-            {isLoading ? <p>Loading</p> : <p>Update Profile</p>}
-          </button>
+            Update Profile
+          </CustomButton>
         </form>
       </div>
     </div>

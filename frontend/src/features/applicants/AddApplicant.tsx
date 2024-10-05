@@ -3,7 +3,7 @@ import {
   ApplicationFormType,
   ErrorResponseType,
 } from "../../_types/form_types";
-import CustomInputField from "../../component/CustomInputField";
+import CustomInputField from "../../component/ui/CustomInputField";
 import { useToast } from "../../context/ToastContext";
 import { useCreateApplicantMutation } from "../../services/applicants_service";
 

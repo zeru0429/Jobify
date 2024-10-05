@@ -3,7 +3,7 @@ import {
   ErrorResponseType,
   RegisterCompanyFormType,
 } from "../../_types/form_types";
-import CustomInputField from "../../component/CustomInputField";
+import CustomInputField from "../../component/ui/CustomInputField";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { useCreateCompanyMutation } from "../../services/company_service";

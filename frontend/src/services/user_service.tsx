@@ -28,6 +28,17 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    resetUserPassword: builder.mutation<
+      any,
+      { body: RegisterUserFormType; params: string }
+    >({
+      query: ({ body, params }) => ({
+        url: `/${params}/password`,
+        method: "PATCH",
+        data: body,
+      }),
+      invalidatesTags: ["User"],
+    }),
 
     getAllUsers: builder.query({
       query: () => ({
@@ -58,6 +69,7 @@ export const {
   useCreateUserMutation,
   useGetAllUsersQuery,
   useGetSingleUserQuery,
+  useResetUserPasswordMutation,
   useUpdateUserProfileMutation,
   useDeleteUserMutation,
 } = userApi;

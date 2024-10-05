@@ -5,26 +5,19 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
-  MRT_GlobalFilterTextField,
-  MRT_ToggleFiltersButton,
 } from "material-react-table";
 
-// Material UI Imports
-import {
-  Box,
-  Button,
-  Dialog,
-  ListItemIcon,
-  MenuItem,
-  lighten,
-} from "@mui/material";
-
-// Icons Imports
-import { AccountCircle, Send } from "@mui/icons-material";
+// Material UI Imports // Icons Imports
+import { Box, Dialog, ListItemIcon, MenuItem, lighten } from "@mui/material";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
 // Mock Data
 import { UserListType } from "../../_types/user_table";
 import EditProfile from "./forms/EditProfile";
+import ResetPassword from "./forms/ResetPassword";
+import { DeleteForever } from "@mui/icons-material";
+import Warning from "../../component/Warning";
 
 // Define user list table props type
 type UserListTableProps = {
@@ -36,15 +29,33 @@ const UsersListTable = ({ users }: UserListTableProps) => {
     null
   );
 
-  const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openReset, setOpenReset] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
-  const handleClickOpen = (row: UserListType) => {
+  const handleClickOpenEdit = (row: UserListType) => {
     setSelectedRowData(row);
-    setOpen(true);
+    setOpenEdit(true);
   };
-  const handleClose = () => {
-    setOpen(false);
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
   };
+  const handleClickOpenReset = (row: UserListType) => {
+    setSelectedRowData(row);
+    setOpenReset(true);
+  };
+  const handleCloseReset = () => {
+    setOpenReset(false);
+  };
+  const handleClickOpenDelete = (row: UserListType) => {
+    setSelectedRowData(row);
+    setOpenDelete(true);
+  };
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
+  const handleDeleteUser = () => {};
+
   const columns = useMemo<MRT_ColumnDef<UserListType>[]>(
     () => [
       {
@@ -154,49 +165,46 @@ const UsersListTable = ({ users }: UserListTableProps) => {
       <MenuItem
         key={0}
         onClick={() => {
-          handleClickOpen(row.original);
+          handleClickOpenEdit(row.original);
           closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <AccountCircle />
+          <PersonAddIcon />
         </ListItemIcon>
         Edit profile
       </MenuItem>,
       <MenuItem
-        key={1}
+        key={0}
         onClick={() => {
-          // Change password logic...
+          handleClickOpenReset(row.original);
           closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <Send />
+          <VpnKeyIcon />
         </ListItemIcon>
-        Change password
+        Reset Password
+      </MenuItem>,
+      <MenuItem
+        key={0}
+        onClick={() => {
+          handleClickOpenDelete(row.original);
+          closeMenu();
+        }}
+        sx={{ m: 0 }}
+      >
+        <ListItemIcon>
+          <DeleteForever />
+        </ListItemIcon>
+        Delete
       </MenuItem>,
     ],
 
     renderTopToolbar: ({ table }) => {
-      const handleDeactivate = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert("Deactivating " + row.getValue("name"));
-        });
-      };
-
-      const handleActivate = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert("Activating " + row.getValue("name"));
-        });
-      };
-
-      const handleContact = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert("Contacting " + row.getValue("name"));
-        });
-      };
+      console.log(table);
 
       return (
         <Box
@@ -207,40 +215,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
             p: "8px",
             justifyContent: "space-between",
           })}
-        >
-          <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <MRT_GlobalFilterTextField table={table} />
-            <MRT_ToggleFiltersButton table={table} />
-          </Box>
-          <Box>
-            <Box sx={{ display: "flex", gap: "0.5rem" }}>
-              <Button
-                color="error"
-                disabled={!table.getIsSomeRowsSelected()}
-                onClick={handleDeactivate}
-                variant="contained"
-              >
-                Deactivate
-              </Button>
-              <Button
-                color="success"
-                disabled={!table.getIsSomeRowsSelected()}
-                onClick={handleActivate}
-                variant="contained"
-              >
-                Activate
-              </Button>
-              <Button
-                color="info"
-                disabled={!table.getIsSomeRowsSelected()}
-                onClick={handleContact}
-                variant="contained"
-              >
-                Contact
-              </Button>
-            </Box>
-          </Box>
-        </Box>
+        ></Box>
       );
     },
   });
@@ -250,10 +225,23 @@ const UsersListTable = ({ users }: UserListTableProps) => {
       <MaterialReactTable table={table} />
       <Box>
         {/* Dialog for Adding User */}
-        <Dialog open={open}>
+        <Dialog open={openEdit}>
           <EditProfile
-            handleClose={handleClose}
+            handleClose={handleCloseEdit}
             selectedRowData={selectedRowData}
+          />
+        </Dialog>
+        <Dialog open={openReset}>
+          <ResetPassword
+            handleClose={handleCloseReset}
+            selectedRowData={selectedRowData}
+          />
+        </Dialog>
+        <Dialog open={openDelete}>
+          <Warning
+            handleClose={handleCloseDelete}
+            handleAction={handleDeleteUser}
+            message={`Are You Sure Do You Want to delete ${selectedRowData?.firstName} ${selectedRowData?.lastName}`}
           />
         </Dialog>
       </Box>

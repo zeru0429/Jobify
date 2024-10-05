@@ -3,10 +3,13 @@ import {
   RegisterUserFormType,
   ErrorResponseType,
 } from "../../../_types/form_types";
-import CustomDropdownField from "../../../component/CustomDropDown";
-import CustomInputField from "../../../component/CustomInputField";
-import CustomPasswordInput from "../../../component/CustomPasswordInput";
+import CustomDropdownField from "../../../component/ui/CustomDropDown";
+import CustomInputField from "../../../component/ui/CustomInputField";
+import CustomPasswordInput from "../../../component/ui/CustomPasswordInput";
 import { useToast } from "../../../context/ToastContext";
+import { useAuth } from "../../../context/AuthContext";
+import { useCreateUserMutation } from "../../../services/user_service";
+import CustomButton from "../../../component/ui/CustomButton";
 
 interface AddUserProps {
   handleClose: () => void;
@@ -45,6 +48,27 @@ const AddUser: React.FC<AddUserProps> = ({ handleClose }) => {
   return (
     <>
       <div className=" w-full ">
+        {/* close icon to close the modal */}
+        <div
+          className="absolute top-1 left-0 right-0 m-2 p-2 cursor-pointer text-red-800"
+          onClick={handleClose}
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </div>
+        <br />
         <div className="w-full max-w-md p-6 shadow-md rounded-lg text-center m-auto">
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
             {/* First Name Field */}
@@ -123,12 +147,13 @@ const AddUser: React.FC<AddUserProps> = ({ handleClose }) => {
               placeholder="Confirm Password"
             />
 
-            <button
+            <CustomButton
               type="submit"
-              className="bg-[#002A47]  w-full py-2 text-white rounded-md hover:bg-[#112737] dark:bg-[#071218] hover:dark:bg-[#0c1920]   transition duration-300"
+              isLoading={isLoading}
+              onClick={() => console.log("Button Clicked")}
             >
-              {isLoading ? <p>Loading</p> : <p>Add User</p>}
-            </button>
+              Add User
+            </CustomButton>
           </form>
         </div>
       </div>
@@ -136,10 +161,3 @@ const AddUser: React.FC<AddUserProps> = ({ handleClose }) => {
   );
 };
 export default AddUser;
-function useAuth(): { userData: any } {
-  throw new Error("Function not implemented.");
-}
-
-function useCreateUserMutation(): [any, { isLoading: any }] {
-  throw new Error("Function not implemented.");
-}

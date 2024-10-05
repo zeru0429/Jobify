@@ -3,12 +3,12 @@ import {
   ErrorResponseType,
   RegisterJobFormType,
 } from "../../_types/form_types";
-import CustomInputField from "../../component/CustomInputField";
+import CustomInputField from "../../component/ui/CustomInputField";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { useCreateJobMutation } from "../../services/job_service";
 import { useRequestGeminiMutation } from "../../services/ai_service";
-import CustomTextArea from "../../component/CustomeTextArea";
+import CustomTextArea from "../../component/ui/CustomeTextArea";
 
 const AddJob = () => {
   const { setToastData } = useToast();

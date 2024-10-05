@@ -5,6 +5,8 @@ import { Box, Button, Dialog } from "@mui/material";
 import { useGetAllUsersQuery } from "../../services/user_service";
 import { useState } from "react";
 import AddUser from "./forms/AddUser";
+import Loader from "../../component/Loading";
+import RectangularButton from "../../component/ui/RectangularButton";
 
 const UserList = () => {
   const [open, setOpen] = useState(false);
@@ -25,20 +27,27 @@ const UserList = () => {
 
   return (
     <div>
-      <Box>
-        <Button
-          className="dark:text-white dark:bg-slate-600 text-white bg-[#011e32]"
-          onClick={handleClickOpen}
-          variant="contained"
-        >
+      <Box
+        sx={{
+          width: "200px",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "end",
+          placeItems: "end",
+        }}
+      >
+        <RectangularButton type="primary" onClick={handleClickOpen}>
           Add admin
-        </Button>
-        <br />
-        <br />
-        <br />
+        </RectangularButton>
       </Box>
+      <br />
+
       {isError && <Box>Error occurred {error.toString()}</Box>}
-      {isLoading && <Box>Loading...</Box>}
+      {isLoading && (
+        <Box>
+          <Loader />
+        </Box>
+      )}
       {isSuccess && (
         <Box>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
