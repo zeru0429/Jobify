@@ -8,6 +8,7 @@ interface CustomInputFieldProps {
   register: UseFormRegisterReturn;
   error?: FieldError;
   iconPath?: string;
+  defaultValue?: string; // Optional default value prop
 }
 
 const CustomInputField: React.FC<CustomInputFieldProps> = ({
@@ -17,6 +18,7 @@ const CustomInputField: React.FC<CustomInputFieldProps> = ({
   register,
   error,
   iconPath,
+  defaultValue,
 }) => {
   return (
     <div className="relative mb-4">
@@ -24,6 +26,7 @@ const CustomInputField: React.FC<CustomInputFieldProps> = ({
         type={type}
         id={id}
         placeholder={placeholder}
+        defaultValue={defaultValue}
         className={`w-full px-10 py-2 rounded-md text-black dark:text-white outline-none transition 
           border 
           ${error ? "border-red-600" : "border-gray-300 dark:border-gray-600"} 

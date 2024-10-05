@@ -1,12 +1,13 @@
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import UsersListTable from "./UserListTable";
-import { Box, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Box, Button, Dialog } from "@mui/material";
 import { useGetAllUsersQuery } from "../../services/user_service";
+import { useState } from "react";
+import AddUser from "./forms/AddUser";
 
 const UserList = () => {
-  const navigator = useNavigate();
+  const [open, setOpen] = useState(false);
   const {
     isError,
     isLoading,
@@ -14,16 +15,20 @@ const UserList = () => {
     data: users,
     error,
   } = useGetAllUsersQuery("userApi");
-  const handleClick = () => {
-    navigator("/admin/add-user");
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (
     <div>
       <Box>
         <Button
-          className="dark:text-white dark:bg-slate-600 text-white bg-[#011e32] "
-          onClick={handleClick}
+          className="dark:text-white dark:bg-slate-600 text-white bg-[#011e32]"
+          onClick={handleClickOpen}
           variant="contained"
         >
           Add admin
@@ -32,7 +37,7 @@ const UserList = () => {
         <br />
         <br />
       </Box>
-      {isError && <Box>Error occurred</Box>}
+      {isError && <Box>Error occurred {error.toString()}</Box>}
       {isLoading && <Box>Loading...</Box>}
       {isSuccess && (
         <Box>
@@ -41,6 +46,10 @@ const UserList = () => {
           </LocalizationProvider>
         </Box>
       )}
+      {/* Dialog for Adding User */}
+      <Dialog open={open}>
+        <AddUser handleClose={handleClose} />
+      </Dialog>
     </div>
   );
 };

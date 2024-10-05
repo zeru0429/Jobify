@@ -17,6 +17,18 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    updateUserProfile: builder.mutation<
+      any,
+      { body: RegisterUserFormType; params: string }
+    >({
+      query: ({ body, params }) => ({
+        url: `/${params}/profile`,
+        method: "PATCH",
+        data: body,
+      }),
+      invalidatesTags: ["User"],
+    }),
+
     getAllUsers: builder.query({
       query: () => ({
         url: "/",
@@ -46,5 +58,6 @@ export const {
   useCreateUserMutation,
   useGetAllUsersQuery,
   useGetSingleUserQuery,
+  useUpdateUserProfileMutation,
   useDeleteUserMutation,
 } = userApi;

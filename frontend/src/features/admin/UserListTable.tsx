@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 // MRT Imports
 import {
@@ -10,13 +10,21 @@ import {
 } from "material-react-table";
 
 // Material UI Imports
-import { Box, Button, ListItemIcon, MenuItem, lighten } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  ListItemIcon,
+  MenuItem,
+  lighten,
+} from "@mui/material";
 
 // Icons Imports
 import { AccountCircle, Send } from "@mui/icons-material";
 
 // Mock Data
 import { UserListType } from "../../_types/user_table";
+import EditProfile from "./forms/EditProfile";
 
 // Define user list table props type
 type UserListTableProps = {
@@ -24,6 +32,19 @@ type UserListTableProps = {
 };
 
 const UsersListTable = ({ users }: UserListTableProps) => {
+  const [selectedRowData, setSelectedRowData] = useState<UserListType | null>(
+    null
+  );
+
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = (row: UserListType) => {
+    setSelectedRowData(row);
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
   const columns = useMemo<MRT_ColumnDef<UserListType>[]>(
     () => [
       {
@@ -58,9 +79,9 @@ const UsersListTable = ({ users }: UserListTableProps) => {
                 component="span"
                 sx={(theme) => ({
                   backgroundColor:
-                    cell.getValue<String>() == "admin"
+                    cell.getValue<String>() == "super_admin"
                       ? theme.palette.error.dark
-                      : cell.getValue<String>() == "admin"
+                      : cell.getValue<String>() == "super_admin"
                       ? theme.palette.warning.dark
                       : theme.palette.success.dark,
                   borderRadius: "0.25rem",
@@ -129,11 +150,11 @@ const UsersListTable = ({ users }: UserListTableProps) => {
       shape: "rounded",
       variant: "outlined",
     },
-    renderRowActionMenuItems: ({ closeMenu }) => [
+    renderRowActionMenuItems: ({ row, closeMenu }) => [
       <MenuItem
         key={0}
         onClick={() => {
-          // View profile logic...
+          handleClickOpen(row.original);
           closeMenu();
         }}
         sx={{ m: 0 }}
@@ -141,12 +162,12 @@ const UsersListTable = ({ users }: UserListTableProps) => {
         <ListItemIcon>
           <AccountCircle />
         </ListItemIcon>
-        View Profile
+        Edit profile
       </MenuItem>,
       <MenuItem
         key={1}
         onClick={() => {
-          // Send email logic...
+          // Change password logic...
           closeMenu();
         }}
         sx={{ m: 0 }}
@@ -154,9 +175,10 @@ const UsersListTable = ({ users }: UserListTableProps) => {
         <ListItemIcon>
           <Send />
         </ListItemIcon>
-        Send Email
+        Change password
       </MenuItem>,
     ],
+
     renderTopToolbar: ({ table }) => {
       const handleDeactivate = () => {
         table.getSelectedRowModel().flatRows.map((row) => {
@@ -223,14 +245,20 @@ const UsersListTable = ({ users }: UserListTableProps) => {
     },
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <Box>
+      <MaterialReactTable table={table} />
+      <Box>
+        {/* Dialog for Adding User */}
+        <Dialog open={open}>
+          <EditProfile
+            handleClose={handleClose}
+            selectedRowData={selectedRowData}
+          />
+        </Dialog>
+      </Box>
+    </Box>
+  );
 };
 
 export default UsersListTable;
-
-/*
-
- 
-
-
- */
