@@ -15,17 +15,17 @@ userRouter.get("/", userController.getAllUser);
 userRouter.get("/:id", userController.getSingleUser);
 
 // Update user profile by ID
-userRouter.put("/:id/profile", (req: Request, res: Response) => {
+userRouter.patch("/:id/profile", (req: Request, res: Response) => {
   userController.updateProfile(req, res);
 });
 
 // Change user password by ID
-userRouter.put("/:id/password", (req: Request, res: Response) => {
-  userController.changePassword(req, res);
+userRouter.patch("/:id/password", (req: Request, res: Response) => {
+  userController.resetPassword(req, res);
 });
 
 // Change user email by ID
-userRouter.put("/:id/email", (req: Request, res: Response) => {
+userRouter.patch("/:id/email", (req: Request, res: Response) => {
   userController.changeEmail(req, res);
 });
 

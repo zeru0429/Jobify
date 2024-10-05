@@ -13,7 +13,7 @@ const app: Express = express();
 
 // middle ware
 const corsOptions = {
-  origin: "*",
+  origin: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
