@@ -6,7 +6,7 @@ import { RegisterJobFormType } from "../_types/form_types";
 // Create API service
 export const jobApi = createApi({
   reducerPath: "jobApi",
-  baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/job/` }),
+  baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/api/job` }),
   tagTypes: ["job"],
   endpoints: (builder) => ({
     createJob: builder.mutation<any, RegisterJobFormType>({

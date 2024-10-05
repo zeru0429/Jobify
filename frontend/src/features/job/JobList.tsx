@@ -1,33 +1,61 @@
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { Box, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
 import JobListTable from "./JobListTable";
+import RectangularButton from "../../component/ui/RectangularButton";
+import { useNavigate } from "react-router-dom";
+import { useGetAllJobQuery } from "../../services/job_service";
+import Loader from "../../component/Loading";
+import UsersListTable from "../admin/UserListTable";
 
 const JobList = () => {
   const navigator = useNavigate();
+  const {
+    isError,
+    isLoading,
+    isSuccess,
+    data: jobs,
+    error,
+  } = useGetAllJobQuery("userApi");
+
   const handleClick = () => {
     navigator("/admin/add-job");
   };
+
   return (
     <div>
-      <Box>
-        <Button
-          className="dark:text-white dark:bg-slate-600 text-white bg-[#011e32] "
-          onClick={handleClick}
-          variant="contained"
-        >
+      <Box
+        sx={{
+          width: "200px",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "end",
+          placeItems: "end",
+        }}
+      >
+        <RectangularButton type="primary" onClick={handleClick}>
           Add Job
-        </Button>
-        <br />
-        <br />
-        <br />
+        </RectangularButton>
       </Box>
+      <br />
       <Box>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <JobListTable />
-        </LocalizationProvider>
+        <br />
       </Box>
+      {isError && <Box>Error occurred {error.toString()}</Box>}
+      {isLoading && (
+        <Box>
+          <Loader />
+        </Box>
+      )}
+      {isSuccess && (
+        <Box>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <JobListTable jobs={jobs} />
+          </LocalizationProvider>
+        </Box>
+      )}
+
+      {/* Dialog for Adding User */}
     </div>
   );
 };

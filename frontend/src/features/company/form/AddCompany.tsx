@@ -8,6 +8,7 @@ import { useAuth } from "../../../context/AuthContext";
 import { useToast } from "../../../context/ToastContext";
 import { useCreateCompanyMutation } from "../../../services/company_service";
 import CustomFileInputField from "../../../component/ui/CustomeFileInput";
+import CustomButton from "../../../component/ui/CustomButton";
 
 interface AddCompanyProps {
   handleClose: () => void;
@@ -33,7 +34,7 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
 
       // Append logo if present
       if (data.logo && data.logo) {
-        formData.append("logo", data.logo);
+        formData.append("file", data.logo);
       }
 
       await createCompany(formData).unwrap();
@@ -90,7 +91,7 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
 
           {/* Company Logo Field */}
           <CustomFileInputField
-            id="logo"
+            id="file"
             placeholder="Company Logo URL"
             isSingle={true}
             register={register("logo", {
@@ -122,12 +123,13 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
             error={errors.logo}
           />
 
-          <button
+          <CustomButton
             type="submit"
-            className="bg-[#002A47] w-full py-2 text-white rounded-md hover:bg-[#112737] dark:bg-[#071218] hover:dark:bg-[#0c1920] transition duration-300"
+            isLoading={isLoading}
+            onClick={() => console.log("Button Clicked")}
           >
-            {isLoading ? <p>Loading...</p> : <p>Add Company</p>}
-          </button>
+            Add Company
+          </CustomButton>
         </form>
       </div>
     </div>

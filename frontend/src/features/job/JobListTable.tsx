@@ -15,7 +15,6 @@ import { Box, Button, ListItemIcon, MenuItem, lighten } from "@mui/material";
 // Icons Imports
 import { AccountCircle, Send } from "@mui/icons-material";
 // Mock Data
-import { jobData } from "../../demo/demo_job";
 
 export type JobListType = {
   title: string;
@@ -30,7 +29,10 @@ export type JobListType = {
   updatedAt: string;
 };
 
-const JobListTable = () => {
+type JobListTableProps = {
+  jobs: JobListType[];
+};
+const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
   const columns = useMemo<MRT_ColumnDef<JobListType>[]>(
     () => [
       {
@@ -113,7 +115,7 @@ const JobListTable = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data: jobData,
+    data: jobs,
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
