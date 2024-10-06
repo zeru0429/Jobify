@@ -10,7 +10,8 @@ const parser = new DataParser();
 // Store the original image
 const storage = multer.memoryStorage(); // Store files in memory
 export const upload = multer({ storage });
-
+// Updated multer configuration for multiple files
+export const uploadMulti = multer({ storage }).array("files", 2);
 export const formatImage = (file: any) => {
   const fileExtension = path.extname(file.originalname).toString();
   console.log(fileExtension);
