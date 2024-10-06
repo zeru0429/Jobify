@@ -13,6 +13,7 @@ import { Box, ListItemIcon, MenuItem, lighten } from "@mui/material";
 
 // Icons Imports
 import { AccountCircle, Send } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 // Mock Data
 export type ApplicantListType = {
@@ -32,6 +33,7 @@ interface CompanyListTableProps {
 const ApplicantListTable: React.FC<CompanyListTableProps> = ({
   applicants,
 }) => {
+  const navigator = useNavigate();
   const columns = useMemo<MRT_ColumnDef<ApplicantListType>[]>(
     () => [
       {
@@ -153,11 +155,11 @@ const ApplicantListTable: React.FC<CompanyListTableProps> = ({
         shape: "rounded",
         variant: "outlined",
       }}
-      renderRowActionMenuItems={({ closeMenu }) => [
+      renderRowActionMenuItems={({ row, closeMenu }) => [
         <MenuItem
           key="view-details"
           onClick={() => {
-            // Implement your logic to view applicant details
+            navigator("/admin/applicant-detail", { state: row.original });
             closeMenu();
           }}
         >

@@ -15,9 +15,11 @@ import CompanyList from "../features/company/Company_list";
 import JobList from "../features/job/JobList";
 import ApplicantsList from "../features/applicants/ApplicantsList";
 import AddJob from "../features/job/form/AddJob";
-import AddApplication from "../features/applicants/AddApplicant";
+
 import UpdateJob from "../features/job/form/UpdateJob";
 import Home from "../features/public/Home";
+import AddApplication from "../features/applicants/form/AddApplicant";
+import ApplicantDetailPage from "../features/applicants/ApplicantDetailPage";
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -47,6 +49,10 @@ export const router = createBrowserRouter(
 
         <Route path="/admin/applicants" element={<ApplicantsList />} />
         <Route path="/admin/add-applicant" element={<AddApplication />} />
+        <Route
+          path="/admin/applicant-detail"
+          element={<ApplicantDetailPage />}
+        />
 
         <Route
           path="/admin/report"

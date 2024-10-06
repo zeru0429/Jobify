@@ -28,7 +28,6 @@ const UpdateJob: React.FC<UpdateJobProps> = () => {
 
   const navigator = useNavigate();
   const { setToastData } = useToast();
-  const { userData } = useAuth();
   const {
     isError: isErrorCompany,
     isLoading: isLoadingCompany,

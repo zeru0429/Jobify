@@ -1,11 +1,11 @@
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useToast } from "../../../context/ToastContext";
 import {
   ApplicationFormType,
   ErrorResponseType,
-} from "../../_types/form_types";
-import CustomInputField from "../../component/ui/CustomInputField";
-import { useToast } from "../../context/ToastContext";
-import { useCreateApplicantMutation } from "../../services/applicants_service";
+} from "../../../_types/form_types";
+import { useCreateApplicantMutation } from "../../../services/applicants_service";
+import CustomInputField from "../../../component/ui/CustomInputField";
 
 const AddApplication = () => {
   const { setToastData } = useToast();
