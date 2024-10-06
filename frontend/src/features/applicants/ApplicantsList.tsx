@@ -3,6 +3,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ApplicantListTable from "./ApplicantListTable";
+import RectangularButton from "../../component/ui/RectangularButton";
 
 const ApplicantsList = () => {
   const navigator = useNavigate();
@@ -11,18 +12,21 @@ const ApplicantsList = () => {
   };
   return (
     <div>
-      <Box>
-        <Button
-          className="dark:text-white dark:bg-slate-600 text-white bg-[#011e32] "
-          onClick={handleClick}
-          variant="contained"
-        >
+      <Box
+        sx={{
+          width: "200px",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "end",
+          placeItems: "end",
+        }}
+      >
+        <RectangularButton type="primary" onClick={handleClick}>
           Add Applicants
-        </Button>
-        <br />
-        <br />
-        <br />
+        </RectangularButton>
       </Box>
+      <br />
+      <br />
       <Box>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <ApplicantListTable />

@@ -29,6 +29,12 @@ export const axiosBaseQuery =
       const err: any = axiosError as {
         response?: { status?: number; data?: any };
       };
+      console.log(`${err} ====== `);
+      if (err.status === 401) {
+        localStorage.removeItem("token");
+        //navigate to login page using window
+        window.location.href = "/login";
+      }
 
       return {
         error: {
