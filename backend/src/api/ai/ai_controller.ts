@@ -8,22 +8,47 @@ const aiController = {
   generateJobDescription: async (req: Request, res: Response) => {
     try {
       // Check if at least one field is provided
-      const { title, type, location, salary, contactEmail } = req.body;
-      if (!title && !type && !location && !salary && !contactEmail) {
+      const {
+        title,
+        type,
+        description,
+        location,
+        salary,
+        contactEmail,
+        company,
+        contactName,
+        contactNumber,
+      } = req.body;
+
+      if (
+        !title &&
+        !type &&
+        !description &&
+        !location &&
+        !salary &&
+        !contactEmail &&
+        !company &&
+        !contactName &&
+        !contactNumber
+      ) {
         return res.status(400).json({
           success: false,
           message:
-            "At least one of the fields (title, type, location, salary, contactEmail) is required.",
+            "At least one of the fields (title, type, description, location, salary, contactEmail, company, contactName, contactNumber) is required.",
         });
       }
 
       const content = `Generate a job description for a title of ${
         title || "N/A"
-      }. 
-      Job Type: ${type || "N/A"}. 
-      Location: ${location || "N/A"}. 
-      Salary: ${salary || "N/A"}. 
-      Contact Email: ${contactEmail || "N/A"}. 
+      }.
+      Job Type: ${type || "N/A"}.
+      Description: ${description || "N/A"}.
+      Location: ${location || "N/A"}.
+      Salary: ${salary || "N/A"}.
+      Contact Email: ${contactEmail || "N/A"}.
+      Company: ${company || "N/A"}.
+      Contact Name: ${contactName || "N/A"}.
+      Contact Number: ${contactNumber || "N/A"}.
       Please include key responsibilities, qualifications, and any additional requirements.`;
 
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -32,8 +57,8 @@ const aiController = {
       if (
         result &&
         result.response &&
-        result?.response?.candidates &&
-        result?.response?.candidates?.length > 0
+        result.response.candidates &&
+        result.response.candidates.length > 0
       ) {
         const data = result.response.candidates[0].content.parts[0].text;
 
@@ -50,7 +75,10 @@ const aiController = {
     } catch (error) {
       return res.status(500).json({
         success: false,
-        message: error,
+        message:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred.",
       });
     }
   },
