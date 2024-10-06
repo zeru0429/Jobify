@@ -12,7 +12,6 @@ const isAuth = async (
 ): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
-
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       res.status(403).json({
         success: false,
@@ -20,9 +19,7 @@ const isAuth = async (
       });
       return; // Ensure to return here to avoid further execution
     }
-
     const token = authHeader.split(" ")[1]; // Get the token part after "Bearer "
-
     // Verify the token
     const payload = (await jwt.verify(token, JWT_SECRET!)) as PayloadType;
     if (payload) {

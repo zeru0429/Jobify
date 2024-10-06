@@ -37,7 +37,7 @@ companyRouter.patch(
 
 // Delete a company by ID
 companyRouter.delete("/:id", (req: Request, res: Response) => {
-  companyController.deleteCompany;
+  companyController.deleteCompany(req, res);
 });
 
 export default companyRouter;

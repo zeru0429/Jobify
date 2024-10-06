@@ -85,7 +85,11 @@ app.post("/login", (req: Request, res: Response) => {
   userController.login(req, res);
 });
 //api
-app.use("/api", cacheMiddleware, appRouter);
+app.use(
+  "/api",
+  // cacheMiddleware,
+  appRouter
+);
 
 app.get("/", (req: Request, res: Response) => {
   res.send(`Express + TypeScript Server `);
