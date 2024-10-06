@@ -101,7 +101,9 @@ const UpdateJob: React.FC<UpdateJobProps> = () => {
       const company = getValues("company");
       const createdAt = getValues("createdAt");
       const createdBy = getValues("createdBy");
-
+      const selectedCompany = companies.find((i: any) => {
+        return i._id === company;
+      });
       //  if all of the form input empty return
       if (
         !title &&
@@ -113,18 +115,6 @@ const UpdateJob: React.FC<UpdateJobProps> = () => {
       ) {
         return;
       } else {
-        console.log({
-          title,
-          type,
-          description,
-          location,
-          salary,
-          contactEmail,
-          company,
-
-          createdAt,
-          createdBy,
-        });
         try {
           const response = await createAiRequest({
             title,
@@ -133,8 +123,7 @@ const UpdateJob: React.FC<UpdateJobProps> = () => {
             location,
             salary,
             contactEmail,
-            company,
-
+            company: selectedCompany.name,
             createdAt,
             createdBy,
           });
