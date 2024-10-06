@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react"; // Ensure you're importing from the correct path
 import { axiosBaseQuery } from "../util/axios/axios_base_query";
 import { BASE_URL } from "../util/secrete";
-import { LoginFormType } from "../_types/form_types";
+import { ApplicationFormType, LoginFormType } from "../_types/form_types";
 
 export const publicApi = createApi({
   reducerPath: "publicApi",
@@ -14,8 +14,25 @@ export const publicApi = createApi({
         data: body,
       }),
     }),
+    getIndexPage: builder.mutation<any, { take: number; skip: number }>({
+      query: ({ take, skip }) => ({
+        url: `/api/jobs/public?take=${take}&skip=${skip}`,
+        method: "GET",
+      }),
+    }),
+    applyJob: builder.mutation<any, ApplicationFormType>({
+      query: (body: ApplicationFormType) => ({
+        url: "/api/applicant/apply-job",
+        method: "POST",
+        data: body,
+      }),
+    }),
   }),
 });
 
 // Export the login mutation
-export const { useLoginMutation } = publicApi;
+export const {
+  useLoginMutation,
+  useGetIndexPageMutation,
+  useApplyJobMutation,
+} = publicApi;

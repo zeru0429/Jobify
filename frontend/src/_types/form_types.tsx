@@ -45,8 +45,7 @@ export interface ApplicationFormType {
   job: string;
   applicantName: string;
   applicantEmail: string;
-  resume?: string;
-  coverLetter?: string;
+  resume?: File | null;
+  coverLetter?: File | null;
   status: "applied" | "interviewed" | "offered" | "rejected";
-  appliedAt?: Date;
 }

@@ -18,7 +18,7 @@ import AddJob from "../features/job/form/AddJob";
 
 import UpdateJob from "../features/job/form/UpdateJob";
 import Home from "../features/public/Home";
-import AddApplication from "../features/applicants/form/AddApplicant";
+import ApplyJobApplication from "../features/public/ApplyJobApplication";
 import ApplicantDetailPage from "../features/applicants/ApplicantDetailPage";
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,6 +29,7 @@ export const router = createBrowserRouter(
       <Route path="/confirm-password" element={<ConfirmPassword />} />
       <Route path="/forget-password" element={<ForgetPassword />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/apply/" element={<ApplyJobApplication />} />
 
       {/* admin section */}
       <Route path="/admin" element={<AdminLayout />}>
@@ -48,7 +49,7 @@ export const router = createBrowserRouter(
         <Route path="/admin/update-job" element={<UpdateJob />} />
 
         <Route path="/admin/applicants" element={<ApplicantsList />} />
-        <Route path="/admin/add-applicant" element={<AddApplication />} />
+
         <Route
           path="/admin/applicant-detail"
           element={<ApplicantDetailPage />}

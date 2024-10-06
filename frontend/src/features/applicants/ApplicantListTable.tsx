@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 // MRT Imports
 import {
@@ -9,14 +9,20 @@ import {
 } from "material-react-table";
 
 // Material UI Imports
-import { Box, ListItemIcon, MenuItem, lighten } from "@mui/material";
+import { Box, Dialog, ListItemIcon, MenuItem, lighten } from "@mui/material";
 
 // Icons Imports
-import { AccountCircle, Send } from "@mui/icons-material";
+import { AccountCircle, DeleteForever, Send } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import Warning from "../../component/Warning";
+import { useDeleteApplicantMutation } from "../../services/applicants_service";
+import { useToast } from "../../context/ToastContext";
+import { ErrorResponseType } from "../../_types/form_types";
+import UpdateApplication from "./form/UpdateApplicant";
 
 // Mock Data
 export type ApplicantListType = {
+  _id: string;
   job: string;
   applicantName: string;
   applicantEmail: string;
@@ -26,14 +32,62 @@ export type ApplicantListType = {
   appliedAt: Date;
 };
 
-interface CompanyListTableProps {
+interface ApplicantListTableProps {
   applicants: ApplicantListType[];
 }
 
-const ApplicantListTable: React.FC<CompanyListTableProps> = ({
+const ApplicantListTable: React.FC<ApplicantListTableProps> = ({
   applicants,
 }) => {
+  const { setToastData } = useToast();
   const navigator = useNavigate();
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [selectedRowData, setSelectedRowData] =
+    useState<ApplicantListType | null>(null);
+  const [deleteApplicant, { isLoading, isSuccess }] =
+    useDeleteApplicantMutation();
+  const handleClickOpenEdit = (row: ApplicantListType) => {
+    setSelectedRowData(row);
+    setOpenEdit(true);
+  };
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
+  const handleClickOpenDelete = (row: ApplicantListType) => {
+    setSelectedRowData(row);
+    setOpenDelete(true);
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
+  const handleDeleteApplicant = async () => {
+    if (selectedRowData?._id != null) {
+      try {
+        await deleteApplicant({ params: selectedRowData?._id }).unwrap();
+        setToastData({
+          message: "User deleted successfully",
+          success: true,
+        });
+        handleCloseDelete();
+      } catch (error: any) {
+        handleCloseDelete();
+        const res: ErrorResponseType = error;
+        setToastData({
+          message: res.data.message,
+          success: false,
+        });
+      }
+    } else {
+      handleCloseDelete();
+      setToastData({
+        message: "User not selected is missing",
+        success: false,
+      });
+    }
+  };
+
   const columns = useMemo<MRT_ColumnDef<ApplicantListType>[]>(
     () => [
       {
@@ -126,78 +180,111 @@ const ApplicantListTable: React.FC<CompanyListTableProps> = ({
   );
 
   return (
-    <MaterialReactTable
-      columns={columns}
-      data={applicants}
-      enableColumnFilterModes
-      enableColumnOrdering
-      enableGrouping
-      enableColumnPinning
-      enableFacetedValues
-      enableRowActions
-      enableRowSelection
-      initialState={{
-        showGlobalFilter: true,
-        columnPinning: {
-          left: ["mrt-row-expand", "mrt-row-select"],
-          right: ["mrt-row-actions"],
-        },
-      }}
-      paginationDisplayMode="pages"
-      positionToolbarAlertBanner="bottom"
-      muiSearchTextFieldProps={{
-        size: "small",
-        variant: "outlined",
-      }}
-      muiPaginationProps={{
-        color: "secondary",
-        rowsPerPageOptions: [10, 20, 30],
-        shape: "rounded",
-        variant: "outlined",
-      }}
-      renderRowActionMenuItems={({ row, closeMenu }) => [
-        <MenuItem
-          key="view-details"
-          onClick={() => {
-            navigator("/admin/applicant-detail", { state: row.original });
-            closeMenu();
-          }}
-        >
-          <ListItemIcon>
-            <AccountCircle />
-          </ListItemIcon>
-          View Details
-        </MenuItem>,
-        <MenuItem
-          key="send-email"
-          onClick={() => {
-            // Implement your logic to send an email
-            closeMenu();
-          }}
-        >
-          <ListItemIcon>
-            <Send />
-          </ListItemIcon>
-          Send Email
-        </MenuItem>,
-      ]}
-      renderTopToolbar={({ table }) => (
-        <Box
-          sx={(theme) => ({
-            backgroundColor: lighten(theme.palette.background.default, 0.05),
-            display: "flex",
-            gap: "0.5rem",
-            p: "8px",
-            justifyContent: "space-between",
-          })}
-        >
-          <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <MRT_GlobalFilterTextField table={table} />
-            <MRT_ToggleFiltersButton table={table} />
+    <>
+      <MaterialReactTable
+        columns={columns}
+        data={applicants}
+        enableColumnFilterModes
+        enableColumnOrdering
+        enableGrouping
+        enableColumnPinning
+        enableFacetedValues
+        enableRowActions
+        enableRowSelection
+        initialState={{
+          showGlobalFilter: true,
+          columnPinning: {
+            left: ["mrt-row-expand", "mrt-row-select"],
+            right: ["mrt-row-actions"],
+          },
+        }}
+        paginationDisplayMode="pages"
+        positionToolbarAlertBanner="bottom"
+        muiSearchTextFieldProps={{
+          size: "small",
+          variant: "outlined",
+        }}
+        muiPaginationProps={{
+          color: "secondary",
+          rowsPerPageOptions: [10, 20, 30],
+          shape: "rounded",
+          variant: "outlined",
+        }}
+        renderRowActionMenuItems={({ row, closeMenu }) => [
+          <MenuItem
+            key="view-details"
+            onClick={() => {
+              navigator("/admin/applicant-detail", { state: row.original });
+              closeMenu();
+            }}
+          >
+            <ListItemIcon>
+              <AccountCircle />
+            </ListItemIcon>
+            View Details
+          </MenuItem>,
+          <MenuItem
+            key={`delete-${row.original._id}`}
+            onClick={() => {
+              handleClickOpenDelete(row.original);
+              closeMenu();
+            }}
+            sx={{ m: 0 }}
+          >
+            <ListItemIcon>
+              <DeleteForever />
+            </ListItemIcon>
+            Delete
+          </MenuItem>,
+
+          <MenuItem
+            key="send-email"
+            onClick={() => {
+              handleClickOpenEdit(row.original);
+              closeMenu();
+            }}
+          >
+            <ListItemIcon>
+              <Send />
+            </ListItemIcon>
+            Change status
+          </MenuItem>,
+        ]}
+        renderTopToolbar={({ table }) => (
+          <Box
+            sx={(theme) => ({
+              backgroundColor: lighten(theme.palette.background.default, 0.05),
+              display: "flex",
+              gap: "0.5rem",
+              p: "8px",
+              justifyContent: "space-between",
+            })}
+          >
+            <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <MRT_GlobalFilterTextField table={table} />
+              <MRT_ToggleFiltersButton table={table} />
+            </Box>
           </Box>
-        </Box>
-      )}
-    />
+        )}
+      />
+      {/* Delete */}
+      <Dialog open={openDelete}>
+        <Warning
+          handleClose={handleCloseDelete}
+          handleAction={handleDeleteApplicant}
+          message={`Are You Sure Do You Want to delete ${selectedRowData?.applicantName}`}
+          isLoading={isLoading}
+          isSuccess={isSuccess}
+        />
+      </Dialog>
+      {/* Dialog for update Company Profile */}
+      <Dialog open={openEdit}>
+        <UpdateApplication
+          handleClose={handleCloseEdit}
+          selectedRowData={selectedRowData}
+        />
+      </Dialog>
+    </>
   );
 };
 

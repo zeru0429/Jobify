@@ -9,14 +9,6 @@ export const applicantApi = createApi({
   baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/api/applicant/` }),
   tagTypes: ["applicant"],
   endpoints: (builder) => ({
-    createApplicant: builder.mutation<any, ApplicationFormType>({
-      query: (body: ApplicationFormType) => ({
-        url: "/",
-        method: "POST",
-        data: body,
-      }),
-      invalidatesTags: ["applicant"],
-    }),
     getAllApplicant: builder.query<any, { params: string }>({
       query: ({ params }) => ({
         url: `/job/${params}`,
@@ -31,10 +23,21 @@ export const applicantApi = createApi({
       }),
       providesTags: (_result, _error, id) => [{ type: "applicant", id }],
     }),
-    deleteApplicant: builder.mutation<any, string>({
-      query: (id: string) => ({
-        url: `/${id}`,
+    deleteApplicant: builder.mutation<any, { params: string }>({
+      query: ({ params }) => ({
+        url: `/${params}`,
         method: "DELETE",
+      }),
+      invalidatesTags: ["applicant"],
+    }),
+    updateApplicantStatus: builder.mutation<
+      any,
+      { body: { status: string }; params: string }
+    >({
+      query: ({ body, params }) => ({
+        url: `/${params}`,
+        method: "PATCH",
+        data: body,
       }),
       invalidatesTags: ["applicant"],
     }),
@@ -43,8 +46,8 @@ export const applicantApi = createApi({
 
 // Hooks generated from the API service
 export const {
-  useCreateApplicantMutation,
   useGetAllApplicantQuery,
   useGetSingleApplicantQuery,
   useDeleteApplicantMutation,
+  useUpdateApplicantStatusMutation,
 } = applicantApi;
