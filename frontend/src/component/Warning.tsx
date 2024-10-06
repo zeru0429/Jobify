@@ -5,6 +5,8 @@ interface WarningProps {
   message: string;
   handleClose: () => void;
   handleAction: () => void;
+  isLoading: boolean;
+  isSuccess: boolean;
 }
 
 const Warning: React.FC<WarningProps> = ({
@@ -47,7 +49,7 @@ const Warning: React.FC<WarningProps> = ({
           </Box>
           <Box sx={{ width: "45%" }}>
             <RectangularButton type="primary" onClick={handleAction}>
-              Confirm
+              {"Confirm"}
             </RectangularButton>
           </Box>
         </Box>

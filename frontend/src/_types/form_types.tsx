@@ -20,9 +20,12 @@ export interface RegisterUserFormType {
   createdBy: number;
 }
 export interface RegisterCompanyFormType {
-  adminId?: string;
   name: string;
+  type: string;
   logo?: File | null;
+  companyType: string;
+  address: string;
+  description?: string;
 }
 
 export interface RegisterJobFormType {

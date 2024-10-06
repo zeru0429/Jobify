@@ -9,6 +9,7 @@ import { useToast } from "../../../context/ToastContext";
 import { useCreateCompanyMutation } from "../../../services/company_service";
 import CustomFileInputField from "../../../component/ui/CustomeFileInput";
 import CustomButton from "../../../component/ui/CustomButton";
+import CustomTextArea from "../../../component/ui/CustomeTextArea";
 
 interface AddCompanyProps {
   handleClose: () => void;
@@ -31,9 +32,13 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
       const formData = new FormData();
       formData.append("admin", userData?.id.toString() || "");
       formData.append("name", data.name);
+      formData.append("type", data.type); // Added company type
+      formData.append("companyType", data.companyType); // Added company type
+      formData.append("address", data.address); // Added address
+      formData.append("description", data.description || ""); // Added description
 
       // Append logo if present
-      if (data.logo && data.logo) {
+      if (data.logo) {
         formData.append("file", data.logo);
       }
 
@@ -89,17 +94,27 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
             error={errors.name}
           />
 
+          {/* Company Type Field */}
+          <CustomInputField
+            id="type"
+            type="text"
+            placeholder="Company Type"
+            register={register("type", {
+              required: "Company type is required",
+            })}
+            error={errors.type}
+          />
+
           {/* Company Logo Field */}
           <CustomFileInputField
-            id="file"
-            placeholder="Company Logo URL"
+            id="logo"
+            placeholder="Company Logo"
             isSingle={true}
             register={register("logo", {
               required: "Logo is required",
               validate: {
-                validUrl: (value: File | null | undefined) => {
-                  // Check if value is empty (no file uploaded)
-                  if (!value || value === null || value === undefined) {
+                validImage: (value: File | null | undefined) => {
+                  if (!value) {
                     return "Logo is required";
                   }
                   const validImageTypes = [
@@ -115,12 +130,31 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
                       return "Please upload a valid image (JPEG, PNG, GIF, WEBP)";
                     }
                   }
-
                   return true;
                 },
               },
             })}
             error={errors.logo}
+          />
+
+          {/* Company Address Field */}
+          <CustomInputField
+            id="address"
+            type="text"
+            placeholder="Company Address"
+            register={register("address", {
+              required: "Address is required",
+            })}
+            error={errors.address}
+          />
+
+          {/* Job Description Field */}
+          <CustomTextArea
+            id="description"
+            placeholder="Company Description"
+            register={register("description")}
+            error={errors.description}
+            iconPath="M3 3h18v2H3V3zm0 4h18v2H3V7zm0 4h18v2H3v-2zm0 4h10v2H3v-2zm0 4h18v2H3v-2z"
           />
 
           <CustomButton

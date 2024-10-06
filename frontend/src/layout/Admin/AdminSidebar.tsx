@@ -4,7 +4,7 @@ import List from "@mui/material/List";
 import { useAuth } from "../../context/AuthContext";
 
 const AdminSidebar = () => {
-  const { isSuperAdmin } = useAuth();
+  const { isSuperAdmin, isAdmin } = useAuth();
   const [currentView, setCurrentView] = useState("");
   const activeClass =
     "bg-[#002A47] text-white dark:bg-[#005577] dark:text-white";
@@ -86,96 +86,100 @@ const AdminSidebar = () => {
                 </Link>
               </li>
             )}
-            {/* Company */}
-            <li className="hs-accordion" id="company-accordion">
-              <Link
-                to="/admin/company"
-                onClick={() => handleToggleView("company")}
-              >
-                <button
-                  type="button"
-                  className={`${buttonClass} ${
-                    currentView === "company" ? activeClass : ""
-                  }`}
-                  aria-expanded="true"
-                  aria-controls="company-accordion"
-                >
-                  {/* SVG for Company */}
-                  <svg
-                    className="size-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={24}
-                    height={24}
-                    viewBox="0 0 24 24"
+            {isAdmin && (
+              <>
+                {/* Company */}
+                <li className="hs-accordion" id="company-accordion">
+                  <Link
+                    to="/admin/company"
+                    onClick={() => handleToggleView("company")}
                   >
-                    <path
-                      fill="currentColor"
-                      d="M6.5 11L12 2l5.5 9zm11 11q-1.875 0-3.187-1.312T13 17.5t1.313-3.187T17.5 13t3.188 1.313T22 17.5t-1.312 3.188T17.5 22M3 21.5v-8h8v8zM17.5 20q1.05 0 1.775-.725T20 17.5t-.725-1.775T17.5 15t-1.775.725T15 17.5t.725 1.775T17.5 20M5 19.5h4v-4H5zM10.05 9h3.9L12 5.85zm7.45 8.5"
-                    />
-                  </svg>
-                  Company
-                </button>
-              </Link>
-            </li>
-            {/* Jobs */}
-            <li className="hs-accordion" id="jobs-accordion">
-              <Link to="/admin/job" onClick={() => handleToggleView("job")}>
-                <button
-                  type="button"
-                  className={`${buttonClass} ${
-                    currentView === "job" ? activeClass : ""
-                  }`}
-                  aria-expanded="true"
-                  aria-controls="jobs-accordion"
-                >
-                  {/* SVG for Jobs */}
-                  <svg
-                    className="size-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={24}
-                    height={24}
-                    viewBox="0 0 32 32"
+                    <button
+                      type="button"
+                      className={`${buttonClass} ${
+                        currentView === "company" ? activeClass : ""
+                      }`}
+                      aria-expanded="true"
+                      aria-controls="company-accordion"
+                    >
+                      {/* SVG for Company */}
+                      <svg
+                        className="size-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width={24}
+                        height={24}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M6.5 11L12 2l5.5 9zm11 11q-1.875 0-3.187-1.312T13 17.5t1.313-3.187T17.5 13t3.188 1.313T22 17.5t-1.312 3.188T17.5 22M3 21.5v-8h8v8zM17.5 20q1.05 0 1.775-.725T20 17.5t-.725-1.775T17.5 15t-1.775.725T15 17.5t.725 1.775T17.5 20M5 19.5h4v-4H5zM10.05 9h3.9L12 5.85zm7.45 8.5"
+                        />
+                      </svg>
+                      Company
+                    </button>
+                  </Link>
+                </li>
+                {/* Jobs */}
+                <li className="hs-accordion" id="jobs-accordion">
+                  <Link to="/admin/job" onClick={() => handleToggleView("job")}>
+                    <button
+                      type="button"
+                      className={`${buttonClass} ${
+                        currentView === "job" ? activeClass : ""
+                      }`}
+                      aria-expanded="true"
+                      aria-controls="jobs-accordion"
+                    >
+                      {/* SVG for Jobs */}
+                      <svg
+                        className="size-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width={24}
+                        height={24}
+                        viewBox="0 0 32 32"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M26 6v4H6V6zm0-2H6a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2M10 16v10H6V16zm0-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V16a2 2 0 0 0-2-2m16 2v10H16V16zm0-2H16a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V16a2 2 0 0 0-2-2"
+                        />
+                      </svg>
+                      Jobs
+                    </button>
+                  </Link>
+                </li>
+                {/* Applications */}
+                <li className="hs-accordion" id="applications-accordion">
+                  <Link
+                    to="/admin/applicants"
+                    onClick={() => handleToggleView("applicants")}
                   >
-                    <path
-                      fill="currentColor"
-                      d="M26 6v4H6V6zm0-2H6a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2M10 16v10H6V16zm0-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V16a2 2 0 0 0-2-2m16 2v10H16V16zm0-2H16a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V16a2 2 0 0 0-2-2"
-                    />
-                  </svg>
-                  Jobs
-                </button>
-              </Link>
-            </li>
-            {/* Applications */}
-            <li className="hs-accordion" id="applications-accordion">
-              <Link
-                to="/admin/applicants"
-                onClick={() => handleToggleView("applicants")}
-              >
-                <button
-                  type="button"
-                  className={`${buttonClass} ${
-                    currentView === "applicants" ? activeClass : ""
-                  }`}
-                  aria-expanded="true"
-                  aria-controls="applications-accordion"
-                >
-                  {/* SVG for Applications */}
-                  <svg
-                    className="size-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width={24}
-                    height={24}
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1M9 9H5V5h4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1m-1 6h-4V5h4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1m-1 6H5v-4h4zm8-6c-2.206 0-4 1.794-4 4s1.794 4 4 4s4-1.794 4-4s-1.794-4-4-4m0 6c-1.103 0-2-.897-2-2s.897-2 2-2s2 .897 2 2s-.897 2-2 2"
-                    />
-                  </svg>
-                  Applications
-                </button>
-              </Link>
-            </li>
+                    <button
+                      type="button"
+                      className={`${buttonClass} ${
+                        currentView === "applicants" ? activeClass : ""
+                      }`}
+                      aria-expanded="true"
+                      aria-controls="applications-accordion"
+                    >
+                      {/* SVG for Applications */}
+                      <svg
+                        className="size-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width={24}
+                        height={24}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1M9 9H5V5h4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1m-1 6h-4V5h4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1m-1 6H5v-4h4zm8-6c-2.206 0-4 1.794-4 4s1.794 4 4 4s4-1.794 4-4s-1.794-4-4-4m0 6c-1.103 0-2-.897-2-2s.897-2 2-2s2 .897 2 2s-.897 2-2 2"
+                        />
+                      </svg>
+                      Applications
+                    </button>
+                  </Link>
+                </li>
+              </>
+            )}
             {/* Report */}
             <li className="hs-accordion" id="report-accordion">
               <Link

@@ -16,13 +16,13 @@ import LogOutButton from "../LogOutButton";
 import Login from "../../features/public/Login";
 export const AdminLayout = () => {
   const [open, setOpen] = useState(false);
-  const { isAdmin, userData, isSuperAdmin } = useAuth();
+  const { isAdmin, isLoggedIn, isSuperAdmin } = useAuth();
 
   const handleDrawerClose = () => {
     setOpen(false);
   };
 
-  if (userData == null) {
+  if (!isLoggedIn) {
     return <Login />;
   }
   if (isAdmin || isSuperAdmin) {

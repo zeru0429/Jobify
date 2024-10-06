@@ -18,6 +18,8 @@ import EditProfile from "./forms/EditProfile";
 import ResetPassword from "./forms/ResetPassword";
 import { DeleteForever } from "@mui/icons-material";
 import Warning from "../../component/Warning";
+import { useDeleteUserMutation } from "../../services/user_service";
+import { ErrorResponseType } from "../../_types/form_types";
 
 // Define user list table props type
 type UserListTableProps = {
@@ -28,6 +30,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
   const [selectedRowData, setSelectedRowData] = useState<UserListType | null>(
     null
   );
+  const [deleteUser, { isLoading, isSuccess }] = useDeleteUserMutation();
 
   const [openEdit, setOpenEdit] = useState(false);
   const [openReset, setOpenReset] = useState(false);
@@ -51,10 +54,36 @@ const UsersListTable = ({ users }: UserListTableProps) => {
     setSelectedRowData(row);
     setOpenDelete(true);
   };
+
   const handleCloseDelete = () => {
     setOpenDelete(false);
   };
-  const handleDeleteUser = () => {};
+
+  const handleDeleteUser = async () => {
+    if (selectedRowData?._id != null) {
+      try {
+        await deleteUser({ params: selectedRowData?._id }).unwrap();
+        setToastData({
+          message: "User deleted successfully",
+          success: true,
+        });
+        handleCloseDelete();
+      } catch (error: any) {
+        handleCloseDelete();
+        const res: ErrorResponseType = error;
+        setToastData({
+          message: res.data.message,
+          success: false,
+        });
+      }
+    } else {
+      handleCloseDelete();
+      setToastData({
+        message: "User not selected is missing",
+        success: false,
+      });
+    }
+  };
 
   const columns = useMemo<MRT_ColumnDef<UserListType>[]>(
     () => [
@@ -163,7 +192,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
     },
     renderRowActionMenuItems: ({ row, closeMenu }) => [
       <MenuItem
-        key={0}
+        key={`edit-${row.original._id}`}
         onClick={() => {
           handleClickOpenEdit(row.original);
           closeMenu();
@@ -176,7 +205,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
         Edit profile
       </MenuItem>,
       <MenuItem
-        key={0}
+        key={`reset-${row.original._id}`}
         onClick={() => {
           handleClickOpenReset(row.original);
           closeMenu();
@@ -189,7 +218,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
         Reset Password
       </MenuItem>,
       <MenuItem
-        key={0}
+        key={`delete-${row.original._id}`}
         onClick={() => {
           handleClickOpenDelete(row.original);
           closeMenu();
@@ -229,17 +258,21 @@ const UsersListTable = ({ users }: UserListTableProps) => {
             selectedRowData={selectedRowData}
           />
         </Dialog>
+        {/* Dialog for Reset Password */}
         <Dialog open={openReset}>
           <ResetPassword
             handleClose={handleCloseReset}
             selectedRowData={selectedRowData}
           />
         </Dialog>
+        {/* Delete */}
         <Dialog open={openDelete}>
           <Warning
             handleClose={handleCloseDelete}
             handleAction={handleDeleteUser}
             message={`Are You Sure Do You Want to delete ${selectedRowData?.firstName} ${selectedRowData?.lastName}`}
+            isLoading={isLoading}
+            isSuccess={isSuccess}
           />
         </Dialog>
       </Box>
@@ -248,3 +281,6 @@ const UsersListTable = ({ users }: UserListTableProps) => {
 };
 
 export default UsersListTable;
+function setToastData(arg0: { message: string; success: boolean }) {
+  throw new Error("Function not implemented.");
+}
