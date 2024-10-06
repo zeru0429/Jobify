@@ -20,11 +20,11 @@ export const publicApi = createApi({
         method: "GET",
       }),
     }),
-    applyJob: builder.mutation<any, ApplicationFormType>({
-      query: (body: ApplicationFormType) => ({
+    applyJob: builder.mutation({
+      query: (formData) => ({
         url: "/api/applicant/apply-job",
         method: "POST",
-        data: body,
+        data: formData,
       }),
     }),
   }),

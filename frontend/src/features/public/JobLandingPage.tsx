@@ -35,7 +35,7 @@ export interface JobLandingPageType {
   salary: number;
   contactEmail: string;
   createdBy: string;
-  company: Company;
+  company: Company | null; // Allow company to be null
   createdAt: string;
   updatedAt: string;
   __v: number;
@@ -52,6 +52,16 @@ const JobLandingPage: React.FC<JobLandingPageProps> = ({ jobs }) => {
     navigate(`/apply/`, { state: job });
   };
 
+  // Function to format the date
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h4" gutterBottom align="center">
@@ -66,26 +76,30 @@ const JobLandingPage: React.FC<JobLandingPageProps> = ({ jobs }) => {
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
                 <Avatar
-                  src={job.company.avatar}
-                  alt={job.company.name}
+                  src={job.company?.avatar} // Use optional chaining
+                  alt={job.company?.name || "Company Avatar"} // Fallback for alt text
                   sx={{ mr: 2 }}
                 />
-                <Typography variant="h6">{job.company.name}</Typography>
+                <Typography variant="h6">
+                  {job.company?.name || "Unknown Company"}
+                </Typography>{" "}
+                {/* Fallback for company name */}
               </Box>
               <Typography variant="h5" component="div">
                 {job.title}
               </Typography>
               <Typography color="text.secondary">{job.type}</Typography>
               <Typography color="text.secondary">{job.location}</Typography>
-
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                noWrap={!showFullDescription}
-                sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
-              >
-                {job.description}
+              <Typography color="text.secondary">
+                Posted on: {formatDate(job.createdAt)}{" "}
+                {/* Display posted date */}
               </Typography>
+
+              <Collapse in={showFullDescription}>
+                <Typography variant="body2" color="text.secondary">
+                  {job.description}
+                </Typography>
+              </Collapse>
 
               <Button
                 variant="text"
@@ -95,12 +109,6 @@ const JobLandingPage: React.FC<JobLandingPageProps> = ({ jobs }) => {
               >
                 {showFullDescription ? "Show Less" : "See All"}
               </Button>
-
-              <Collapse in={showFullDescription}>
-                <Typography variant="body2" color="text.secondary">
-                  {job.description}
-                </Typography>
-              </Collapse>
 
               <Button
                 variant="contained"

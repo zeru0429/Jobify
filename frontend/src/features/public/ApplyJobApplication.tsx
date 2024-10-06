@@ -67,10 +67,21 @@ const ApplyJobApplication = () => {
 
   const onSubmit: SubmitHandler<ApplicationFormType> = async (data) => {
     try {
-      data.status = "applied";
-      console.log(data);
-      const response = await applyJob(data).unwrap();
-      console.log(response);
+      // Create form data
+      const formData = new FormData();
+      // Append data
+      formData.append("job", data.job);
+      formData.append("applicantName", data.applicantName);
+      formData.append("applicantEmail", data.applicantEmail);
+      if (data.coverLetter && data.coverLetter[0])
+        formData.append("files", data.coverLetter[0]);
+
+      if (data.resume && data.resume[0])
+        formData.append("files", data.resume[0]);
+
+      console.log(data); // Debugging purpose
+      const response = await applyJob(formData).unwrap();
+      console.log(response); // Debugging purpose
       setToastData({
         message: "Application submitted successfully",
         success: true,
@@ -141,7 +152,7 @@ const ApplyJobApplication = () => {
               register={register("resume", {
                 required: "Resume is required",
                 validate: {
-                  validFile: (value: File | null | undefined) => {
+                  validFile: (value: File[] | null | undefined) => {
                     if (!value) {
                       return "Resume is required";
                     }
@@ -163,7 +174,9 @@ const ApplyJobApplication = () => {
                   },
                 },
               })}
-              error={errors.resume}
+              error={
+                Array.isArray(errors.resume) ? errors.resume[0] : errors.resume
+              }
             />
 
             {/* Cover Letter Field */}
@@ -174,7 +187,7 @@ const ApplyJobApplication = () => {
               register={register("coverLetter", {
                 required: "CoverLetter is required",
                 validate: {
-                  validFile: (value: File | null | undefined) => {
+                  validFile: (value: File[] | null | undefined) => {
                     if (!value) {
                       return "Resume is required";
                     }
@@ -196,7 +209,11 @@ const ApplyJobApplication = () => {
                   },
                 },
               })}
-              error={errors.coverLetter}
+              error={
+                Array.isArray(errors.coverLetter)
+                  ? errors.coverLetter[0]
+                  : errors.coverLetter
+              }
             />
 
             <button

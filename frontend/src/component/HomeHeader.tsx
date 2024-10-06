@@ -68,9 +68,9 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
           ) : (
             <Button
               className="bg-[#002A47] hover:dark:bg-[#5a5a5a] dark:text-gray-200 px-3 py-1 text-white rounded-md"
-              onClick={handleLogOut}
+              onClick={() => navigate("/admin")}
             >
-              Logout
+              Admin
             </Button>
           )}
         </div>

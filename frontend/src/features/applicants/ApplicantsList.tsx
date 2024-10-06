@@ -7,6 +7,7 @@ import RectangularButton from "../../component/ui/RectangularButton";
 import { useGetAllApplicantQuery } from "../../services/applicants_service";
 import Loader from "../../component/Loading";
 
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const ApplicantsList = () => {
   const location = useLocation();
   const jobId = location.state;
@@ -28,6 +29,10 @@ const ApplicantsList = () => {
   console.log(applicants);
   return (
     <div>
+      {/* Close icon to close the modal */}
+      <ArrowBackIcon onClick={() => window.history.back()} />
+      <br />
+      <br />
       <Box
         sx={{
           width: "200px",

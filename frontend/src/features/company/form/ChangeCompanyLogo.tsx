@@ -43,7 +43,7 @@ const ChangeCompanyLogo: React.FC<ChangeCompanyLogoProps> = ({
         }).unwrap();
 
         setToastData({
-          message: "Company created successfully",
+          message: "logo updated successfully",
           success: true,
         });
         handleClose();
