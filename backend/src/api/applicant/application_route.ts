@@ -8,7 +8,7 @@ const applicationRouter = express.Router();
 
 // Create a new application
 applicationRouter.post(
-  "/",
+  "/apply-job",
   uploadMulti,
   (req: Request, res: Response, next: NextFunction) => {
     applicationController.createApplication(req, res, next);

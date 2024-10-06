@@ -78,7 +78,10 @@ const jobController = {
     const skip = parseInt(req.query.skip as string) || 0;
     const take = parseInt(req.query.take as string) || 10;
     // Fetch jobs with pagination
-    const jobs = await Job.find({ isAvailable: true }).skip(skip).limit(take);
+    const jobs = await Job.find({ isAvailable: true })
+      .populate("company")
+      .skip(skip)
+      .limit(take);
     const totalJobs = await Job.countDocuments({ isAvailable: true });
     res.status(200).json({
       success: true,

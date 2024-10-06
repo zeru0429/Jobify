@@ -51,24 +51,24 @@ const csp = {
 };
 app.use(cors(corsOptions));
 app.use(limiter);
-app.use(helmet());
+// app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(errorHandlerMiddleware);
-app.use(
-  helmet({
-    contentSecurityPolicy: csp,
-    crossOriginEmbedderPolicy: true,
-    crossOriginResourcePolicy: { policy: "same-origin" },
-    referrerPolicy: { policy: "no-referrer" },
-    hsts: {
-      maxAge: 31536000,
-      includeSubDomains: true,
-      preload: true,
-    },
-    xssFilter: false,
-  })
-);
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: csp,
+//     crossOriginEmbedderPolicy: true,
+//     crossOriginResourcePolicy: { policy: "same-origin" },
+//     referrerPolicy: { policy: "no-referrer" },
+//     hsts: {
+//       maxAge: 31536000,
+//       includeSubDomains: true,
+//       preload: true,
+//     },
+//     xssFilter: false,
+//   })
+// );
 cloudinary.config({
   cloud_name: CLOUD_NAME,
   api_key: CLOUD_API_KEY,
