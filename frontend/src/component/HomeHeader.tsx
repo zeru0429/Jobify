@@ -19,7 +19,6 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({
   isLoggedIn,
   toggleThemeData,
   themeData,
-  handleLogOut,
   navigate,
 }) => {
   const getThemeIcon = () => {

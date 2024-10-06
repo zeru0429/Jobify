@@ -15,30 +15,23 @@ import {
 } from "../../services/public_service";
 import { useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Avatar, Button } from "@mui/material";
 import CustomFileInputField from "../../component/ui/CustomeFileInput";
 
 const ApplyJobApplication = () => {
-  const navigator = useNavigate();
-  const { themeData, setThemeData } = useThemeData();
-
   const navigate = useNavigate();
+  const { themeData, setThemeData } = useThemeData();
   const { isLoggedIn, setUserData, fetchData } = useAuth();
   const [getIndexPage] = useGetIndexPageMutation();
+  const { setToastData } = useToast();
+  const [applyJob, { isLoading }] = useApplyJobMutation();
+
+  const location = useLocation();
+  const state: JobLandingPageType = location.state;
 
   useEffect(() => {
     getIndexPage({ take: 10, skip: 0 });
   }, [getIndexPage]);
-
-  const toggleThemeData = () => {
-    if (themeData === "light") {
-      setThemeData("dark");
-    } else if (themeData === "dark") {
-      setThemeData("light");
-    } else if (themeData === "system") {
-      setThemeData("dark");
-    }
-  };
 
   const handleLogOut = () => {
     localStorage.removeItem("token");
@@ -46,14 +39,6 @@ const ApplyJobApplication = () => {
     fetchData();
     navigate("/login");
   };
-
-  const location = useLocation();
-
-  const state: JobLandingPageType = location.state;
-
-  console.log(state);
-  const { setToastData } = useToast();
-  const [applyJob, { isLoading }] = useApplyJobMutation();
 
   const {
     register,
@@ -67,21 +52,14 @@ const ApplyJobApplication = () => {
 
   const onSubmit: SubmitHandler<ApplicationFormType> = async (data) => {
     try {
-      // Create form data
       const formData = new FormData();
-      // Append data
       formData.append("job", data.job);
       formData.append("applicantName", data.applicantName);
       formData.append("applicantEmail", data.applicantEmail);
-      if (data.coverLetter && data.coverLetter[0])
-        formData.append("files", data.coverLetter[0]);
+      if (data.coverLetter?.[0]) formData.append("files", data.coverLetter[0]);
+      if (data.resume?.[0]) formData.append("files", data.resume[0]);
 
-      if (data.resume && data.resume[0])
-        formData.append("files", data.resume[0]);
-
-      console.log(data); // Debugging purpose
-      const response = await applyJob(formData).unwrap();
-      console.log(response); // Debugging purpose
+      await applyJob(formData).unwrap();
       setToastData({
         message: "Application submitted successfully",
         success: true,
@@ -97,32 +75,54 @@ const ApplyJobApplication = () => {
   };
 
   return (
-    <Box>
+    <Box sx={{ padding: 4 }}>
       <HomeHeader
         isLoggedIn={isLoggedIn}
-        toggleThemeData={toggleThemeData}
+        toggleThemeData={() =>
+          setThemeData(themeData === "light" ? "dark" : "light")
+        }
         themeData={themeData}
         handleLogOut={handleLogOut}
-        navigate={navigator}
+        navigate={navigate}
       />
       <br />
-      {/* center header */}
+
       <Box
-        sx={{ height: "100px", display: "flex", justifyContent: "center" }}
-      ></Box>
-      <Box>
-        <Typography variant="h5" component="div">
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          marginTop: 4,
+        }}
+      >
+        <Avatar
+          src={state.company?.avatar}
+          alt={state.company?.name || "Company Avatar"}
+          sx={{ mr: 2 }}
+        />
+        <Typography variant="h6">
+          {state.company?.name || "Unknown Company"}
+        </Typography>{" "}
+        <Typography variant="h4" gutterBottom>
           {state.title}
         </Typography>
-        <Typography color="text.secondary">{state.type}</Typography>
-        <Typography color="text.secondary">{state.location}</Typography>
-        <br />
-      </Box>
-
-      <div className="w-full h-full">
-        <div className="w-full max-w-md p-6 shadow-md rounded-lg text-center m-auto">
+        <Typography variant="h6" color="text.secondary">
+          {state.type} | {state.location}
+        </Typography>
+        <Typography color="text.secondary">
+          Posted on: {new Date(state.createdAt).toLocaleDateString()}
+        </Typography>
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: 500,
+            marginTop: 4,
+            padding: 3,
+            boxShadow: 2,
+            borderRadius: 2,
+          }}
+        >
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            {/* Applicant Name Field */}
             <CustomInputField
               id="applicantName"
               type="text"
@@ -132,44 +132,35 @@ const ApplyJobApplication = () => {
               })}
               error={errors.applicantName}
             />
-            {/* Email Field */}
             <CustomInputField
               id="applicantEmail"
-              type="text"
-              placeholder="Applicant Name"
+              type="email"
+              placeholder="Applicant Email"
               register={register("applicantEmail", {
-                required: "Applicant name is required",
+                required: "Email is required",
+                pattern: {
+                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                  message: "Invalid email address",
+                },
               })}
               error={errors.applicantEmail}
             />
-
-            {/* Resume Field */}
-
             <CustomFileInputField
               id="resume"
-              placeholder="Company resume"
+              placeholder="Upload Resume"
               isSingle={true}
               register={register("resume", {
                 required: "Resume is required",
                 validate: {
                   validFile: (value: File[] | null | undefined) => {
-                    if (!value) {
-                      return "Resume is required";
-                    }
                     const validFileTypes = [
-                      "application/pdf", // PDF
-                      "application/vnd.ms-powerpoint", // PPT
-                      "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX
-                      "application/msword", // DOC
-                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+                      "application/pdf",
+                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                      "application/msword",
                     ];
-                    const file: any = value;
-                    if (file) {
-                      const data: File = file[0];
-                      if (!validFileTypes.includes(data.type)) {
-                        return "Please upload a valid file (PDF, PPT, DOC)";
-                      }
-                    }
+                    if (!value || !value[0]) return "Resume is required";
+                    if (!validFileTypes.includes(value[0].type))
+                      return "Please upload a valid file (PDF, DOC, DOCX)";
                     return true;
                   },
                 },
@@ -178,33 +169,22 @@ const ApplyJobApplication = () => {
                 Array.isArray(errors.resume) ? errors.resume[0] : errors.resume
               }
             />
-
-            {/* Cover Letter Field */}
             <CustomFileInputField
               id="coverLetter"
-              placeholder="Company CoverLetter"
+              placeholder="Upload Cover Letter"
               isSingle={true}
               register={register("coverLetter", {
-                required: "CoverLetter is required",
+                required: "Cover letter is required",
                 validate: {
                   validFile: (value: File[] | null | undefined) => {
-                    if (!value) {
-                      return "Resume is required";
-                    }
                     const validFileTypes = [
-                      "application/pdf", // PDF
-                      "application/vnd.ms-powerpoint", // PPT
-                      "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX
-                      "application/msword", // DOC
-                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
+                      "application/pdf",
+                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                      "application/msword",
                     ];
-                    const file: any = value;
-                    if (file) {
-                      const data: File = file[0];
-                      if (!validFileTypes.includes(data.type)) {
-                        return "Please upload a valid file (PDF, PPT, DOC)";
-                      }
-                    }
+                    if (!value || !value[0]) return "Cover letter is required";
+                    if (!validFileTypes.includes(value[0].type))
+                      return "Please upload a valid file (PDF, DOC, DOCX)";
                     return true;
                   },
                 },
@@ -215,17 +195,19 @@ const ApplyJobApplication = () => {
                   : errors.coverLetter
               }
             />
-
-            <button
+            <Button
               type="submit"
-              className="bg-[#002A47] w-full py-2 text-white rounded-md hover:bg-[#112737] dark:bg-[#071218] hover:dark:bg-[#0c1920] transition duration-300"
+              variant="contained"
+              color="primary"
+              sx={{ marginTop: 2, width: "100%" }}
             >
-              {isLoading ? <p>Loading</p> : <p>Submit Application</p>}
-            </button>
+              {isLoading ? "Loading..." : "Submit Application"}
+            </Button>
           </form>
-        </div>
-      </div>
+        </Box>
+      </Box>
     </Box>
   );
 };
+
 export default ApplyJobApplication;
