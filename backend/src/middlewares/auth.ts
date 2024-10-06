@@ -15,11 +15,12 @@ const isAuth = async (
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       res.status(403).json({
         success: false,
-        message: "Not authorized",
+        message: "Not authorized token not found",
       });
       return; // Ensure to return here to avoid further execution
     }
     const token = authHeader.split(" ")[1]; // Get the token part after "Bearer "
+
     // Verify the token
     const payload = (await jwt.verify(token, JWT_SECRET!)) as PayloadType;
     if (payload) {
@@ -41,11 +42,18 @@ const isAuth = async (
         message: "Not authorized",
       });
     }
-  } catch (error) {
-    res.status(403).json({
-      success: false,
-      message: "Not authorized",
-    });
+  } catch (error: any) {
+    if (error.name === "TokenExpiredError") {
+      res.status(401).json({
+        success: false,
+        message: "Token expired",
+      });
+    } else {
+      res.status(403).json({
+        success: false,
+        message: "Not authorized invalid token",
+      });
+    }
   }
 };
 
