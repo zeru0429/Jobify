@@ -1,8 +1,13 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import Application from "./applicant_module.js";
 
 const applicationController = {
-  createApplication: async (req: Request, res: Response) => {
+  createApplication: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    console.log(req.body);
     try {
       const {
         job,

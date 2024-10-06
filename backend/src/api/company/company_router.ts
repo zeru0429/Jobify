@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction } from "express";
 import { Request, Response } from "express";
 import companyController from "./company_controller.js";
 import { upload } from "../../config/multer.js";
@@ -14,17 +14,26 @@ companyRouter.post(
 );
 
 // Get all companies
-companyRouter.get("/", companyController.getAllCompanies);
+companyRouter.get("/", (req: Request, res: Response, next: NextFunction) => {
+  companyController.getAllCompanies(req, res, next);
+});
 
 // Get a single company by ID
-companyRouter.get("/:id", (req: Request, res: Response) => {
-  companyController.getSingleCompany;
+companyRouter.get("/:id", (req: Request, res: Response, next: NextFunction) => {
+  companyController.getSingleCompany(req, res, next);
 });
 
 // Update a company by ID
-companyRouter.put("/:id", (req: Request, res: Response) => {
-  companyController.updateCompany;
+companyRouter.patch("/:id/profile", (req: Request, res: Response) => {
+  companyController.updateCompanyProfile(req, res);
 });
+companyRouter.patch(
+  "/:id/change-logo",
+  upload.single("file"),
+  (req: Request, res: Response) => {
+    companyController.updateCompanyLogo(req, res);
+  }
+);
 
 // Delete a company by ID
 companyRouter.delete("/:id", (req: Request, res: Response) => {

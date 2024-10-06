@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction } from "express";
 import { Request, Response } from "express";
 import applicationController from "./application_controller.js";
 import { isAuth } from "../../middlewares/auth.js";
@@ -6,9 +6,12 @@ import { isAuth } from "../../middlewares/auth.js";
 const applicationRouter = express.Router();
 
 // Create a new application
-applicationRouter.post("/", (req: Request, res: Response) => {
-  applicationController.createApplication;
-});
+applicationRouter.post(
+  "/",
+  (req: Request, res: Response, next: NextFunction) => {
+    applicationController.createApplication(req, res, next);
+  }
+);
 
 // Get all applications
 applicationRouter.get("/", applicationController.getAllApplications);
