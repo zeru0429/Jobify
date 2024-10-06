@@ -162,12 +162,8 @@ const userController = {
         message: "New password does not meet requirements",
       });
     }
-
-    // Hash the new password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-
     // Save the user with the new password
+    user.password = password;
     await user.save();
 
     res.status(200).json({
