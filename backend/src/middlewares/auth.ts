@@ -28,18 +28,18 @@ const isAuth = async (
       const user = await User.findById(payload.id);
 
       if (user) {
-        req.user = user as UserType; // Cast to UserType since user is not null
-        next(); // Call the next middleware
+        req.user = user as UserType;
+        next();
       } else {
-        res.status(404).json({
+        res.status(401).json({
           success: false,
-          message: "User not found",
+          message: "invalid toke user not found",
         });
       }
     } else {
-      res.status(403).json({
+      res.status(401).json({
         success: false,
-        message: "Not authorized",
+        message: "Not authorized invalid token",
       });
     }
   } catch (error: any) {
