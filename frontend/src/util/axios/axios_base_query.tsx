@@ -16,12 +16,17 @@ export const axiosBaseQuery =
     headers?: any;
   }) => {
     try {
+      // Check if data is FormData, and avoid setting Content-Type manually
+      const isFormData = data instanceof FormData;
       const result = await axiosInstance({
         url: baseUrl ? `${baseUrl}${url}` : url,
         method,
         data,
         params,
-        headers,
+        headers: {
+          ...headers,
+          ...(isFormData ? {} : { "Content-Type": "application/json" }), // Only set for non-FormData requests
+        },
       });
       return { data: result.data };
     } catch (axiosError: any) {
@@ -32,7 +37,6 @@ export const axiosBaseQuery =
       console.log(`${err} ====== `);
       if (err.status === 401) {
         localStorage.removeItem("token");
-        //navigate to login page using window
         window.location.href = "/login";
       }
 

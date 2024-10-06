@@ -9,11 +9,10 @@ export const companyApi = createApi({
   baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/api/company` }),
   tagTypes: ["company"],
   endpoints: (builder) => ({
-    createCompany: builder.mutation<any, FormData>({
+    createCompany: builder.mutation({
       query: (formData) => ({
         url: "/",
         method: "POST",
-
         data: formData,
       }),
       invalidatesTags: ["company"],

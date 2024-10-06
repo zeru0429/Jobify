@@ -22,7 +22,7 @@ export interface RegisterUserFormType {
 export interface RegisterCompanyFormType {
   name: string;
   type: string;
-  logo?: File | null;
+  logo?: File[] | null;
   companyType: string;
   address: string;
   description?: string;

@@ -9,33 +9,31 @@ import { BASE_URL } from "../secrete";
 const instance = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
-// Set the token in the request headers
 instance.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     const token = await getToken();
+
     if (token) {
-      const headers = AxiosHeaders.from(config.headers); // Create an AxiosHeaders instance
-      headers.set("Authorization", `Bearer ${token}`); // Set the Authorization header
-      config.headers = headers; // Assign the modified headers back to config
+      const headers = AxiosHeaders.from(config.headers);
+      headers.set("Authorization", `Bearer ${token}`);
+      config.headers = headers;
     }
-    return config; // Return the modified config
+
+    // Do NOT set the Content-Type if the data is FormData
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"]; // Let Axios set it to multipart/form-data automatically
+    }
+
+    return config;
   },
-  (error) => {
-    return Promise.reject(error); // Handle the error
-  }
+  (error) => Promise.reject(error)
 );
+
 instance.interceptors.response.use(
-  (response: AxiosResponse) => {
-    return response.data;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (response: AxiosResponse) => response.data,
+  (error) => Promise.reject(error)
 );
 
 export default instance;

@@ -29,8 +29,8 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
   const onSubmit: SubmitHandler<RegisterCompanyFormType> = async (data) => {
     try {
       // Create a FormData object for file uploads
+
       const formData = new FormData();
-      formData.append("admin", userData?.id.toString() || "");
       formData.append("name", data.name);
       formData.append("type", data.type);
       formData.append("companyType", data.companyType);
@@ -38,9 +38,10 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
       formData.append("description", data.description || "");
 
       // Append logo if present
-      if (data.logo) {
-        formData.append("file", data.logo);
+      if (data.logo && data.logo[0]) {
+        formData.append("file", data.logo[0]);
       }
+      console.log(data.logo);
 
       await createCompany(formData).unwrap();
 
@@ -57,6 +58,31 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
       });
     }
   };
+  /*
+    const onSubmit: SubmitHandler<RegisterCompanyFormType> = async (data) => {
+    try {
+      const formData = new FormData();
+      formData.append("admin", userData?.id.toString() || "");
+      formData.append("name", data.name);
+      formData.append("type", data.type);
+      formData.append("companyType", data.companyType);
+      formData.append("address", data.address);
+      formData.append("description", data.description || "");
+
+      // Handle file upload
+      if (data.logo && data.logo[0]) {
+        formData.append("file", data.logo[0]);
+      }
+
+      await createCompany(formData).unwrap();
+      setToastData({ message: "Company created successfully", success: true });
+      handleClose();
+    } catch (error: any) {
+      const res: ErrorResponseType = error;
+      setToastData({ message: res.data.message.toString(), success: false });
+    }
+  };
+   */
 
   return (
     <div className="w-full">
@@ -122,7 +148,7 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
             register={register("logo", {
               required: "Logo is required",
               validate: {
-                validImage: (value: File | null | undefined) => {
+                validImage: (value: File[] | null | undefined) => {
                   if (!value) {
                     return "Logo is required";
                   }
