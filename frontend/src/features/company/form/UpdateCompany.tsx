@@ -4,57 +4,69 @@ import {
   RegisterCompanyFormType,
 } from "../../../_types/form_types";
 import CustomInputField from "../../../component/ui/CustomInputField";
-import { useAuth } from "../../../context/AuthContext";
 import { useToast } from "../../../context/ToastContext";
-import { useCreateCompanyMutation } from "../../../services/company_service";
-import CustomFileInputField from "../../../component/ui/CustomeFileInput";
+import { useUpdateCompanyProfileMutation } from "../../../services/company_service";
 import CustomButton from "../../../component/ui/CustomButton";
 import CustomTextArea from "../../../component/ui/CustomeTextArea";
+import { CompanyListType } from "../CompanyListTable";
 
-interface AddCompanyProps {
+interface UpdateCompanyProps {
   handleClose: () => void;
+  selectedRowData: CompanyListType | null;
 }
 
-const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
+const UpdateCompany: React.FC<UpdateCompanyProps> = ({
+  handleClose,
+  selectedRowData,
+}) => {
   const { setToastData } = useToast();
-  const { userData } = useAuth();
-  const [createCompany, { isLoading }] = useCreateCompanyMutation();
+
+  const [updateCompany, { isLoading }] = useUpdateCompanyProfileMutation();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterCompanyFormType>();
+  } = useForm<RegisterCompanyFormType>({
+    defaultValues: {
+      address: selectedRowData?.address || "",
+      companyType: selectedRowData?.companyType || "",
+      description: selectedRowData?.description || "",
+      name: selectedRowData?.name || "",
+      type: selectedRowData?.type || "",
+    },
+  });
 
   const onSubmit: SubmitHandler<RegisterCompanyFormType> = async (data) => {
-    try {
-      // Create a FormData object for file uploads
-      const formData = new FormData();
-      formData.append("admin", userData?.id.toString() || "");
-      formData.append("name", data.name);
-      formData.append("type", data.type);
-      formData.append("companyType", data.companyType);
-      formData.append("address", data.address);
-      formData.append("description", data.description || "");
+    if (selectedRowData) {
+      try {
+        console.log({
+          body: data,
+          params: selectedRowData._id,
+        });
+        await updateCompany({
+          body: data,
+          params: selectedRowData._id,
+        }).unwrap();
 
-      // Append logo if present
-      if (data.logo) {
-        formData.append("file", data.logo);
+        setToastData({
+          message: "Company updated successfully",
+          success: true,
+        });
+        handleClose();
+      } catch (error: any) {
+        const res: ErrorResponseType = error;
+        setToastData({
+          message: res.data.message.toString(),
+          success: false,
+        });
       }
-
-      await createCompany(formData).unwrap();
-
+    } else {
       setToastData({
-        message: "Company created successfully",
-        success: true,
-      });
-      handleClose();
-    } catch (error: any) {
-      const res: ErrorResponseType = error;
-      setToastData({
-        message: res.data.message.toString(),
+        message: "Company ID is missing",
         success: false,
       });
+      handleClose();
     }
   };
 
@@ -114,38 +126,6 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
             error={errors.type}
           />
 
-          {/* Company Logo Field */}
-          <CustomFileInputField
-            id="logo"
-            placeholder="Company Logo"
-            isSingle={true}
-            register={register("logo", {
-              required: "Logo is required",
-              validate: {
-                validImage: (value: File | null | undefined) => {
-                  if (!value) {
-                    return "Logo is required";
-                  }
-                  const validImageTypes = [
-                    "image/jpeg",
-                    "image/png",
-                    "image/gif",
-                    "image/webp",
-                  ];
-                  const file: any = value;
-                  if (file) {
-                    const data: File = file[0];
-                    if (!validImageTypes.includes(data.type)) {
-                      return "Please upload a valid image (JPEG, PNG, GIF, WEBP)";
-                    }
-                  }
-                  return true;
-                },
-              },
-            })}
-            error={errors.logo}
-          />
-
           {/* Company Address Field */}
           <CustomInputField
             id="address"
@@ -171,7 +151,7 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
             isLoading={isLoading}
             onClick={() => console.log("Button Clicked")}
           >
-            Add Company
+            Update Company
           </CustomButton>
         </form>
       </div>
@@ -179,4 +159,4 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
   );
 };
 
-export default AddCompany;
+export default UpdateCompany;

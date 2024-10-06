@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { axiosBaseQuery } from "../util/axios/axios_base_query";
 import { BASE_URL } from "../util/secrete";
+import { RegisterCompanyFormType } from "../_types/form_types";
 
 // Create API service
 export const companyApi = createApi({
@@ -31,10 +32,32 @@ export const companyApi = createApi({
       }),
       providesTags: (_result, _error, id) => [{ type: "company", id }],
     }),
-    deleteCompany: builder.mutation<any, string>({
-      query: (id: string) => ({
-        url: `/${id}`,
+    deleteCompany: builder.mutation<any, { params: string }>({
+      query: ({ params }) => ({
+        url: `/${params}`,
         method: "DELETE",
+      }),
+      invalidatesTags: ["company"],
+    }),
+    updateCompanyProfile: builder.mutation<
+      any,
+      { body: RegisterCompanyFormType; params: string }
+    >({
+      query: ({ body, params }) => ({
+        url: `/${params}/profile`,
+        method: "PATCH",
+        data: body,
+      }),
+      invalidatesTags: ["company"],
+    }),
+    changeCompanyLogo: builder.mutation<
+      any,
+      { formData: FormData; params: string }
+    >({
+      query: ({ formData, params }) => ({
+        url: `/${params}/change-logo`,
+        method: "PATCH",
+        data: formData,
       }),
       invalidatesTags: ["company"],
     }),
@@ -45,6 +68,8 @@ export const companyApi = createApi({
 export const {
   useCreateCompanyMutation,
   useGetAllCompanyQuery,
+  useUpdateCompanyProfileMutation,
   useGetSingleCompanyQuery,
+  useChangeCompanyLogoMutation,
   useDeleteCompanyMutation,
 } = companyApi;

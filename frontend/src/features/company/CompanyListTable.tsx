@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 // MRT Imports
 import {
@@ -10,26 +10,107 @@ import {
 } from "material-react-table";
 
 // Material UI Imports
-import { Box, ListItemIcon, MenuItem, lighten } from "@mui/material";
+import {
+  Box,
+  Chip,
+  Dialog,
+  ListItemIcon,
+  MenuItem,
+  lighten,
+} from "@mui/material";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { DeleteForever } from "@mui/icons-material";
+import { useToast } from "../../context/ToastContext";
+import { useDeleteCompanyMutation } from "../../services/company_service";
+import { ErrorResponseType } from "../../_types/form_types";
 
+import Warning from "../../component/Warning";
+import UpdateCompany from "./form/UpdateCompany";
+import ChangeCompanyLogo from "./form/ChangeCompanyLogo";
 // Icons Imports
-import { AccountCircle, Send } from "@mui/icons-material";
 
 // Mock Data
 
 export type CompanyListType = {
   _id: string;
   name: string;
-  logo: string;
+  logo?: string;
+  avatar?: string;
   admin: string;
-  createdAt: string; // Change to string to match the actual data
-  updatedAt: string; // Change to string to match the actual data
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  type?: string;
+  companyType?: string;
+  address?: string;
+  description?: string;
 };
+
 interface CompanyListTableProps {
   companies: CompanyListType[];
 }
 
 const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openChangeLogo, setOpenChangeLogo] = useState(false);
+  const { setToastData } = useToast();
+  const [selectedRowData, setSelectedRowData] =
+    useState<CompanyListType | null>(null);
+
+  const [deleteCompany, { isLoading, isSuccess }] = useDeleteCompanyMutation();
+  const handleClickOpenDelete = (row: CompanyListType) => {
+    setSelectedRowData(row);
+    setOpenDelete(true);
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
+
+  const handleClickOpenEdit = (row: CompanyListType) => {
+    setSelectedRowData(row);
+    setOpenEdit(true);
+  };
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
+
+  const handleClickOpenChangeLogo = (row: CompanyListType) => {
+    setSelectedRowData(row);
+    setOpenChangeLogo(true);
+  };
+  const handleCloseChangeLogo = () => {
+    setOpenChangeLogo(false);
+  };
+
+  const handleDeleteCompany = async () => {
+    if (selectedRowData?._id != null) {
+      try {
+        await deleteCompany({ params: selectedRowData?._id }).unwrap();
+        setToastData({
+          message: "User deleted successfully",
+          success: true,
+        });
+        handleCloseDelete();
+      } catch (error: any) {
+        handleCloseDelete();
+        const res: ErrorResponseType = error;
+        setToastData({
+          message: res.data.message,
+          success: false,
+        });
+      }
+    } else {
+      handleCloseDelete();
+      setToastData({
+        message: "User not selected is missing",
+        success: false,
+      });
+    }
+  };
+
   const columns = useMemo<MRT_ColumnDef<CompanyListType>[]>(
     () => [
       {
@@ -42,24 +123,50 @@ const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
             size: 250,
           },
           {
-            accessorKey: "logo",
-            header: "Logo",
+            accessorKey: "avatar",
+            header: "Avatar",
             size: 100,
             Cell: ({ cell }) => {
-              const logoUrl = cell.getValue<string>();
-              const isValidUrl = logoUrl && !logoUrl.includes("undefined");
+              const avatarUrl = cell.getValue<string>();
+              const isValidUrl = avatarUrl && !avatarUrl.includes("undefined");
               return (
                 <img
                   src={
                     isValidUrl
-                      ? logoUrl
-                      : "https://via.placeholder.com/50x50?text=No+Logo"
+                      ? avatarUrl
+                      : "https://via.placeholder.com/50x50?text=No+Avatar"
                   }
-                  alt="Company Logo"
+                  alt="Company Avatar"
                   style={{ width: "50px", height: "50px", borderRadius: "4px" }}
                 />
               );
             },
+          },
+          {
+            accessorKey: "address",
+            header: "Address",
+            size: 200,
+          },
+          {
+            accessorKey: "type",
+            header: "Type",
+            size: 150,
+          },
+          {
+            accessorKey: "companyType",
+            header: "Company Type",
+            size: 150,
+          },
+          {
+            accessorKey: "isActive",
+            header: "Status",
+            Cell: ({ cell }) => (
+              <Chip
+                label={cell.getValue<boolean>() ? "Active" : "Inactive"}
+                color={cell.getValue<boolean>() ? "success" : "error"}
+              />
+            ),
+            size: 100,
           },
         ],
       },
@@ -74,11 +181,6 @@ const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
             sortingFn: "datetime",
             Cell: ({ cell }) =>
               new Date(cell.getValue<string>()).toLocaleDateString(),
-          },
-          {
-            accessorKey: "admin",
-            header: "Admin ID",
-            size: 200,
           },
         ],
       },
@@ -97,6 +199,10 @@ const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
     enableRowActions: true,
     enableRowSelection: true,
     initialState: {
+      pagination: {
+        pageSize: 5,
+        pageIndex: 0,
+      },
       showGlobalFilter: true,
       columnPinning: {
         left: ["mrt-row-expand", "mrt-row-select"],
@@ -111,39 +217,53 @@ const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
     },
     muiPaginationProps: {
       color: "secondary",
-      rowsPerPageOptions: [10, 20, 30],
+      rowsPerPageOptions: [5, 10, 20, 30],
       shape: "rounded",
       variant: "outlined",
     },
 
-    renderRowActionMenuItems: ({ closeMenu }) => [
+    renderRowActionMenuItems: ({ row, closeMenu }) => [
       <MenuItem
-        key={0}
+        key={`edit-${row.original._id}`}
         onClick={() => {
-          // View company details logic...
+          handleClickOpenEdit(row.original);
           closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <AccountCircle />
+          <PersonAddIcon />
         </ListItemIcon>
-        View Details
+        Edit company profile
       </MenuItem>,
       <MenuItem
-        key={1}
+        key={`changeLogo-${row.original._id}`}
         onClick={() => {
-          // Send email logic...
+          handleClickOpenChangeLogo(row.original);
           closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <Send />
+          <VpnKeyIcon />
         </ListItemIcon>
-        Send Email
+        changeLogo Password
+      </MenuItem>,
+      <MenuItem
+        key={`delete-${row.original._id}`}
+        onClick={() => {
+          handleClickOpenDelete(row.original);
+          closeMenu();
+        }}
+        sx={{ m: 0 }}
+      >
+        <ListItemIcon>
+          <DeleteForever />
+        </ListItemIcon>
+        Delete
       </MenuItem>,
     ],
+
     renderTopToolbar: ({ table }) => (
       <Box
         sx={(theme) => ({
@@ -162,7 +282,39 @@ const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
     ),
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <>
+      <Box>
+        <MaterialReactTable table={table} />
+      </Box>
+      <Box>
+        {/* Dialog for update Company Profile */}
+        <Dialog open={openEdit}>
+          <UpdateCompany
+            handleClose={handleCloseEdit}
+            selectedRowData={selectedRowData}
+          />
+        </Dialog>
+        {/* Dialog for change logo */}
+        <Dialog open={openChangeLogo}>
+          <ChangeCompanyLogo
+            handleClose={handleCloseChangeLogo}
+            selectedRowData={selectedRowData}
+          />
+        </Dialog>
+        {/* Delete */}
+        <Dialog open={openDelete}>
+          <Warning
+            handleClose={handleCloseDelete}
+            handleAction={handleDeleteCompany}
+            message={`Are You Sure Do You Want to delete ${selectedRowData?.name}`}
+            isLoading={isLoading}
+            isSuccess={isSuccess}
+          />
+        </Dialog>
+      </Box>
+    </>
+  );
 };
 
 export default CompanyListTable;

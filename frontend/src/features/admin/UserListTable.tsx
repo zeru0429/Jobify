@@ -20,6 +20,7 @@ import { DeleteForever } from "@mui/icons-material";
 import Warning from "../../component/Warning";
 import { useDeleteUserMutation } from "../../services/user_service";
 import { ErrorResponseType } from "../../_types/form_types";
+import { useToast } from "../../context/ToastContext";
 
 // Define user list table props type
 type UserListTableProps = {
@@ -27,11 +28,11 @@ type UserListTableProps = {
 };
 
 const UsersListTable = ({ users }: UserListTableProps) => {
+  const { setToastData } = useToast();
   const [selectedRowData, setSelectedRowData] = useState<UserListType | null>(
     null
   );
   const [deleteUser, { isLoading, isSuccess }] = useDeleteUserMutation();
-
   const [openEdit, setOpenEdit] = useState(false);
   const [openReset, setOpenReset] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -172,6 +173,10 @@ const UsersListTable = ({ users }: UserListTableProps) => {
     enableRowActions: true,
     enableRowSelection: true,
     initialState: {
+      pagination: {
+        pageSize: 5,
+        pageIndex: 0,
+      },
       showGlobalFilter: true,
       columnPinning: {
         left: ["mrt-row-expand", "mrt-row-select"],
@@ -281,6 +286,3 @@ const UsersListTable = ({ users }: UserListTableProps) => {
 };
 
 export default UsersListTable;
-function setToastData(arg0: { message: string; success: boolean }) {
-  throw new Error("Function not implemented.");
-}
