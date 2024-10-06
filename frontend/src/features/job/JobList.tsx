@@ -6,7 +6,6 @@ import RectangularButton from "../../component/ui/RectangularButton";
 import { useNavigate } from "react-router-dom";
 import { useGetAllJobQuery } from "../../services/job_service";
 import Loader from "../../component/Loading";
-import UsersListTable from "../admin/UserListTable";
 
 const JobList = () => {
   const navigator = useNavigate();

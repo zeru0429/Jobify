@@ -146,7 +146,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
             header: "Created At",
             filterVariant: "date",
             sortingFn: "datetime",
-            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(), // Render Date as string
+            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(),
           },
           {
             accessorFn: (row) => new Date(row.updatedAt),
@@ -154,7 +154,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
             header: "Updated At",
             filterVariant: "date",
             sortingFn: "datetime",
-            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(), // Render Date as string
+            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(),
           },
         ],
       },

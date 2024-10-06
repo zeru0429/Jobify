@@ -28,14 +28,14 @@ const CustomTextArea: React.FC<CustomTextAreaProps> = ({
         id={id}
         placeholder={placeholder}
         rows={rows}
-        className={`w-full px-10 py-2 rounded-md text-black dark:text-white outline-none transition 
+        className={`w-full  h-[500px] px-10 py-2 rounded-md text-black dark:text-white outline-none transition 
           border 
           ${error ? "border-red-600" : "border-gray-300 dark:border-gray-600"} 
           bg-white dark:bg-gray-800 
           focus:border-blue-500 focus:ring focus:ring-blue-300`}
         {...register}
-        onFocus={onFocus} // Pass the onFocus function
-        onBlur={onBlur} // Pass the onBlur function
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
       {iconPath && (
         <svg

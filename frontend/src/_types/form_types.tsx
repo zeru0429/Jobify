@@ -36,9 +36,10 @@ export interface RegisterJobFormType {
   createdAt: Date;
   salary: number;
   contactEmail: string;
-  createdBy: string;
+  contactName: string;
+  contactNumber: string;
   company: string;
-  updatedAt?: Date;
+  createdBy: string;
 }
 
 export interface ApplicationFormType {

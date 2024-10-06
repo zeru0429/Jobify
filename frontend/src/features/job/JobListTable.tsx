@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 // MRT Imports
 import {
@@ -8,15 +8,31 @@ import {
   MRT_GlobalFilterTextField,
   MRT_ToggleFiltersButton,
 } from "material-react-table";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { useToast } from "../../context/ToastContext";
 
 // Material UI Imports
-import { Box, Button, ListItemIcon, MenuItem, lighten } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  ListItemIcon,
+  MenuItem,
+  lighten,
+} from "@mui/material";
 
 // Icons Imports
-import { AccountCircle, Send } from "@mui/icons-material";
+import { AccountCircle, DeleteForever, Send } from "@mui/icons-material";
+import { useDeleteJobMutation } from "../../services/job_service";
+import { ErrorResponseType } from "../../_types/form_types";
+import Warning from "../../component/Warning";
+
 // Mock Data
 
 export type JobListType = {
+  _id: string;
+  isAvailable: boolean;
   title: string;
   type: string;
   description: string;
@@ -32,7 +48,59 @@ export type JobListType = {
 type JobListTableProps = {
   jobs: JobListType[];
 };
+
 const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
+  const { setToastData } = useToast();
+
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [selectedRowData, setSelectedRowData] = useState<JobListType | null>(
+    null
+  );
+  const [deleteJob, { isLoading, isSuccess }] = useDeleteJobMutation();
+  const handleClickOpenEdit = (row: JobListType) => {
+    setSelectedRowData(row);
+    setOpenEdit(true);
+  };
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
+
+  const handleClickOpenDelete = (row: JobListType) => {
+    setSelectedRowData(row);
+    setOpenDelete(true);
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
+
+  const handleDeleteJob = async () => {
+    if (selectedRowData?._id != null) {
+      try {
+        await deleteJob({ params: selectedRowData?._id }).unwrap();
+        setToastData({
+          message: "User deleted successfully",
+          success: true,
+        });
+        handleCloseDelete();
+      } catch (error: any) {
+        handleCloseDelete();
+        const res: ErrorResponseType = error;
+        setToastData({
+          message: res.data.message,
+          success: false,
+        });
+      }
+    } else {
+      handleCloseDelete();
+      setToastData({
+        message: "User not selected is missing",
+        success: false,
+      });
+    }
+  };
+
   const columns = useMemo<MRT_ColumnDef<JobListType>[]>(
     () => [
       {
@@ -85,6 +153,25 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
             header: "Job Type",
             size: 150,
           },
+          {
+            accessorKey: "isAvailable",
+            header: "Availability",
+            Cell: ({ cell }) => (
+              <Box
+                component="span"
+                sx={{
+                  backgroundColor: cell.getValue<boolean>() ? "green" : "red",
+                  borderRadius: "0.25rem",
+                  color: "#fff",
+                  maxWidth: "6ch",
+                  p: "0.25rem",
+                  textAlign: "center",
+                }}
+              >
+                {cell.getValue<boolean>() ? "Available" : "Unavailable"}
+              </Box>
+            ),
+          },
         ],
       },
       {
@@ -92,13 +179,13 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
         header: "Additional Info",
         columns: [
           {
-            accessorFn: (row) => new Date(row.createdAt), // convert to Date for sorting and filtering
+            accessorFn: (row) => new Date(row.createdAt),
             id: "createdAt",
             header: "Created At",
             filterVariant: "date",
             filterFn: "lessThan",
             sortingFn: "datetime",
-            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(), // render Date as a string
+            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(),
           },
           {
             accessorKey: "contactEmail",
@@ -143,44 +230,57 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
       variant: "outlined",
     },
 
-    renderRowActionMenuItems: ({ closeMenu }) => [
+    renderRowActionMenuItems: ({ row, closeMenu }) => [
       <MenuItem
-        key={0}
+        key={`edit-${row.original._id}`}
         onClick={() => {
-          // View job details logic...
+          // handleClickOpenEdit(row.original);
           closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <AccountCircle />
+          <PersonAddIcon />
         </ListItemIcon>
-        View Job Details
+        Edit Job
       </MenuItem>,
       <MenuItem
-        key={1}
+        key={`reset-${row.original._id}`}
         onClick={() => {
-          // Send email logic...
+          // handleClickOpenReset(row.original);
           closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <Send />
+          <VpnKeyIcon />
         </ListItemIcon>
-        Send Email
+        View detail;
+      </MenuItem>,
+      <MenuItem
+        key={`delete-${row.original._id}`}
+        onClick={() => {
+          handleClickOpenDelete(row.original);
+          closeMenu();
+        }}
+        sx={{ m: 0 }}
+      >
+        <ListItemIcon>
+          <DeleteForever />
+        </ListItemIcon>
+        Delete
       </MenuItem>,
     ],
     renderTopToolbar: ({ table }) => {
       const handleDeactivate = () => {
         table.getSelectedRowModel().flatRows.map((row) => {
-          alert("deactivating job " + row.getValue("title"));
+          alert("Deactivating job: " + row.getValue("title"));
         });
       };
 
       const handleActivate = () => {
         table.getSelectedRowModel().flatRows.map((row) => {
-          alert("activating job " + row.getValue("title"));
+          alert("Activating job: " + row.getValue("title"));
         });
       };
 
@@ -223,7 +323,23 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
     },
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <>
+      {/* Delete */}
+      <Box>
+        <MaterialReactTable table={table} />
+      </Box>
+      <Dialog open={openDelete}>
+        <Warning
+          handleClose={handleCloseDelete}
+          handleAction={handleDeleteJob}
+          message={`Are You Sure Do You Want to delete ${selectedRowData?.title} `}
+          isLoading={isLoading}
+          isSuccess={isSuccess}
+        />
+      </Dialog>
+    </>
+  );
 };
 
 export default JobListTable;
