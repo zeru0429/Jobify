@@ -237,7 +237,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
       </MenuItem>,
     ],
 
-    renderTopToolbar: ({ table }) => {
+    renderTopToolbar: ({}) => {
       return (
         <Box
           sx={(theme) => ({

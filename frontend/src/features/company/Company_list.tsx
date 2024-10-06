@@ -7,7 +7,6 @@ import AddCompany from "./form/AddCompany";
 import { useState } from "react";
 import { useGetAllCompanyQuery } from "../../services/company_service";
 import Loader from "../../component/Loading";
-import UpdateCompany from "./form/UpdateCompany";
 
 const CompanyList = () => {
   const [open, setOpen] = useState(false);

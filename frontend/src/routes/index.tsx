@@ -42,10 +42,7 @@ export const router = createBrowserRouter(
 
         <Route path="/admin/job" element={<JobList />} />
         <Route path="/admin/add-job" element={<AddJob />} />
-        <Route
-          path="/admin/update-job"
-          element={<UpdateJob selectedRowData={null} />}
-        />
+        <Route path="/admin/update-job" element={<UpdateJob />} />
 
         <Route path="/admin/applicants" element={<ApplicantsList />} />
         <Route path="/admin/add-applicant" element={<AddApplication />} />

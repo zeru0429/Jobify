@@ -23,7 +23,7 @@ import {
 } from "@mui/material";
 
 // Icons Imports
-import { AccountCircle, DeleteForever, Send } from "@mui/icons-material";
+import { DeleteForever } from "@mui/icons-material";
 import { useDeleteJobMutation } from "../../services/job_service";
 import { ErrorResponseType } from "../../_types/form_types";
 import Warning from "../../component/Warning";
@@ -54,19 +54,11 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
   const navigator = useNavigate();
   const { setToastData } = useToast();
 
-  const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState<JobListType | null>(
     null
   );
   const [deleteJob, { isLoading, isSuccess }] = useDeleteJobMutation();
-  const handleClickOpenEdit = (row: JobListType) => {
-    setSelectedRowData(row);
-    setOpenEdit(true);
-  };
-  const handleCloseEdit = () => {
-    setOpenEdit(false);
-  };
 
   const handleClickOpenDelete = (row: JobListType) => {
     setSelectedRowData(row);

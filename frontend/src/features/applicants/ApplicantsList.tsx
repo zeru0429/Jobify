@@ -1,6 +1,6 @@
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ApplicantListTable from "./ApplicantListTable";
 import RectangularButton from "../../component/ui/RectangularButton";
