@@ -79,9 +79,11 @@ const applicationController = {
     // Upload the files to Cloudinary
     const coverLetter = await cloudinary.uploader.upload(validFileContents[0], {
       folder: "applications/cover_letters",
+      resource_type: "raw",
     });
     const resume = await cloudinary.uploader.upload(validFileContents[1], {
       folder: "applications/resumes",
+      resource_type: "raw",
     });
 
     // Create the application document
