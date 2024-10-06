@@ -17,11 +17,12 @@ import ApplicantsList from "../features/applicants/ApplicantsList";
 import AddJob from "../features/job/form/AddJob";
 import AddApplication from "../features/applicants/AddApplicant";
 import UpdateJob from "../features/job/form/UpdateJob";
+import Home from "../features/public/Home";
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       {/* root section */}
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/confirm-password" element={<ConfirmPassword />} />
       <Route path="/forget-password" element={<ForgetPassword />} />

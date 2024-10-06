@@ -6,7 +6,7 @@ import { ApplicationFormType } from "../_types/form_types";
 // Create API service
 export const applicantApi = createApi({
   reducerPath: "applicantApi",
-  baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/applicant/` }),
+  baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/api/applicant/` }),
   tagTypes: ["applicant"],
   endpoints: (builder) => ({
     createApplicant: builder.mutation<any, ApplicationFormType>({
@@ -17,9 +17,9 @@ export const applicantApi = createApi({
       }),
       invalidatesTags: ["applicant"],
     }),
-    getAllApplicant: builder.query({
-      query: () => ({
-        url: "/",
+    getAllApplicant: builder.query<any, { params: string }>({
+      query: ({ params }) => ({
+        url: `/job/${params}`,
         method: "GET",
       }),
       providesTags: ["applicant"],

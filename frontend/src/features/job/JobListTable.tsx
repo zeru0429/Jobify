@@ -243,7 +243,8 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
       <MenuItem
         key={`reset-${row.original._id}`}
         onClick={() => {
-          // handleClickOpenReset(row.original);
+          navigator(`/admin/applicants`, { state: row.original._id });
+
           closeMenu();
         }}
         sx={{ m: 0 }}
@@ -251,7 +252,7 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
         <ListItemIcon>
           <VpnKeyIcon />
         </ListItemIcon>
-        View detail;
+        View Applicants list
       </MenuItem>,
       <MenuItem
         key={`delete-${row.original._id}`}

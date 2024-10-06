@@ -45,8 +45,7 @@ const AddJob: React.FC<AddJobProps> = () => {
   const onSubmit: SubmitHandler<RegisterJobFormType> = async (data) => {
     try {
       data.createdBy = userData?.id.toString();
-      console.log(data);
-
+      data.isAvailable = JSON.parse(`${data.isAvailable}`);
       const response = await createJob(data).unwrap();
       console.log(response);
       setToastData({
@@ -133,6 +132,26 @@ const AddJob: React.FC<AddJobProps> = () => {
               <Loader />
             </div>
           )}
+          {/* isAvailable */}
+          <CustomDropdownField
+            id="isAvailable"
+            options={[
+              {
+                label: "Available",
+                value: "true",
+              },
+              {
+                label: "Not Available",
+                value: "false",
+              },
+            ]}
+            placeholder="Select an option"
+            register={register("isAvailable", {
+              required: "This field is required",
+            })}
+            error={errors.isAvailable}
+            iconPath="M12 2L3.5 6.5v5.8c0 4.7 3.2 9.3 8.5 10.7 5.3-1.4 8.5-6 8.5-10.7V6.5L12 2z"
+          />
           {isSuccessCompany && (
             <CustomDropdownField
               id="company"

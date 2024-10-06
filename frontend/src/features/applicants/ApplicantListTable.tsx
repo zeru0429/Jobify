@@ -3,7 +3,6 @@ import { useMemo } from "react";
 // MRT Imports
 import {
   MaterialReactTable,
-  useMaterialReactTable,
   type MRT_ColumnDef,
   MRT_GlobalFilterTextField,
   MRT_ToggleFiltersButton,
@@ -14,10 +13,8 @@ import { Box, ListItemIcon, MenuItem, lighten } from "@mui/material";
 
 // Icons Imports
 import { AccountCircle, Send } from "@mui/icons-material";
-import { applicationData } from "../../demo/demo_applicants";
 
 // Mock Data
-
 export type ApplicantListType = {
   job: string;
   applicantName: string;
@@ -28,7 +25,13 @@ export type ApplicantListType = {
   appliedAt: Date;
 };
 
-const ApplicantListTable = () => {
+interface CompanyListTableProps {
+  applicants: ApplicantListType[];
+}
+
+const ApplicantListTable: React.FC<CompanyListTableProps> = ({
+  applicants,
+}) => {
   const columns = useMemo<MRT_ColumnDef<ApplicantListType>[]>(
     () => [
       {
@@ -86,88 +89,114 @@ const ApplicantListTable = () => {
         accessorKey: "status",
         header: "Status",
         size: 100,
+        Cell: ({ cell }) => {
+          const status = cell.getValue<string>();
+          const color =
+            status.toLowerCase() === "applied"
+              ? "#FFC107" // Yellow
+              : status.toLowerCase() === "interviewed"
+              ? "#2196F3" // Blue
+              : status.toLowerCase() === "offered"
+              ? "#4CAF50" // Green
+              : status.toLowerCase() === "rejected"
+              ? "#F44336" // Red
+              : "default";
+
+          return (
+            <Box
+              component="span"
+              sx={{
+                backgroundColor: color,
+                borderRadius: "0.25rem",
+                color: "#fff",
+                padding: "0.25rem 0.5rem",
+                textAlign: "center",
+                display: "inline-block",
+              }}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </Box>
+          );
+        },
       },
     ],
     []
   );
 
-  const table = useMaterialReactTable({
-    columns,
-    data: applicationData,
-    enableColumnFilterModes: true,
-    enableColumnOrdering: true,
-    enableGrouping: true,
-    enableColumnPinning: true,
-    enableFacetedValues: true,
-    enableRowActions: true,
-    enableRowSelection: true,
-    initialState: {
-      showGlobalFilter: true,
-      columnPinning: {
-        left: ["mrt-row-expand", "mrt-row-select"],
-        right: ["mrt-row-actions"],
-      },
-    },
-    paginationDisplayMode: "pages",
-    positionToolbarAlertBanner: "bottom",
-    muiSearchTextFieldProps: {
-      size: "small",
-      variant: "outlined",
-    },
-    muiPaginationProps: {
-      color: "secondary",
-      rowsPerPageOptions: [10, 20, 30],
-      shape: "rounded",
-      variant: "outlined",
-    },
-
-    renderRowActionMenuItems: ({ closeMenu }) => [
-      <MenuItem
-        key={0}
-        onClick={() => {
-          // View applicant details logic...
-          closeMenu();
-        }}
-        sx={{ m: 0 }}
-      >
-        <ListItemIcon>
-          <AccountCircle />
-        </ListItemIcon>
-        View Details
-      </MenuItem>,
-      <MenuItem
-        key={1}
-        onClick={() => {
-          // Send email logic...
-          closeMenu();
-        }}
-        sx={{ m: 0 }}
-      >
-        <ListItemIcon>
-          <Send />
-        </ListItemIcon>
-        Send Email
-      </MenuItem>,
-    ],
-    renderTopToolbar: ({ table }) => (
-      <Box
-        sx={(theme) => ({
-          backgroundColor: lighten(theme.palette.background.default, 0.05),
-          display: "flex",
-          gap: "0.5rem",
-          p: "8px",
-          justifyContent: "space-between",
-        })}
-      >
-        <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-          <MRT_GlobalFilterTextField table={table} />
-          <MRT_ToggleFiltersButton table={table} />
+  return (
+    <MaterialReactTable
+      columns={columns}
+      data={applicants}
+      enableColumnFilterModes
+      enableColumnOrdering
+      enableGrouping
+      enableColumnPinning
+      enableFacetedValues
+      enableRowActions
+      enableRowSelection
+      initialState={{
+        showGlobalFilter: true,
+        columnPinning: {
+          left: ["mrt-row-expand", "mrt-row-select"],
+          right: ["mrt-row-actions"],
+        },
+      }}
+      paginationDisplayMode="pages"
+      positionToolbarAlertBanner="bottom"
+      muiSearchTextFieldProps={{
+        size: "small",
+        variant: "outlined",
+      }}
+      muiPaginationProps={{
+        color: "secondary",
+        rowsPerPageOptions: [10, 20, 30],
+        shape: "rounded",
+        variant: "outlined",
+      }}
+      renderRowActionMenuItems={({ closeMenu }) => [
+        <MenuItem
+          key="view-details"
+          onClick={() => {
+            // Implement your logic to view applicant details
+            closeMenu();
+          }}
+        >
+          <ListItemIcon>
+            <AccountCircle />
+          </ListItemIcon>
+          View Details
+        </MenuItem>,
+        <MenuItem
+          key="send-email"
+          onClick={() => {
+            // Implement your logic to send an email
+            closeMenu();
+          }}
+        >
+          <ListItemIcon>
+            <Send />
+          </ListItemIcon>
+          Send Email
+        </MenuItem>,
+      ]}
+      renderTopToolbar={({ table }) => (
+        <Box
+          sx={(theme) => ({
+            backgroundColor: lighten(theme.palette.background.default, 0.05),
+            display: "flex",
+            gap: "0.5rem",
+            p: "8px",
+            justifyContent: "space-between",
+          })}
+        >
+          <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <MRT_GlobalFilterTextField table={table} />
+            <MRT_ToggleFiltersButton table={table} />
+          </Box>
         </Box>
-      </Box>
-    ),
-  });
-
-  return <MaterialReactTable table={table} />;
+      )}
+    />
+  );
 };
 
 export default ApplicantListTable;

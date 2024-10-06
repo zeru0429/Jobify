@@ -38,6 +38,7 @@ export interface RegisterJobFormType {
   contactEmail: string;
   company: string;
   createdBy: string;
+  isAvailable?: boolean;
 }
 
 export interface ApplicationFormType {

@@ -47,6 +47,7 @@ const UpdateJob: React.FC<UpdateJobProps> = () => {
     formState: { errors },
   } = useForm<RegisterJobFormType>({
     defaultValues: {
+      isAvailable: state?.isAvailable,
       title: state?.title,
       type: state?.type,
       description: state?.description,
@@ -61,7 +62,7 @@ const UpdateJob: React.FC<UpdateJobProps> = () => {
   const onSubmit: SubmitHandler<RegisterJobFormType> = async (data) => {
     if (state._id) {
       try {
-        data.createdBy = userData?.id.toString();
+        data.isAvailable = JSON.parse(`${data.isAvailable}`);
         const response = await updateJob({
           body: data,
           params: state._id,
@@ -89,7 +90,6 @@ const UpdateJob: React.FC<UpdateJobProps> = () => {
     }
   };
   const handleTextGeneration = async () => {
-    console.log("here");
     console.log(aiIsLoading);
     if (!aiIsLoading) {
       const title = getValues("title");
@@ -170,6 +170,27 @@ const UpdateJob: React.FC<UpdateJobProps> = () => {
               iconPath="M12 2L3.5 6.5v5.8c0 4.7 3.2 9.3 8.5 10.7 5.3-1.4 8.5-6 8.5-10.7V6.5L12 2z"
             />
           )}
+          {/* isAvailable */}
+          <CustomDropdownField
+            id="isAvailable"
+            options={[
+              {
+                label: "Available",
+                value: "true",
+              },
+              {
+                label: "Not Available",
+                value: "false",
+              },
+            ]}
+            placeholder="Select an option"
+            register={register("isAvailable", {
+              required: "This field is required",
+            })}
+            error={errors.isAvailable}
+            iconPath="M12 2L3.5 6.5v5.8c0 4.7 3.2 9.3 8.5 10.7 5.3-1.4 8.5-6 8.5-10.7V6.5L12 2z"
+          />
+
           {/* Job Title Field */}
           <CustomInputField
             id="title"
