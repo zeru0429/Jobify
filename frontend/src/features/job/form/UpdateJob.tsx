@@ -4,7 +4,6 @@ import {
   RegisterJobFormType,
 } from "../../../_types/form_types";
 import CustomInputField from "../../../component/ui/CustomInputField";
-import { useAuth } from "../../../context/AuthContext";
 import { useToast } from "../../../context/ToastContext";
 import { useUpdateJobMutation } from "../../../services/job_service";
 import { useRequestGeminiMutation } from "../../../services/ai_service";

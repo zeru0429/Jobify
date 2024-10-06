@@ -33,8 +33,8 @@ const ChangeCompanyLogo: React.FC<ChangeCompanyLogoProps> = ({
         // Create a FormData object for file uploads
         const formData = new FormData();
         // Append logo if present
-        if (data.logo) {
-          formData.append("file", data.logo);
+        if (data.logo && data.logo[0]) {
+          formData.append("file", data.logo[0]);
         }
 
         await changeCompanyLogo({
@@ -96,7 +96,7 @@ const ChangeCompanyLogo: React.FC<ChangeCompanyLogoProps> = ({
             register={register("logo", {
               required: "Logo is required",
               validate: {
-                validImage: (value: File | null | undefined) => {
+                validImage: (value: File[] | null | undefined) => {
                   if (!value) {
                     return "Logo is required";
                   }
@@ -117,7 +117,7 @@ const ChangeCompanyLogo: React.FC<ChangeCompanyLogoProps> = ({
                 },
               },
             })}
-            error={errors.logo}
+            error={Array.isArray(errors.logo) ? errors.logo[0] : errors.logo}
           />
 
           <CustomButton

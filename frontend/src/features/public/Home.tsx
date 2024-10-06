@@ -1,9 +1,8 @@
 import { Box } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useThemeData } from "../../context/them_context";
-import { MdNightlight, MdLightMode, MdBrightnessAuto } from "react-icons/md";
 import JobLandingPage from "./JobLandingPage";
 import { useGetIndexPageMutation } from "../../services/public_service";
 import Loader from "../../component/Loading";
@@ -29,19 +28,6 @@ const Home = () => {
       setThemeData("light");
     } else if (themeData === "system") {
       setThemeData("dark");
-    }
-  };
-
-  const getThemeIcon = () => {
-    switch (themeData) {
-      case "light":
-        return MdNightlight;
-      case "dark":
-        return MdLightMode;
-      case "system":
-        return MdBrightnessAuto;
-      default:
-        return MdLightMode;
     }
   };
 

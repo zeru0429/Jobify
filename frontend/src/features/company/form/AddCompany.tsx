@@ -17,7 +17,7 @@ interface AddCompanyProps {
 
 const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
   const { setToastData } = useToast();
-  const { userData } = useAuth();
+  useAuth();
   const [createCompany, { isLoading }] = useCreateCompanyMutation();
 
   const {
@@ -169,7 +169,7 @@ const AddCompany: React.FC<AddCompanyProps> = ({ handleClose }) => {
                 },
               },
             })}
-            error={errors.logo}
+            error={Array.isArray(errors.logo) ? errors.logo[0] : errors.logo}
           />
 
           {/* Company Address Field */}

@@ -1,8 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useLocation } from "react-router-dom";
-import CustomButton from "../../component/ui/CustomButton";
-import RectangularButton from "../../component/ui/RectangularButton";
 export interface ApplicantListType {
   _id: string;
   job: {

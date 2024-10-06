@@ -1,7 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { axiosBaseQuery } from "../util/axios/axios_base_query";
 import { BASE_URL } from "../util/secrete";
-import { ApplicationFormType } from "../_types/form_types";
 
 // Create API service
 export const applicantApi = createApi({

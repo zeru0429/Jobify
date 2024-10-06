@@ -17,7 +17,7 @@ const Header: React.FC<ChildComponentProps> = ({ setOpen }) => {
   const { themeData, setThemeData } = useThemeData();
   const [isOpen, setIsOpen] = useState(false);
   const navigator = useNavigate();
-  const { userData, isLoggedIn, setUserData } = useAuth();
+  const { userData, isLoggedIn } = useAuth();
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -46,12 +46,6 @@ const Header: React.FC<ChildComponentProps> = ({ setOpen }) => {
       navigator("/login");
     }
   }, []);
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("token2");
-    setUserData({ firstName: "", id: 0, role: "", token: null });
-    navigator("/login");
-  };
   return (
     <>
       <AppBar className="bg-[#002A47] text-white dark:bg-slate-900 dark:text-white">

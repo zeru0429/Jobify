@@ -24,7 +24,7 @@ const ApplyJobApplication = () => {
 
   const navigate = useNavigate();
   const { isLoggedIn, setUserData, fetchData } = useAuth();
-  const [getIndexPage, { data: jobs }] = useGetIndexPageMutation();
+  const [getIndexPage] = useGetIndexPageMutation();
 
   useEffect(() => {
     getIndexPage({ take: 10, skip: 0 });
