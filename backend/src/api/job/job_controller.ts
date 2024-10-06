@@ -73,6 +73,24 @@ const jobController = {
       data: jobs,
     });
   },
+  getAllPublicJob: async (req: Request, res: Response) => {
+    // Skip and take from pagination
+    const skip = parseInt(req.query.skip as string) || 0;
+    const take = parseInt(req.query.take as string) || 10;
+    // Fetch jobs with pagination
+    const jobs = await Job.find({ isAvailable: true }).skip(skip).limit(take);
+    const totalJobs = await Job.countDocuments({ isAvailable: true });
+    res.status(200).json({
+      success: true,
+      data: jobs,
+      pagination: {
+        total: totalJobs,
+        skip,
+        take,
+        hasMore: totalJobs > skip + take,
+      },
+    });
+  },
 
   getSingleJob: async (req: Request, res: Response, next: NextFunction) => {
     const adminId = req.user?._id;

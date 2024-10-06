@@ -9,13 +9,12 @@ jobRouter.post("/", (req: Request, res: Response, next: NextFunction) => {
   jobController.createJob(req, res, next);
 });
 
-// Get all jobs
-jobRouter.get("/", jobController.getAllJob);
-
 // Get a single job by ID
 jobRouter.get("/:id", (req: Request, res: Response, next: NextFunction) => {
   jobController.getSingleJob(req, res, next);
 });
+// Get all jobs
+jobRouter.get("/", jobController.getAllJob);
 
 // Update a job by ID
 jobRouter.patch("/:id", (req: Request, res: Response) => {
