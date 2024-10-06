@@ -38,12 +38,24 @@ export const jobApi = createApi({
       }),
       invalidatesTags: ["job"],
     }),
+    updateJob: builder.mutation<
+      any,
+      { body: RegisterJobFormType; params: string }
+    >({
+      query: ({ body, params }) => ({
+        url: `/${params}`,
+        method: "PATCH",
+        data: body,
+      }),
+      invalidatesTags: ["job"],
+    }),
   }),
 });
 
 // Hooks generated from the API service
 export const {
   useCreateJobMutation,
+  useUpdateJobMutation,
   useGetAllJobQuery,
   useGetSingleJobQuery,
   useDeleteJobMutation,

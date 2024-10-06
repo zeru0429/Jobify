@@ -14,8 +14,9 @@ import DashBoard from "../features/admin/DashBoard";
 import CompanyList from "../features/company/Company_list";
 import JobList from "../features/job/JobList";
 import ApplicantsList from "../features/applicants/ApplicantsList";
-import AddJob from "../features/job/AddJob";
+import AddJob from "../features/job/form/AddJob";
 import AddApplication from "../features/applicants/AddApplicant";
+import UpdateJob from "../features/job/form/UpdateJob";
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -41,6 +42,10 @@ export const router = createBrowserRouter(
 
         <Route path="/admin/job" element={<JobList />} />
         <Route path="/admin/add-job" element={<AddJob />} />
+        <Route
+          path="/admin/update-job"
+          element={<UpdateJob selectedRowData={null} />}
+        />
 
         <Route path="/admin/applicants" element={<ApplicantsList />} />
         <Route path="/admin/add-applicant" element={<AddApplication />} />

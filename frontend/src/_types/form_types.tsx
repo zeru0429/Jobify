@@ -36,8 +36,6 @@ export interface RegisterJobFormType {
   createdAt: Date;
   salary: number;
   contactEmail: string;
-  contactName: string;
-  contactNumber: string;
   company: string;
   createdBy: string;
 }

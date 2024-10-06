@@ -2,18 +2,18 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import {
   ErrorResponseType,
   RegisterJobFormType,
-} from "../../_types/form_types";
-import CustomInputField from "../../component/ui/CustomInputField";
-import { useAuth } from "../../context/AuthContext";
-import { useToast } from "../../context/ToastContext";
-import { useCreateJobMutation } from "../../services/job_service";
-import { useRequestGeminiMutation } from "../../services/ai_service";
-import CustomTextArea from "../../component/ui/CustomeTextArea";
-import CustomButton from "../../component/ui/CustomButton";
+} from "../../../_types/form_types";
+import CustomInputField from "../../../component/ui/CustomInputField";
+import { useAuth } from "../../../context/AuthContext";
+import { useToast } from "../../../context/ToastContext";
+import { useCreateJobMutation } from "../../../services/job_service";
+import { useRequestGeminiMutation } from "../../../services/ai_service";
+import CustomTextArea from "../../../component/ui/CustomeTextArea";
+import CustomButton from "../../../component/ui/CustomButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CustomDropdownField from "../../component/ui/CustomDropDown";
-import { useGetAllCompanyQuery } from "../../services/company_service";
-import Loader from "../../component/Loading";
+import CustomDropdownField from "../../../component/ui/CustomDropDown";
+import { useGetAllCompanyQuery } from "../../../services/company_service";
+import Loader from "../../../component/Loading";
 import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress, IconButton, Typography } from "@mui/material";
 import { Keyboard } from "@mui/icons-material";
@@ -74,8 +74,6 @@ const AddJob: React.FC<AddJobProps> = () => {
       const salary = getValues("salary");
       const contactEmail = getValues("contactEmail");
       const company = getValues("company");
-      const contactName = getValues("contactName");
-      const contactNumber = getValues("contactNumber");
       const createdAt = getValues("createdAt");
       const createdBy = getValues("createdBy");
 
@@ -98,8 +96,7 @@ const AddJob: React.FC<AddJobProps> = () => {
           salary,
           contactEmail,
           company,
-          contactName,
-          contactNumber,
+
           createdAt,
           createdBy,
         });
@@ -112,14 +109,12 @@ const AddJob: React.FC<AddJobProps> = () => {
             salary,
             contactEmail,
             company,
-            contactName,
-            contactNumber,
+
             createdAt,
             createdBy,
           });
           const { data } = response;
 
-          console.log(data);
           setValue("description", `${data}`);
         } catch (error) {
           console.log(error);
@@ -224,32 +219,7 @@ const AddJob: React.FC<AddJobProps> = () => {
             error={errors.contactEmail}
             iconPath="M12 2C10.3 2 9 3.3 9 5V5.1L2.2 10.3C1.8 10.7 1.8 11.3 2.2 11.7L9 17.5C9.4 17.8 10 18 10.5 18H13.5C14 18 14.6 17.8 15 17.5L21.8 11.7C22.2 11.3 22.2 10.7 21.8 10.3L15 5.1V5C15 3.3 13.7 2 12 2ZM12 4C12.6 4 13 4.4 13 5V10.2L17.3 13L12 18L6.7 13L11 10.2V5C11 4.4 11.4 4 12 4Z"
           />
-          {/* Contact Name Field */}
-          <CustomInputField
-            id="contactName"
-            type="text"
-            placeholder="Contact Name"
-            register={register("contactName", {
-              required: "Contact name is required",
-            })}
-            error={errors.contactName}
-            iconPath="M12 2C10.3 2 9 3.3 9 5V5.1L2.2 10.3C1.8 10.7 1.8 11.3 2.2 11.7L9 17.5C9.4 17.8 10 18 10.5 18H13.5C14 18 14.6 17.8 15 17.5L21.8 11.7C22.2 11.3 22.2 10.7 21.8 10.3L15 5.1V5C15 3.3 13.7 2 12 2Z"
-          />
-          {/* Contact Number Field */}
-          <CustomInputField
-            id="contactNumber"
-            type="tel"
-            placeholder="Contact Number"
-            register={register("contactNumber", {
-              required: "Contact number is required",
-              pattern: {
-                value: /^\+?[1-9]\d{1,14}$/,
-                message: "Invalid phone number format",
-              },
-            })}
-            error={errors.contactNumber}
-            iconPath="M12 2C10.3 2 9 3.3 9 5V5.1L2.2 10.3C1.8 10.7 1.8 11.3 2.2 11.7L9 17.5C9.4 17.8 10 18 10.5 18H13.5C14 18 14.6 17.8 15 17.5L21.8 11.7C22.2 11.3 22.2 10.7 21.8 10.3L15 5.1V5C15 3.3 13.7 2 12 2Z"
-          />
+
           {/* Job Description Field */}
           <CustomTextArea
             id="jobDescription"
