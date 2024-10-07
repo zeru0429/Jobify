@@ -9,7 +9,15 @@ import {
 } from "material-react-table";
 
 // Material UI Imports
-import { Box, Dialog, ListItemIcon, MenuItem, lighten } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  Dialog,
+  ListItemIcon,
+  MenuItem,
+  TextField,
+  lighten,
+} from "@mui/material";
 
 // Icons Imports
 import { AccountCircle, DeleteForever, Send } from "@mui/icons-material";
@@ -87,6 +95,18 @@ const ApplicantListTable: React.FC<ApplicantListTableProps> = ({
       });
     }
   };
+  const nameSuggestions = Array.from(
+    new Set(applicants.map((applicant) => applicant.applicantName))
+  );
+  const emailSuggestions = Array.from(
+    new Set(applicants.map((applicant) => applicant.applicantEmail))
+  );
+  const statusSuggestions = Array.from(
+    new Set(applicants.map((applicant) => applicant.status))
+  );
+  const allSuggestions = Array.from(
+    new Set([...nameSuggestions, ...statusSuggestions, ...emailSuggestions])
+  );
 
   const columns = useMemo<MRT_ColumnDef<ApplicantListType>[]>(
     () => [
@@ -94,15 +114,44 @@ const ApplicantListTable: React.FC<ApplicantListTableProps> = ({
         accessorKey: "applicantName",
         header: "Applicant Name",
         size: 200,
+        Filter: ({ column }) => (
+          <Autocomplete
+            options={nameSuggestions}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Filter by Name"
+                variant="outlined"
+                size="small"
+              />
+            )}
+            onChange={(event, value) => column.setFilterValue(value)}
+          />
+        ),
       },
       {
         accessorKey: "applicantEmail",
         header: "Email",
         size: 250,
+        Filter: ({ column }) => (
+          <Autocomplete
+            options={emailSuggestions}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Filter by Email"
+                variant="outlined"
+                size="small"
+              />
+            )}
+            onChange={(event, value) => column.setFilterValue(value)}
+          />
+        ),
       },
       {
         accessorKey: "resume",
         header: "Resume",
+        enableColumnFilter: false,
         Cell: ({ cell }) => (
           <a
             href={cell.getValue<string>()}
@@ -117,6 +166,7 @@ const ApplicantListTable: React.FC<ApplicantListTableProps> = ({
       {
         accessorKey: "coverLetter",
         header: "Cover Letter",
+        enableColumnFilter: false,
         Cell: ({ cell }) =>
           cell.getValue<string>() ? (
             <a
@@ -145,6 +195,20 @@ const ApplicantListTable: React.FC<ApplicantListTableProps> = ({
         accessorKey: "status",
         header: "Status",
         size: 100,
+        Filter: ({ column }) => (
+          <Autocomplete
+            options={statusSuggestions}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Filter by Status"
+                variant="outlined"
+                size="small"
+              />
+            )}
+            onChange={(event, value) => column.setFilterValue(value)}
+          />
+        ),
         Cell: ({ cell }) => {
           const status = cell.getValue<string>();
           const color =
@@ -260,10 +324,22 @@ const ApplicantListTable: React.FC<ApplicantListTableProps> = ({
               justifyContent: "space-between",
             })}
           >
-            <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-              <MRT_GlobalFilterTextField table={table} />
-              <MRT_ToggleFiltersButton table={table} />
-            </Box>
+            <Autocomplete
+              options={allSuggestions}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Search..."
+                  variant="outlined"
+                  size="small"
+                  sx={{ width: "300px" }} // Adjust the width as needed
+                />
+              )}
+              onChange={(event, value) => {
+                // Set global filter based on the selected suggestion
+                table.setGlobalFilter(value);
+              }}
+            />
           </Box>
         )}
       />

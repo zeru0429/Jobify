@@ -5,17 +5,16 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
-  MRT_GlobalFilterTextField,
-  MRT_ToggleFiltersButton,
 } from "material-react-table";
 
 // Material UI Imports
 import {
+  Autocomplete,
   Box,
-  Chip,
   Dialog,
   ListItemIcon,
   MenuItem,
+  TextField,
   lighten,
 } from "@mui/material";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
@@ -110,7 +109,24 @@ const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
       });
     }
   };
-
+  const nameSuggestions = companies.map((company) => company.name);
+  const typeSuggestions = Array.from(
+    new Set(companies.map((company) => company.type))
+  );
+  const addressSuggestions = Array.from(
+    new Set(companies.map((company) => company.address))
+  );
+  const companyTypeSuggestions = Array.from(
+    new Set(companies.map((company) => company.companyType))
+  );
+  const allSuggestions = Array.from(
+    new Set([
+      ...nameSuggestions,
+      ...typeSuggestions,
+      ...companyTypeSuggestions,
+      ...addressSuggestions,
+    ])
+  );
   const columns = useMemo<MRT_ColumnDef<CompanyListType>[]>(
     () => [
       {
@@ -121,11 +137,27 @@ const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
             accessorKey: "name",
             header: "Company Name",
             size: 250,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={nameSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Name"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
           },
           {
             accessorKey: "avatar",
             header: "Avatar",
             size: 100,
+            enableSorting: false,
+            enableColumnFilter: false,
             Cell: ({ cell }) => {
               const avatarUrl = cell.getValue<string>();
               const isValidUrl = avatarUrl && !avatarUrl.includes("undefined");
@@ -146,28 +178,59 @@ const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
             accessorKey: "address",
             header: "Address",
             size: 200,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={addressSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Address"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
           },
           {
             accessorKey: "type",
             header: "Type",
             size: 150,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={typeSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by type"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
           },
           {
             accessorKey: "companyType",
             header: "Company Type",
             size: 150,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={companyTypeSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Company type"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
           },
-          // {
-          //   accessorKey: "isActive",
-          //   header: "Status",
-          //   Cell: ({ cell }) => (
-          //     <Chip
-          //       label={cell.getValue<boolean>() ? "Active" : "Inactive"}
-          //       color={cell.getValue<boolean>() ? "success" : "error"}
-          //     />
-          //   ),
-          //   size: 100,
-          // },
         ],
       },
       {
@@ -274,10 +337,28 @@ const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
           justifyContent: "space-between",
         })}
       >
-        <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-          <MRT_GlobalFilterTextField table={table} />
-          <MRT_ToggleFiltersButton table={table} />
-        </Box>
+        <Autocomplete
+          options={allSuggestions}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Search..."
+              variant="outlined"
+              size="small"
+              sx={{ width: "300px" }} // Adjust the width as needed
+            />
+          )}
+          onChange={(_event, value) => {
+            // Set global filter based on the selected suggestion
+            table.setGlobalFilter(value);
+          }}
+          onInputChange={(_event, value) => {
+            // Update the global filter as the user types
+            table.setGlobalFilter(value);
+          }}
+          clearOnEscape
+          freeSolo // Allows users to input values that are not in the options
+        />
       </Box>
     ),
   });

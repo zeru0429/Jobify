@@ -5,8 +5,6 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
-  MRT_GlobalFilterTextField,
-  MRT_ToggleFiltersButton,
 } from "material-react-table";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -14,11 +12,12 @@ import { useToast } from "../../context/ToastContext";
 
 // Material UI Imports
 import {
+  Autocomplete,
   Box,
-  Button,
   Dialog,
   ListItemIcon,
   MenuItem,
+  TextField,
   lighten,
 } from "@mui/material";
 
@@ -94,7 +93,26 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
       });
     }
   };
+  const titleSuggestions = Array.from(new Set(jobs.map((job) => job.title)));
+  const typeSuggestions = Array.from(new Set(jobs.map((job) => job.type)));
 
+  const locationSuggestions = Array.from(
+    new Set(jobs.map((job) => job.location))
+  );
+
+  const salarySuggestions = Array.from(new Set(jobs.map((job) => job.salary)));
+  const availabilitySuggestions = Array.from(
+    new Set(jobs.map((job) => job.isAvailable))
+  );
+  const allSuggestions = Array.from(
+    new Set([
+      ...titleSuggestions,
+      ...typeSuggestions,
+      ...locationSuggestions,
+      ...salarySuggestions,
+      ...availabilitySuggestions,
+    ])
+  );
   const columns = useMemo<MRT_ColumnDef<JobListType>[]>(
     () => [
       {
@@ -105,17 +123,59 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
             accessorKey: "title",
             header: "Job Title",
             size: 250,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={titleSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Title"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
           },
           {
             accessorKey: "location",
             header: "Location",
             size: 200,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={locationSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Location"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
           },
           {
             accessorKey: "salary",
             filterFn: "between",
             header: "Salary",
             size: 150,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={salarySuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Salary"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
             Cell: ({ cell }) => (
               <Box
                 component="span"
@@ -146,10 +206,43 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
             accessorKey: "type",
             header: "Job Type",
             size: 150,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={typeSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Type"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
           },
           {
             accessorKey: "isAvailable",
             header: "Availability",
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={[true, false]} // Options for boolean values
+                getOptionLabel={(option) =>
+                  option ? "Available" : "Unavailable"
+                } // Display labels
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Availability"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => {
+                  column.setFilterValue(value); // Set the filter value directly to boolean
+                }}
+              />
+            ),
             Cell: ({ cell }) => (
               <Box
                 component="span"
@@ -268,56 +361,40 @@ const JobListTable: React.FC<JobListTableProps> = ({ jobs }) => {
         Delete
       </MenuItem>,
     ],
-    renderTopToolbar: ({ table }) => {
-      const handleDeactivate = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert("Deactivating job: " + row.getValue("title"));
-        });
-      };
-
-      const handleActivate = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert("Activating job: " + row.getValue("title"));
-        });
-      };
-
-      return (
-        <Box
-          sx={(theme) => ({
-            backgroundColor: lighten(theme.palette.background.default, 0.05),
-            display: "flex",
-            gap: "0.5rem",
-            p: "8px",
-            justifyContent: "space-between",
-          })}
-        >
-          <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <MRT_GlobalFilterTextField table={table} />
-            <MRT_ToggleFiltersButton table={table} />
-          </Box>
-          <Box>
-            <Box sx={{ display: "flex", gap: "0.5rem" }}>
-              <Button
-                color="error"
-                disabled={!table.getIsSomeRowsSelected()}
-                onClick={handleDeactivate}
-                variant="contained"
-              >
-                Deactivate
-              </Button>
-              <Button
-                color="success"
-                disabled={!table.getIsSomeRowsSelected()}
-                onClick={handleActivate}
-                variant="contained"
-              >
-                Activate
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      );
-    },
+    renderTopToolbar: ({ table }) => (
+      <Box
+        sx={(theme) => ({
+          backgroundColor: lighten(theme.palette.background.default, 0.05),
+          display: "flex",
+          gap: "0.5rem",
+          p: "8px",
+          justifyContent: "space-between",
+        })}
+      >
+        <Autocomplete
+          options={allSuggestions}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Search..."
+              variant="outlined"
+              size="small"
+              sx={{ width: "300px" }} // Adjust the width as needed
+            />
+          )}
+          onChange={(_event, value) => {
+            // Set global filter based on the selected suggestion
+            table.setGlobalFilter(value);
+          }}
+          onInputChange={(_event, value) => {
+            // Update the global filter as the user types
+            table.setGlobalFilter(value);
+          }}
+          clearOnEscape
+          freeSolo // Allows users to input values that are not in the options
+        />
+      </Box>
+    ),
   });
 
   return (
