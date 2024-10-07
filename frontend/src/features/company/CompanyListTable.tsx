@@ -157,17 +157,17 @@ const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
             header: "Company Type",
             size: 150,
           },
-          {
-            accessorKey: "isActive",
-            header: "Status",
-            Cell: ({ cell }) => (
-              <Chip
-                label={cell.getValue<boolean>() ? "Active" : "Inactive"}
-                color={cell.getValue<boolean>() ? "success" : "error"}
-              />
-            ),
-            size: 100,
-          },
+          // {
+          //   accessorKey: "isActive",
+          //   header: "Status",
+          //   Cell: ({ cell }) => (
+          //     <Chip
+          //       label={cell.getValue<boolean>() ? "Active" : "Inactive"}
+          //       color={cell.getValue<boolean>() ? "success" : "error"}
+          //     />
+          //   ),
+          //   size: 100,
+          // },
         ],
       },
       {

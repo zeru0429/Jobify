@@ -1,15 +1,13 @@
 import { Divider } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 const LogOutButton = () => {
   const navigator = useNavigate();
-  const { setUserData } = useAuth();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("token2");
-    setUserData({ firstName: "", id: 0, role: "", token: null });
     navigator("/login");
+
+    window.location.reload();
   };
 
   return (

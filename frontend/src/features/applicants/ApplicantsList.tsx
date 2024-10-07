@@ -3,7 +3,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { Box } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import ApplicantListTable from "./ApplicantListTable";
-import RectangularButton from "../../component/ui/RectangularButton";
 import { useGetAllApplicantQuery } from "../../services/applicants_service";
 import Loader from "../../component/Loading";
 
@@ -35,16 +34,13 @@ const ApplicantsList = () => {
       <br />
       <Box
         sx={{
-          width: "200px",
           display: "flex",
           flexDirection: "row",
           alignItems: "end",
           placeItems: "end",
         }}
       >
-        <RectangularButton type="primary" onClick={handleClick}>
-          Add Applicants
-        </RectangularButton>
+        <p className="text-2xl font-bold">List of Applicants</p>
       </Box>
       <br />
       <br />

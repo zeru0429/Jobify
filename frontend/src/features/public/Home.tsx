@@ -15,10 +15,10 @@ const Home = () => {
 
   const [getIndexPage, { data: jobs, isLoading, isError }] =
     useGetIndexPageMutation();
-  const [page, setPage] = useState(0); // Add state for pagination
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
-    getIndexPage({ take: 10, skip: page * 10 }); // Fetch jobs based on the current page
+    getIndexPage({ take: 10, skip: page * 10 });
   }, [getIndexPage, page]);
 
   const toggleThemeData = () => {
@@ -33,7 +33,7 @@ const Home = () => {
   };
 
   const loadMoreJobs = () => {
-    setPage((prev) => prev + 1); // Increment page to load more jobs
+    setPage((prev) => prev + 1);
   };
 
   return (

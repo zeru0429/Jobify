@@ -46,7 +46,9 @@ export const applicantApi = createApi({
 // Hooks generated from the API service
 export const {
   useGetAllApplicantQuery,
+  useLazyGetAllApplicantQuery,
   useGetSingleApplicantQuery,
+  useLazyGetSingleApplicantQuery,
   useDeleteApplicantMutation,
   useUpdateApplicantStatusMutation,
 } = applicantApi;

@@ -31,6 +31,7 @@ const CustomFileInputField: React.FC<CustomFileInputFieldProps> = ({
 
   return (
     <div className="relative mb-4">
+      <p>{placeholder}</p>
       <input
         type="file"
         id={id}
