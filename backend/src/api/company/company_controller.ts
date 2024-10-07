@@ -158,10 +158,11 @@ const companyController = {
     // Check if the name exists before
     const companyExist = await Company.findOne({ name });
     if (companyExist) {
-      return res.status(400).json({
-        success: false,
-        message: "Company already exists.",
-      });
+      if (companyExist._id.toString() !== req.params.id.toString())
+        return res.status(400).json({
+          success: false,
+          message: "Company already exists.",
+        });
     }
 
     // Update company fields

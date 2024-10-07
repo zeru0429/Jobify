@@ -62,6 +62,18 @@ const applicationController = {
         message: "Job is not available",
       });
     }
+    //check if the email register before with this job
+
+    const applicant = await Application.findOne({
+      applicantEmail,
+      job,
+    });
+    if (applicant) {
+      return res.status(409).json({
+        success: false,
+        message: "you all ready applied for this job",
+      });
+    }
 
     // Process the uploaded files
     const fileContents = files.map((file) => formatImage(file));
