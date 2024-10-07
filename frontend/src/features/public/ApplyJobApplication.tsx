@@ -9,20 +9,18 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { JobLandingPageType } from "./JobLandingPage";
 import HomeHeader from "../../component/HomeHeader";
 import { useThemeData } from "../../context/them_context";
-import {
-  useApplyJobMutation,
-  useGetIndexPageMutation,
-} from "../../services/public_service";
+import { useApplyJobMutation } from "../../services/public_service";
 import { useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Box, Typography, Avatar, Button } from "@mui/material";
 import CustomFileInputField from "../../component/ui/CustomeFileInput";
+import { useLazyGetIndexPageQuery } from "../../services/public_service";
 
 const ApplyJobApplication = () => {
   const navigate = useNavigate();
   const { themeData, setThemeData } = useThemeData();
   const { isLoggedIn, setUserData, fetchData } = useAuth();
-  const [getIndexPage] = useGetIndexPageMutation();
+  const [getIndexPage] = useLazyGetIndexPageQuery();
   const { setToastData } = useToast();
   const [applyJob, { isLoading }] = useApplyJobMutation();
 

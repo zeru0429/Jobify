@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Box, Grid, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useGetIndexPageMutation } from "../../services/public_service";
 import { ErrorResponseType } from "../../_types/form_types";
 import { useToast } from "../../context/ToastContext";
 import JobCard from "./JobCard";
+import { useLazyGetIndexPageQuery } from "../../services/public_service";
 
 export interface JobLandingPageType {
   _id: string;
@@ -29,14 +29,19 @@ export interface JobLandingPageType {
 interface JobLandingPageProps {
   initialJobs: JobLandingPageType[];
   loadMoreJobs: () => void;
+  hasMoreJobs: boolean; // Added prop to indicate if more jobs are available
 }
 
-const JobLandingPage: React.FC<JobLandingPageProps> = ({ initialJobs }) => {
+const JobLandingPage: React.FC<JobLandingPageProps> = ({
+  initialJobs,
+  loadMoreJobs,
+  hasMoreJobs,
+}) => {
   const [jobsList, setJobs] = useState<JobLandingPageType[]>(initialJobs);
   const [expanded, setExpanded] = useState<string | null>(null);
   const navigate = useNavigate();
   const { setToastData } = useToast();
-  const [getIndexPage] = useGetIndexPageMutation();
+  const [getIndexPage] = useLazyGetIndexPageQuery();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const handleApplyClick = (job: JobLandingPageType) => {
@@ -44,7 +49,7 @@ const JobLandingPage: React.FC<JobLandingPageProps> = ({ initialJobs }) => {
   };
 
   const loadMoreJobsHandler = async () => {
-    if (isLoadingMore) return;
+    if (isLoadingMore || !hasMoreJobs) return; // Prevent loading if already loading or no more jobs
     setIsLoadingMore(true);
     try {
       const response = await getIndexPage({ take: 10, skip: jobsList.length });

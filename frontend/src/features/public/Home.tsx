@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useThemeData } from "../../context/them_context";
 import JobLandingPage from "./JobLandingPage";
-import { useGetIndexPageMutation } from "../../services/public_service";
+import { useLazyGetIndexPageQuery } from "../../services/public_service";
 import Loader from "../../component/Loading";
 import HomeHeader from "../../component/HomeHeader";
 
@@ -14,12 +14,9 @@ const Home = () => {
   const { isLoggedIn, setUserData, fetchData } = useAuth();
 
   const [getIndexPage, { data: jobs, isLoading, isError }] =
-    useGetIndexPageMutation();
+    useLazyGetIndexPageQuery();
   const [page, setPage] = useState(0);
-
-  useEffect(() => {
-    getIndexPage({ take: 10, skip: page * 10 });
-  }, [getIndexPage, page]);
+  const [hasMoreJobs, setHasMoreJobs] = useState(true);
 
   const toggleThemeData = () => {
     setThemeData(themeData === "light" ? "dark" : "light");
@@ -33,8 +30,22 @@ const Home = () => {
   };
 
   const loadMoreJobs = () => {
-    setPage((prev) => prev + 1);
+    if (hasMoreJobs && !isLoading) {
+      getIndexPage({ take: 10, skip: (page + 1) * 10 }).then((result) => {
+        if (result.data && result.data.length === 0) {
+          setHasMoreJobs(false); // Stop loading if no more jobs
+        }
+      });
+      setPage((prev) => prev + 1);
+    }
   };
+
+  useEffect(() => {
+    // Initial load
+    if (page === 0) {
+      getIndexPage({ take: 10, skip: 0 });
+    }
+  }, [getIndexPage, page]);
 
   return (
     <Box sx={{ height: "100vh", overflowY: "auto" }}>
@@ -52,7 +63,11 @@ const Home = () => {
         </div>
       )}
       {jobs && (
-        <JobLandingPage initialJobs={jobs} loadMoreJobs={loadMoreJobs} />
+        <JobLandingPage
+          initialJobs={jobs}
+          loadMoreJobs={loadMoreJobs}
+          hasMoreJobs={hasMoreJobs}
+        />
       )}
     </Box>
   );

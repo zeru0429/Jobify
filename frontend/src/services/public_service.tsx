@@ -14,7 +14,7 @@ export const publicApi = createApi({
         data: body,
       }),
     }),
-    getIndexPage: builder.mutation<any, { take: number; skip: number }>({
+    getIndexPage: builder.query<any, { take: number; skip: number }>({
       query: ({ take, skip }) => ({
         url: `/api/jobs/public?take=${take}&skip=${skip}`,
         method: "GET",
@@ -33,6 +33,6 @@ export const publicApi = createApi({
 // Export the login mutation
 export const {
   useLoginMutation,
-  useGetIndexPageMutation,
+  useLazyGetIndexPageQuery,
   useApplyJobMutation,
 } = publicApi;

@@ -7,13 +7,13 @@ const AdminSidebar = () => {
   const { isSuperAdmin, isAdmin } = useAuth();
   const [currentView, setCurrentView] = useState("");
   const activeClass =
-    "bg-[#002A47] text-white dark:bg-[#005577] dark:text-white";
+    "bg-[#002A47] dark:bg-white dark:text-[#002A47] text-white  ";
 
   const handleToggleView = (view: string) => {
     setCurrentView(currentView === view ? "" : view);
   };
 
-  const buttonClass = `flex w-full items-center gap-x-3.5 py-[5px] px-2.5 text-sm rounded-lg hover:bg-[#002A47] dark:hover:bg-[#005577] text-gray-700 hover:text-white dark:bg-neutral-700 dark:text-white`;
+  const buttonClass = `dark:hover:bg-[#ff5577] flex w-full items-center gap-x-3.5 py-[5px] px-2.5 text-sm rounded-lg hover:bg-[#002A47]  text-gray-700 hover:text-white dark:bg-neutral-700 dark:text-white`;
 
   return (
     <>
