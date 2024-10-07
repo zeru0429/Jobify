@@ -67,6 +67,7 @@ export const companyApi = createApi({
 export const {
   useCreateCompanyMutation,
   useGetAllCompanyQuery,
+  useLazyGetAllCompanyQuery,
   useUpdateCompanyProfileMutation,
   useGetSingleCompanyQuery,
   useChangeCompanyLogoMutation,

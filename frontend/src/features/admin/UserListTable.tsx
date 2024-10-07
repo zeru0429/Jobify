@@ -1,28 +1,29 @@
 import { useMemo, useState } from "react";
-
-// MRT Imports
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-
-// Material UI Imports // Icons Imports
-import { Box, Dialog, ListItemIcon, MenuItem, lighten } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  ListItemIcon,
+  MenuItem,
+  lighten,
+  Autocomplete,
+  TextField,
+} from "@mui/material";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-
-// Mock Data
+import { DeleteForever } from "@mui/icons-material";
 import { UserListType } from "../../_types/user_table";
 import EditProfile from "./forms/EditProfile";
 import ResetPassword from "./forms/ResetPassword";
-import { DeleteForever } from "@mui/icons-material";
 import Warning from "../../component/Warning";
 import { useDeleteUserMutation } from "../../services/user_service";
 import { ErrorResponseType } from "../../_types/form_types";
 import { useToast } from "../../context/ToastContext";
 
-// Define user list table props type
 type UserListTableProps = {
   users: UserListType[];
 };
@@ -41,16 +42,20 @@ const UsersListTable = ({ users }: UserListTableProps) => {
     setSelectedRowData(row);
     setOpenEdit(true);
   };
+
   const handleCloseEdit = () => {
     setOpenEdit(false);
   };
+
   const handleClickOpenReset = (row: UserListType) => {
     setSelectedRowData(row);
     setOpenReset(true);
   };
+
   const handleCloseReset = () => {
     setOpenReset(false);
   };
+
   const handleClickOpenDelete = (row: UserListType) => {
     setSelectedRowData(row);
     setOpenDelete(true);
@@ -86,6 +91,15 @@ const UsersListTable = ({ users }: UserListTableProps) => {
     }
   };
 
+  // Get unique suggestions from the user data for Autocomplete
+  const nameSuggestions = users.map(
+    (user) => `${user.firstName} ${user.lastName}`
+  );
+  const emailSuggestions = users.map((user) => user.email);
+  const roleSuggestions = Array.from(new Set(users.map((user) => user.role)));
+  const allSuggestions = Array.from(
+    new Set([...nameSuggestions, ...emailSuggestions])
+  );
   const columns = useMemo<MRT_ColumnDef<UserListType>[]>(
     () => [
       {
@@ -97,6 +111,20 @@ const UsersListTable = ({ users }: UserListTableProps) => {
             id: "name",
             header: "Name",
             size: 250,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={nameSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Name"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(event, value) => column.setFilterValue(value)}
+              />
+            ),
           },
           {
             accessorKey: "email",
@@ -104,6 +132,20 @@ const UsersListTable = ({ users }: UserListTableProps) => {
             filterVariant: "autocomplete",
             header: "Email",
             size: 300,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={emailSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Email"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(event, value) => column.setFilterValue(value)}
+              />
+            ),
           },
         ],
       },
@@ -120,10 +162,8 @@ const UsersListTable = ({ users }: UserListTableProps) => {
                 component="span"
                 sx={(theme) => ({
                   backgroundColor:
-                    cell.getValue<String>() == "super_admin"
+                    cell.getValue<String>() === "super_admin"
                       ? theme.palette.error.dark
-                      : cell.getValue<String>() == "super_admin"
-                      ? theme.palette.warning.dark
                       : theme.palette.success.dark,
                   borderRadius: "0.25rem",
                   color: "#fff",
@@ -131,13 +171,22 @@ const UsersListTable = ({ users }: UserListTableProps) => {
                   p: "0.25rem",
                 })}
               >
-                {cell.getValue<number>()?.toLocaleString?.("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                })}
+                {cell.getValue<String>()}
               </Box>
+            ),
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={roleSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Role"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(event, value) => column.setFilterValue(value)}
+              />
             ),
           },
           {
@@ -159,12 +208,12 @@ const UsersListTable = ({ users }: UserListTableProps) => {
         ],
       },
     ],
-    []
+    [nameSuggestions, emailSuggestions]
   );
 
   const table = useMaterialReactTable({
     columns,
-    data: users, // Assuming the users prop contains the data
+    data: users,
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -177,7 +226,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
         pageSize: 5,
         pageIndex: 0,
       },
-      showGlobalFilter: true,
+      showGlobalFilter: true, // This should be true
       columnPinning: {
         left: ["mrt-row-expand", "mrt-row-select"],
         right: ["mrt-row-actions"],
@@ -237,50 +286,60 @@ const UsersListTable = ({ users }: UserListTableProps) => {
       </MenuItem>,
     ],
 
-    renderTopToolbar: ({}) => {
-      return (
-        <Box
-          sx={(theme) => ({
-            backgroundColor: lighten(theme.palette.background.default, 0.05),
-            display: "flex",
-            gap: "0.5rem",
-            p: "8px",
-            justifyContent: "space-between",
-          })}
-        ></Box>
-      );
-    },
+    renderTopToolbar: () => (
+      <Box
+        sx={(theme) => ({
+          backgroundColor: lighten(theme.palette.background.default, 0.05),
+          display: "flex",
+          gap: "0.5rem",
+          p: "8px",
+          justifyContent: "space-between",
+        })}
+      >
+        <Autocomplete
+          options={allSuggestions}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Search..."
+              variant="outlined"
+              size="small"
+              sx={{ width: "300px" }} // Adjust the width as needed
+            />
+          )}
+          onChange={(event, value) => {
+            // Set global filter based on the selected suggestion
+            table.setGlobalFilter(value);
+          }}
+        />
+      </Box>
+    ),
   });
 
   return (
     <Box>
       <MaterialReactTable table={table} />
-      <Box>
-        {/* Dialog for Adding User */}
-        <Dialog open={openEdit}>
-          <EditProfile
-            handleClose={handleCloseEdit}
-            selectedRowData={selectedRowData}
-          />
-        </Dialog>
-        {/* Dialog for Reset Password */}
-        <Dialog open={openReset}>
-          <ResetPassword
-            handleClose={handleCloseReset}
-            selectedRowData={selectedRowData}
-          />
-        </Dialog>
-        {/* Delete */}
-        <Dialog open={openDelete}>
-          <Warning
-            handleClose={handleCloseDelete}
-            handleAction={handleDeleteUser}
-            message={`Are You Sure Do You Want to delete ${selectedRowData?.firstName} ${selectedRowData?.lastName}`}
-            isLoading={isLoading}
-            isSuccess={isSuccess}
-          />
-        </Dialog>
-      </Box>
+      <Dialog open={openEdit}>
+        <EditProfile
+          handleClose={handleCloseEdit}
+          selectedRowData={selectedRowData}
+        />
+      </Dialog>
+      <Dialog open={openReset}>
+        <ResetPassword
+          handleClose={handleCloseReset}
+          selectedRowData={selectedRowData}
+        />
+      </Dialog>
+      <Dialog open={openDelete}>
+        <Warning
+          handleClose={handleCloseDelete}
+          handleAction={handleDeleteUser}
+          message={`Are you sure you want to delete ${selectedRowData?.firstName} ${selectedRowData?.lastName}?`}
+          isLoading={isLoading}
+          isSuccess={isSuccess}
+        />
+      </Dialog>
     </Box>
   );
 };
