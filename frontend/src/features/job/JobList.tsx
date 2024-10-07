@@ -4,19 +4,17 @@ import { Box } from "@mui/material";
 import JobListTable from "./JobListTable";
 import RectangularButton from "../../component/ui/RectangularButton";
 import { useNavigate } from "react-router-dom";
-import { useGetAllJobQuery } from "../../services/job_service";
+import { useLazyGetAllJobQuery } from "../../services/job_service";
 import Loader from "../../component/Loading";
+import { useEffect } from "react";
 
 const JobList = () => {
   const navigator = useNavigate();
-  const {
-    isError,
-    isLoading,
-    isSuccess,
-    data: jobs,
-    error,
-  } = useGetAllJobQuery("userApi");
-
+  const [trigger, { isError, isLoading, isSuccess, data: jobs, error }] =
+    useLazyGetAllJobQuery();
+  useEffect(() => {
+    trigger({});
+  }, [trigger]);
   const handleClick = () => {
     navigator("/admin/add-job");
   };

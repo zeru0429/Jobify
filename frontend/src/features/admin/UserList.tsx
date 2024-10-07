@@ -2,8 +2,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import UsersListTable from "./UserListTable";
 import { Box, Dialog } from "@mui/material";
-import { useGetAllUsersQuery } from "../../services/user_service";
-import { useState } from "react";
+import { useLazyGetAllUsersQuery } from "../../services/user_service";
+import { useEffect, useState } from "react";
 import AddUser from "./forms/AddUser";
 import Loader from "../../component/Loading";
 import RectangularButton from "../../component/ui/RectangularButton";
@@ -13,13 +13,12 @@ import UnauthorizedPage from "../../component/UnauthorizedPage";
 const UserList = () => {
   const { isSuperAdmin } = useAuth();
   const [open, setOpen] = useState(false);
-  const {
-    isError,
-    isLoading,
-    isSuccess,
-    data: users,
-    error,
-  } = useGetAllUsersQuery("userApi");
+  const [trigger, { isError, isLoading, isSuccess, data: users, error }] =
+    useLazyGetAllUsersQuery();
+
+  useEffect(() => {
+    trigger({});
+  }, [trigger]);
 
   const handleClickOpen = () => {
     setOpen(true);

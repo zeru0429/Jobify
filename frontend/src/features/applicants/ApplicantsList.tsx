@@ -3,23 +3,22 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { Box } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import ApplicantListTable from "./ApplicantListTable";
-import { useGetAllApplicantQuery } from "../../services/applicants_service";
+import { useLazyGetAllApplicantQuery } from "../../services/applicants_service";
 import Loader from "../../component/Loading";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useEffect } from "react";
 const ApplicantsList = () => {
   const location = useLocation();
   const jobId = location.state;
   console.log(jobId);
 
-  const {
-    data: applicants,
-    isError,
-    isLoading,
-    isSuccess,
-    error,
-  } = useGetAllApplicantQuery({ params: jobId });
+  const [trigger, { data: applicants, isError, isLoading, isSuccess, error }] =
+    useLazyGetAllApplicantQuery();
 
+  useEffect(() => {
+    trigger({ params: jobId });
+  }, [trigger]);
   // Navigation to add applicant form
   const navigate = useNavigate();
   const handleClick = () => {
