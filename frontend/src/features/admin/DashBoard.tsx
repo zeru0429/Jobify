@@ -15,11 +15,11 @@ const DashBoard = () => {
   return (
     <>
       <Box sx={{ display: "flex" }}>
+        <PieArcLabel triggerQuery={useLazyGetCompanyTypeQuery} />
         <BarsDataset
           dataKeys={dataKeys}
           triggerQuery={useLazyGetCompanyJobQuery}
         />
-        <PieArcLabel triggerQuery={useLazyGetCompanyTypeQuery} />
       </Box>
       <Box sx={{ display: "flex" }}>
         <FormatterDemoNoSnap triggerQuery={useLazyGetMonthlyApplicantQuery} />

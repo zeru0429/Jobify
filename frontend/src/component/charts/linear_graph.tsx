@@ -8,8 +8,8 @@ const chartSetting = {
       label: "Number of Users",
     },
   ],
-  width: 500,
-  height: 300,
+  width: 600,
+  height: 350,
   sx: {
     [`.${axisClasses.left} .${axisClasses.label}`]: {
       transform: "translate(-20px, 0)",
@@ -17,7 +17,13 @@ const chartSetting = {
   },
 };
 
-const BarsDataset = ({ triggerQuery, dataKeys }) => {
+const BarsDataset = ({
+  triggerQuery,
+  dataKeys,
+}: {
+  triggerQuery: any;
+  dataKeys: any;
+}) => {
   const [trigger, { isError, isLoading, isSuccess, data, error }] =
     triggerQuery();
 
@@ -37,7 +43,7 @@ const BarsDataset = ({ triggerQuery, dataKeys }) => {
       <BarChart
         dataset={data}
         xAxis={[{ scaleType: "band", dataKey: "company" }]}
-        series={dataKeys.map(({ key, label }) => ({
+        series={dataKeys.map(({ key, label }: { key: any; label: any }) => ({
           dataKey: key,
           label: label,
         }))}

@@ -4,7 +4,8 @@ import { useEffect } from "react";
 import Loader from "../Loading";
 
 const otherSetting = {
-  height: 300,
+  width: 600,
+  height: 350,
   yAxis: [{ label: "Number of Applicants" }],
   grid: { horizontal: true },
   sx: {

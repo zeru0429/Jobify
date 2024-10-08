@@ -52,7 +52,7 @@ const PieArcLabel = ({ triggerQuery }: { triggerQuery: any }) => {
 
 const size = {
   width: 800,
-  height: 400,
+  height: 350,
 };
 
 export default PieArcLabel;
