@@ -3,7 +3,7 @@ import { valueFormatter } from "../../demo/pi_chart_static_demo_data";
 import { useEffect } from "react";
 import Loader from "../Loading";
 
-const PieArcLabel = ({ triggerQuery }) => {
+const PieArcLabel = ({ triggerQuery }: { triggerQuery: any }) => {
   const [trigger, { isError, isLoading, isSuccess, data, error }] =
     triggerQuery();
 
@@ -51,8 +51,8 @@ const PieArcLabel = ({ triggerQuery }) => {
 };
 
 const size = {
-  width: 400,
-  height: 200,
+  width: 800,
+  height: 400,
 };
 
 export default PieArcLabel;
