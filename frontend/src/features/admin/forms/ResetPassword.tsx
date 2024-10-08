@@ -41,7 +41,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({
       }).unwrap();
       console.log(response);
       setToastData({
-        message: "User created successfully",
+        message: "Password Reset successfully",
         success: true,
       });
       handleClose();
