@@ -15,7 +15,7 @@ const jobValidator = {
     description: z.string().optional(),
     type: z.string().optional(),
     location: z.string().optional(),
-    salary: z.string().optional(),
+    salary: z.number().optional(),
     company: z.string().optional(),
     contactEmail: z.string().optional(),
   }),
