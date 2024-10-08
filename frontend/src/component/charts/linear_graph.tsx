@@ -1,6 +1,7 @@
 import { BarChart } from "@mui/x-charts/BarChart";
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
-
+import { useEffect } from "react";
+import Loader from "../Loading";
 const chartSetting = {
   yAxis: [
     {
@@ -16,24 +17,33 @@ const chartSetting = {
   },
 };
 
-export default function BarsDataset({
-  dataset,
-  dataKeys,
-}: {
-  dataset: {
-    [key: string]: number | string;
-  }[];
-  dataKeys: { key: string; label: string }[];
-}) {
-  return (
-    <BarChart
-      dataset={dataset}
-      xAxis={[{ scaleType: "band", dataKey: "company" }]}
-      series={dataKeys.map(({ key, label }) => ({
-        dataKey: key,
-        label: label,
-      }))}
-      {...chartSetting}
-    />
-  );
-}
+const BarsDataset = ({ triggerQuery, dataKeys }) => {
+  const [trigger, { isError, isLoading, isSuccess, data, error }] =
+    triggerQuery();
+
+  useEffect(() => {
+    trigger({});
+  }, [trigger]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (isError) {
+    return <div>Error occurred: {error.toString()}</div>;
+  }
+  if (isSuccess) {
+    return (
+      <BarChart
+        dataset={data}
+        xAxis={[{ scaleType: "band", dataKey: "company" }]}
+        series={dataKeys.map(({ key, label }) => ({
+          dataKey: key,
+          label: label,
+        }))}
+        {...chartSetting}
+      />
+    );
+  }
+};
+export default BarsDataset;

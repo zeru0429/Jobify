@@ -1,5 +1,7 @@
 import { axisClasses } from "@mui/x-charts/ChartsAxis";
 import { BarChart } from "@mui/x-charts/BarChart";
+import { useEffect } from "react";
+import Loader from "../Loading";
 
 const otherSetting = {
   height: 300,
@@ -12,82 +14,53 @@ const otherSetting = {
   },
 };
 
-// New dataset representing the number of applicants per month
-const dataset = [
-  {
-    month: "January",
-    applicants: 120,
-  },
-  {
-    month: "February",
-    applicants: 150,
-  },
-  {
-    month: "March",
-    applicants: 175,
-  },
-  {
-    month: "April",
-    applicants: 200,
-  },
-  {
-    month: "May",
-    applicants: 225,
-  },
-  {
-    month: "June",
-    applicants: 250,
-  },
-  {
-    month: "July",
-    applicants: 300,
-  },
-  {
-    month: "August",
-    applicants: 280,
-  },
-  {
-    month: "September",
-    applicants: 240,
-  },
-  {
-    month: "October",
-    applicants: 260,
-  },
-  {
-    month: "November",
-    applicants: 300,
-  },
-  {
-    month: "December",
-    applicants: 230,
-  },
-];
-
 const valueFormatter = (value: number | null) => `${value} applicants`;
 
-export default function ApplicantStats() {
-  return (
-    <BarChart
-      dataset={dataset}
-      xAxis={[
-        {
-          scaleType: "band",
-          dataKey: "month",
-          valueFormatter: (month, context) =>
-            context.location === "tick"
-              ? `${month.slice(0, 3)} \n2023`
-              : `${month} 2023`,
-        },
-      ]}
-      series={[
-        {
-          dataKey: "applicants",
-          label: "Number of Applicants",
-          valueFormatter,
-        },
-      ]}
-      {...otherSetting}
-    />
-  );
+interface ApplicantsProps {
+  triggerQuery: any;
 }
+
+const ApplicantStats: React.FC<ApplicantsProps> = ({ triggerQuery }) => {
+  const [trigger, { isError, isLoading, isSuccess, data, error }] =
+    triggerQuery();
+
+  useEffect(() => {
+    trigger({});
+  }, [trigger]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (isError) {
+    return <div>Error occurred: {error.toString()}</div>;
+  }
+
+  if (isSuccess) {
+    return (
+      <BarChart
+        dataset={data}
+        xAxis={[
+          {
+            scaleType: "band",
+            dataKey: "month",
+            valueFormatter: (month, context) =>
+              context.location === "tick"
+                ? `${month.slice(0, 3)} \n2023`
+                : `${month} 2023`,
+          },
+        ]}
+        series={[
+          {
+            dataKey: "applicants",
+            label: "Number of Applicants",
+            valueFormatter,
+          },
+        ]}
+        {...otherSetting}
+      />
+    );
+  }
+};
+
+export default ApplicantStats;

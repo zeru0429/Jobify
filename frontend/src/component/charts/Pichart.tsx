@@ -1,37 +1,58 @@
 import { PieChart, pieArcLabelClasses } from "@mui/x-charts/PieChart";
 import { valueFormatter } from "../../demo/pi_chart_static_demo_data";
+import { useEffect } from "react";
+import Loader from "../Loading";
 
-export default function PieArcLabel({
-  statistic,
-}: {
-  statistic: { label: string; value: number }[];
-}) {
-  return (
-    <PieChart
-      series={[
-        {
-          data: statistic.map((item) => ({
-            id: item.label,
-            value: item.value,
-            label: item.label,
-          })),
-          arcLabel: (item) => `${item.value}%`,
-          arcLabelMinAngle: 35,
-          arcLabelRadius: "60%",
-          valueFormatter, // Apply the custom value formatter
-        },
-      ]}
-      sx={{
-        [`& .${pieArcLabelClasses.root}`]: {
-          fontWeight: "bold",
-        },
-      }}
-      {...size}
-    />
-  );
-}
+const PieArcLabel = ({ triggerQuery }) => {
+  const [trigger, { isError, isLoading, isSuccess, data, error }] =
+    triggerQuery();
+
+  useEffect(() => {
+    trigger({});
+  }, [trigger]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (isError) {
+    return <div>Error occurred: {error.toString()}</div>;
+  }
+
+  if (isSuccess) {
+    // Filter out null labels or provide a default value for them
+    const filteredData = data
+      .filter((item: any) => item.label !== null)
+      .map((item: any) => ({
+        value: item.value,
+        label: item.label || "Unknown",
+      }));
+
+    return (
+      <PieChart
+        series={[
+          {
+            data: filteredData,
+            arcLabel: (item) => `${item.value}%`,
+            arcLabelMinAngle: 35,
+            arcLabelRadius: "60%",
+            valueFormatter,
+          },
+        ]}
+        sx={{
+          [`& .${pieArcLabelClasses.root}`]: {
+            fontWeight: "bold",
+          },
+        }}
+        {...size}
+      />
+    );
+  }
+};
 
 const size = {
   width: 400,
   height: 200,
 };
+
+export default PieArcLabel;
