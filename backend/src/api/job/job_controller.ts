@@ -3,25 +3,13 @@ import Job from "./job_module.js";
 import { NextFunction, Request, Response } from "express";
 import User from "../user/user_module.js";
 import Company from "../company/company_module.js";
+import jobValidator from "./job_validator.js";
 
 const jobController = {
   createJob: async (req: Request, res: Response, next: NextFunction) => {
     req.body.createdBy = req.user?._id;
-    if (
-      !req.body.title ||
-      !req.body.type ||
-      !req.body.description ||
-      !req.body.location ||
-      !req.body.salary ||
-      !req.body.company ||
-      !req.body.contactEmail ||
-      !req.body.createdBy
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-    }
+    //validate
+    jobValidator.create.parse(req.body);
     // check company is valid object id
     if (!mongoose.Types.ObjectId.isValid(req.body.company)) {
       return res.status(400).json({
@@ -127,21 +115,8 @@ const jobController = {
   updateJob: async (req: Request, res: Response) => {
     const adminId = req.user?._id;
     req.body.createdBy = req.user?._id;
-    // Check if all body fields are provided
-    if (
-      !req.body.title ||
-      !req.body.type ||
-      !req.body.description ||
-      !req.body.location ||
-      !req.body.salary ||
-      !req.body.company ||
-      !req.body.contactEmail
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-    }
+    //validate
+    jobValidator.update.parse(req.body);
 
     // Check if company ID is valid
     if (!mongoose.Types.ObjectId.isValid(req.body.company)) {

@@ -4,23 +4,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../../config/secrete.js";
 import mongoose from "mongoose";
+import { userValidator } from "./user_validator.js";
 
 const userController = {
   // Create User
   createUser: async (req: Request, res: Response) => {
-    // Check if all fields are provided
-    if (
-      !req.body.firstName ||
-      !req.body.lastName ||
-      !req.body.role ||
-      !req.body.email ||
-      !req.body.password
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-    }
+    // validate
+    userValidator.create.parse(req.body);
 
     //check if the role is admin or super admin
     if (req.body.role !== "admin" && req.body.role !== "super_admin") {
@@ -78,6 +68,8 @@ const userController = {
 
   // Update User Profile
   updateProfile: async (req: Request, res: Response) => {
+    // validate
+    userValidator.updateProfile.parse(req.body);
     const { firstName, lastName, role } = req.body;
     //check if the object id is valid
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -125,6 +117,8 @@ const userController = {
 
   // Change Password
   resetPassword: async (req: Request, res: Response) => {
+    // validate
+    userValidator.resetPassword.parse(req.body);
     const { confirmPassword, password } = req.body;
     const trimmedConfirmPassword = confirmPassword.trim();
     const trimmedPassword = password.trim();
@@ -174,6 +168,8 @@ const userController = {
 
   // Change Email
   changeEmail: async (req: Request, res: Response) => {
+    // validate
+    userValidator.changeEmail.parse(req.body);
     const { email } = req.body;
 
     // Check if the user exists
@@ -247,13 +243,8 @@ const userController = {
 
   // Login
   login: async (req: Request, res: Response) => {
-    // Check if email and password provided
-    if (!req.body.email || !req.body.password) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide email and password",
-      });
-    }
+    // validate
+    userValidator.login.parse(req.body);
 
     // Check if user exists
     const user = await User.findOne({ email: req.body.email });

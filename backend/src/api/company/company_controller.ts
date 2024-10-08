@@ -4,20 +4,16 @@ import Company from "./company_module.js";
 import { NextFunction, Request, Response } from "express";
 import { v2 as cloudinary } from "cloudinary";
 import { formatImage } from "../../config/multer.js";
+import companyValidator from "./company_validator.js";
 
 const companyController = {
   // Create a new company
   createCompany: async (req: Request, res: Response) => {
+    // validator
+    companyValidator.create.parse(req.body);
     req.body.admin = req.user?._id;
     const { name, type, companyType, address, admin } = req.body;
     // Check if all required fields are provided
-    if (!name || !admin || !type || !companyType || !address) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Name, admin, type, companyType, and address are required fields.",
-      });
-    }
 
     // Check if the file path exists
     if (!req.file) {
@@ -135,7 +131,8 @@ const companyController = {
   // Update a company by ID
   updateCompanyProfile: async (req: Request, res: Response) => {
     const adminId = req.user?._id;
-
+    // validator
+    companyValidator.updateCompanyProfile.parse(req.body);
     const { name, type, companyType, address } = req.body;
     // check id is valid object id
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -158,7 +155,7 @@ const companyController = {
     // Check if the name exists before
     const companyExist = await Company.findOne({ name });
     if (companyExist) {
-      if (companyExist._id.toString() !== req.params.id.toString())
+      if (`${companyExist._id}`.toString() !== req.params.id.toString())
         return res.status(400).json({
           success: false,
           message: "Company already exists.",

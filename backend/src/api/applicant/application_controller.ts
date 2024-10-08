@@ -5,6 +5,7 @@ import Job from "../job/job_module.js";
 import { formatImage } from "../../config/multer.js";
 import { v2 as cloudinary } from "cloudinary";
 import Company from "../company/company_module.js";
+import applicantValidator from "./applicant_validator.js";
 const applicationController = {
   createApplication: async (
     req: Request,
@@ -14,12 +15,7 @@ const applicationController = {
     const { job, applicantName, applicantEmail, status } = req.body;
 
     // Validate required fields
-    if (!job || !applicantName || !applicantEmail) {
-      return res.status(400).json({
-        success: false,
-        message: "Job, applicant name, and email are required",
-      });
-    }
+    applicantValidator.create.parse(req.body);
 
     // Check if the job ID is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(job)) {
