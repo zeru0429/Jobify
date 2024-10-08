@@ -1,5 +1,4 @@
-import express, { NextFunction } from "express";
-import { Request, Response } from "express";
+import express from "express";
 import applicationController from "./application_controller.js";
 import { isAuth } from "../../middlewares/auth.js";
 import { uploadMulti } from "../../middlewares/multer.js";
