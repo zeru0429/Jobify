@@ -12,7 +12,7 @@ const companyController = {
     // validator
     companyValidator.create.parse(req.body);
     req.body.admin = req.user?._id;
-    const { name, type, companyType, address, admin } = req.body;
+    const { name, type, companyType, address, admin, description } = req.body;
     // Check if all required fields are provided
 
     // Check if the file path exists
@@ -68,6 +68,7 @@ const companyController = {
       companyType,
       address,
       admin,
+      description,
       avatar: cloudinaryResponse.secure_url,
       avatarPublicId: cloudinaryResponse.public_id,
     });
@@ -133,7 +134,7 @@ const companyController = {
     const adminId = req.user?._id;
     // validator
     companyValidator.updateCompanyProfile.parse(req.body);
-    const { name, type, companyType, address } = req.body;
+    const { name, type, companyType, address, description } = req.body;
     // check id is valid object id
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
@@ -163,6 +164,9 @@ const companyController = {
     }
 
     // Update company fields
+
+    company.description =
+      description !== undefined ? description : company.description;
     company.name = name !== undefined ? name : company.name;
     company.type = type !== undefined ? type : company.type;
     company.companyType =
