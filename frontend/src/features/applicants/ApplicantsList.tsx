@@ -1,7 +1,7 @@
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { Box } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import ApplicantListTable from "./ApplicantListTable";
 import { useLazyGetAllApplicantQuery } from "../../services/applicants_service";
 import Loader from "../../component/Loading";
@@ -20,10 +20,6 @@ const ApplicantsList = () => {
     trigger({ params: jobId });
   }, [trigger]);
   // Navigation to add applicant form
-  const navigate = useNavigate();
-  const handleClick = () => {
-    navigate("/admin/add-applicant");
-  };
   console.log(applicants);
   return (
     <div>

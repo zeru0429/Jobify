@@ -122,7 +122,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
                     size="small"
                   />
                 )}
-                onChange={(event, value) => column.setFilterValue(value)}
+                onChange={(_event, value) => column.setFilterValue(value)}
               />
             ),
           },
@@ -143,7 +143,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
                     size="small"
                   />
                 )}
-                onChange={(event, value) => column.setFilterValue(value)}
+                onChange={(_event, value) => column.setFilterValue(value)}
               />
             ),
           },
@@ -185,7 +185,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
                     size="small"
                   />
                 )}
-                onChange={(event, value) => column.setFilterValue(value)}
+                onChange={(_event, value) => column.setFilterValue(value)}
               />
             ),
           },
@@ -307,7 +307,7 @@ const UsersListTable = ({ users }: UserListTableProps) => {
               sx={{ width: "300px" }} // Adjust the width as needed
             />
           )}
-          onChange={(event, value) => {
+          onChange={(_event, value) => {
             // Set global filter based on the selected suggestion
             table.setGlobalFilter(value);
           }}

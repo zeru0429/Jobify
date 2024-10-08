@@ -1,12 +1,7 @@
 import { useMemo, useState } from "react";
 
 // MRT Imports
-import {
-  MaterialReactTable,
-  type MRT_ColumnDef,
-  MRT_GlobalFilterTextField,
-  MRT_ToggleFiltersButton,
-} from "material-react-table";
+import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 
 // Material UI Imports
 import {
@@ -125,7 +120,7 @@ const ApplicantListTable: React.FC<ApplicantListTableProps> = ({
                 size="small"
               />
             )}
-            onChange={(event, value) => column.setFilterValue(value)}
+            onChange={(_event, value) => column.setFilterValue(value)}
           />
         ),
       },
@@ -144,7 +139,7 @@ const ApplicantListTable: React.FC<ApplicantListTableProps> = ({
                 size="small"
               />
             )}
-            onChange={(event, value) => column.setFilterValue(value)}
+            onChange={(_event, value) => column.setFilterValue(value)}
           />
         ),
       },
@@ -206,7 +201,7 @@ const ApplicantListTable: React.FC<ApplicantListTableProps> = ({
                 size="small"
               />
             )}
-            onChange={(event, value) => column.setFilterValue(value)}
+            onChange={(_event, value) => column.setFilterValue(value)}
           />
         ),
         Cell: ({ cell }) => {
@@ -335,7 +330,7 @@ const ApplicantListTable: React.FC<ApplicantListTableProps> = ({
                   sx={{ width: "300px" }} // Adjust the width as needed
                 />
               )}
-              onChange={(event, value) => {
+              onChange={(_event, value) => {
                 // Set global filter based on the selected suggestion
                 table.setGlobalFilter(value);
               }}

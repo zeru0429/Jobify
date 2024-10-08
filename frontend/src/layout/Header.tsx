@@ -67,12 +67,12 @@ const Header: React.FC<ChildComponentProps> = ({ setOpen }) => {
                 className="w-[25px] h-[25px] cursor-pointer"
                 onClick={() => setIsOpen(!isOpen)}
               />
-              <Button
-                className=" bg-[#002A47] hover:dark:bg-[#5a5a5a] dark:text-gray-200 px-3 py-1 text-white rounded-md"
+              <p
+                className="  hover:dark:bg-[#5a5a5a] font-bold dark:text-gray-200 px-3 py-1 text-white rounded-md"
                 onClick={() => navigator("/")}
               >
                 Home
-              </Button>
+              </p>
 
               {isOpen && (
                 <div className="absolute right-0  py-2 w-32 border rounded shadow-xl bg-[#002A47] mt-16">

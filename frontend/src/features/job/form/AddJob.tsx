@@ -17,6 +17,7 @@ import Loader from "../../../component/Loading";
 import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress, IconButton, Typography } from "@mui/material";
 import { Keyboard } from "@mui/icons-material";
+import { textFormatter } from "../../../util/text-formater";
 
 interface AddJobProps {}
 
@@ -106,7 +107,7 @@ const AddJob: React.FC<AddJobProps> = () => {
           });
           const { data } = response;
 
-          setValue("description", `${data}`);
+          setValue("description", `${textFormatter(data)}`);
         } catch (error) {
           console.log(error);
         }

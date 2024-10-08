@@ -34,7 +34,6 @@ interface JobLandingPageProps {
 
 const JobLandingPage: React.FC<JobLandingPageProps> = ({
   initialJobs,
-  loadMoreJobs,
   hasMoreJobs,
 }) => {
   const [jobsList, setJobs] = useState<JobLandingPageType[]>(initialJobs);
