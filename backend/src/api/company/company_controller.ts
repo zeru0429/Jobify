@@ -3,7 +3,7 @@ import User from "../user/user_module.js";
 import Company from "./company_module.js";
 import { NextFunction, Request, Response } from "express";
 import { v2 as cloudinary } from "cloudinary";
-import { formatImage } from "../../config/multer.js";
+import { formatImage } from "../../middlewares/multer.js";
 import companyValidator from "./company_validator.js";
 
 const companyController = {

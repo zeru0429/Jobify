@@ -1,6 +1,6 @@
 import multer, { StorageEngine, FileFilterCallback, Multer } from "multer";
 import { ensureDirectoryExists } from "../util/ensure.js";
-import { BASE_URL } from "./secrete.js";
+import { BASE_URL } from "../config/secrete.js";
 import { NextFunction, Response, Request } from "express";
 import DataParser from "datauri/parser.js";
 import path from "path";

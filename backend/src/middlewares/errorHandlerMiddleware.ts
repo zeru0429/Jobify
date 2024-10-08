@@ -6,7 +6,7 @@ interface CustomError extends Error {
   statusCode?: number;
 }
 
-const errorHandlerMiddleware = (
+export const errorHandlerMiddleware = (
   err: CustomError,
   req: Request,
   res: Response,
@@ -22,5 +22,3 @@ const errorHandlerMiddleware = (
     message: msg,
   });
 };
-
-export default errorHandlerMiddleware;

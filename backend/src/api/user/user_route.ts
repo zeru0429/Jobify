@@ -1,38 +1,35 @@
 import express, { Request, Response } from "express";
 import userController from "./user_controller.js";
+import { errorHandlerMethod } from "../../config/errorHandler.js";
 
 const userRouter = express.Router();
 
 // Create a new user
-userRouter.post("/", (req: Request, res: Response) => {
-  userController.createUser(req, res);
-});
+userRouter.post("/", errorHandlerMethod(userController.createUser));
 
 // Get all users
-userRouter.get("/", userController.getAllUser);
+userRouter.get("/", errorHandlerMethod(userController.getAllUser));
 
 // Get a single user by ID
-userRouter.get("/:id", userController.getSingleUser);
+userRouter.get("/:id", errorHandlerMethod(userController.getSingleUser));
 
 // Update user profile by ID
-userRouter.patch("/:id/profile", (req: Request, res: Response) => {
-  userController.updateProfile(req, res);
-});
+userRouter.patch(
+  "/:id/profile",
+  errorHandlerMethod(userController.updateProfile)
+);
 
 // Change user password by ID
-userRouter.patch("/:id/password", (req: Request, res: Response) => {
-  userController.resetPassword(req, res);
-});
+userRouter.patch(
+  "/:id/password",
+  errorHandlerMethod(userController.resetPassword)
+);
 
 // Change user email by ID
-userRouter.patch("/:id/email", (req: Request, res: Response) => {
-  userController.changeEmail(req, res);
-});
+userRouter.patch("/:id/email", errorHandlerMethod(userController.changeEmail));
 
 // Delete a user by ID
-userRouter.delete("/:id", (req: Request, res: Response) => {
-  userController.deleteUser(req, res);
-});
+userRouter.delete("/:id", errorHandlerMethod(userController.deleteUser));
 
 // Export the user router
 export default userRouter;

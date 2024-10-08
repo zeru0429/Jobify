@@ -1,4 +1,7 @@
 import express, { Express, Request, Response } from "express";
+import { Queue, Worker } from "bullmq";
+import Redis from "ioredis";
+
 import { v2 as cloudinary } from "cloudinary";
 import { rateLimit } from "express-rate-limit";
 import helmet from "helmet";
@@ -78,7 +81,7 @@ cloudinary.config({
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 import appRouter from "./router/index.js";
 import userController from "./api/user/user_controller.js";
-import errorHandlerMiddleware from "./config/errorHandlerMiddleware.js";
+import { errorHandlerMiddleware } from "./middlewares/errorHandlerMiddleware.js";
 
 //public
 app.post("/login", (req: Request, res: Response) => {

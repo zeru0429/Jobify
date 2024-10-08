@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import Application from "./applicant_module.js";
 import mongoose from "mongoose";
 import Job from "../job/job_module.js";
-import { formatImage } from "../../config/multer.js";
+import { formatImage } from "../../middlewares/multer.js";
 import { v2 as cloudinary } from "cloudinary";
 import Company from "../company/company_module.js";
 import applicantValidator from "./applicant_validator.js";
