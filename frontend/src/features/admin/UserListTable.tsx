@@ -1,95 +1,169 @@
-import { useMemo } from "react";
-
-// MRT Imports
+import { useMemo, useState } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
-  MRT_GlobalFilterTextField,
-  MRT_ToggleFiltersButton,
 } from "material-react-table";
+import {
+  Box,
+  Dialog,
+  ListItemIcon,
+  MenuItem,
+  lighten,
+  Autocomplete,
+  TextField,
+} from "@mui/material";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { DeleteForever } from "@mui/icons-material";
+import { UserListType } from "../../_types/user_table";
+import EditProfile from "./forms/EditProfile";
+import ResetPassword from "./forms/ResetPassword";
+import Warning from "../../component/Warning";
+import { useDeleteUserMutation } from "../../services/user_service";
+import { ErrorResponseType } from "../../_types/form_types";
+import { useToast } from "../../context/ToastContext";
 
-// Material UI Imports
-import { Box, Button, ListItemIcon, MenuItem, lighten } from "@mui/material";
-
-// Icons Imports
-import { AccountCircle, Send } from "@mui/icons-material";
-
-// Mock Data
-import { data } from "../../demo/demo_users"; // Ensure this matches your data structure
-
-export type UserListType = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  jobTitle: string;
-  salary: number;
-  startDate: string;
-  avatar: string;
+type UserListTableProps = {
+  users: UserListType[];
 };
 
-const UsersListTable = () => {
+const UsersListTable = ({ users }: UserListTableProps) => {
+  const { setToastData } = useToast();
+  const [selectedRowData, setSelectedRowData] = useState<UserListType | null>(
+    null
+  );
+  const [deleteUser, { isLoading, isSuccess }] = useDeleteUserMutation();
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openReset, setOpenReset] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+
+  const handleClickOpenEdit = (row: UserListType) => {
+    setSelectedRowData(row);
+    setOpenEdit(true);
+  };
+
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
+
+  const handleClickOpenReset = (row: UserListType) => {
+    setSelectedRowData(row);
+    setOpenReset(true);
+  };
+
+  const handleCloseReset = () => {
+    setOpenReset(false);
+  };
+
+  const handleClickOpenDelete = (row: UserListType) => {
+    setSelectedRowData(row);
+    setOpenDelete(true);
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
+
+  const handleDeleteUser = async () => {
+    if (selectedRowData?._id != null) {
+      try {
+        await deleteUser({ params: selectedRowData?._id }).unwrap();
+        setToastData({
+          message: "User deleted successfully",
+          success: true,
+        });
+        handleCloseDelete();
+      } catch (error: any) {
+        handleCloseDelete();
+        const res: ErrorResponseType = error;
+        setToastData({
+          message: res.data.message,
+          success: false,
+        });
+      }
+    } else {
+      handleCloseDelete();
+      setToastData({
+        message: "User not selected is missing",
+        success: false,
+      });
+    }
+  };
+
+  // Get unique suggestions from the user data for Autocomplete
+  const nameSuggestions = users.map(
+    (user) => `${user.firstName} ${user.lastName}`
+  );
+  const emailSuggestions = users.map((user) => user.email);
+  const roleSuggestions = Array.from(new Set(users.map((user) => user.role)));
+  const allSuggestions = Array.from(
+    new Set([...nameSuggestions, ...emailSuggestions])
+  );
   const columns = useMemo<MRT_ColumnDef<UserListType>[]>(
     () => [
       {
-        id: "employee", //id used to define `group` column
+        id: "employee",
         header: "Employee",
         columns: [
           {
-            accessorFn: (row) => `${row.firstName} ${row.lastName}`, //accessorFn used to join multiple data into a single cell
-            id: "name", //id is still required when using accessorFn instead of accessorKey
+            accessorFn: (row) => `${row.firstName} ${row.lastName}`,
+            id: "name",
             header: "Name",
             size: 250,
-            Cell: ({ renderedCellValue, row }) => (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "1rem",
-                }}
-              >
-                <img
-                  alt="avatar"
-                  height={30}
-                  src={row.original.avatar}
-                  loading="lazy"
-                  style={{ borderRadius: "50%", width: "50px", height: "50px" }}
-                />
-                {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
-                <span>{renderedCellValue}</span>
-              </Box>
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={nameSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Name"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
             ),
           },
           {
-            accessorKey: "email", //accessorKey used to define `data` column. `id` gets set to accessorKey automatically
+            accessorKey: "email",
             enableClickToCopy: true,
             filterVariant: "autocomplete",
             header: "Email",
             size: 300,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={emailSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Email"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
           },
         ],
       },
       {
-        id: "id",
-        header: "Job Info",
+        id: "details",
+        header: "Details",
         columns: [
           {
-            accessorKey: "salary",
-            // filterVariant: 'range', //if not using filter modes feature, use this instead of filterFn
-            filterFn: "between",
-            header: "Salary",
+            accessorKey: "role",
+            header: "Role",
             size: 200,
-            //custom conditional format and styling
             Cell: ({ cell }) => (
               <Box
                 component="span"
                 sx={(theme) => ({
                   backgroundColor:
-                    cell.getValue<number>() < 50_000
+                    cell.getValue<String>() === "super_admin"
                       ? theme.palette.error.dark
-                      : cell.getValue<number>() >= 50_000 &&
-                        cell.getValue<number>() < 75_000
-                      ? theme.palette.warning.dark
                       : theme.palette.success.dark,
                   borderRadius: "0.25rem",
                   color: "#fff",
@@ -97,44 +171,49 @@ const UsersListTable = () => {
                   p: "0.25rem",
                 })}
               >
-                {cell.getValue<number>()?.toLocaleString?.("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                })}
+                {cell.getValue<String>()}
               </Box>
+            ),
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={roleSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Role"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
             ),
           },
           {
-            accessorKey: "jobTitle", //hey a simple column for once
-            header: "Job Title",
-            size: 350,
+            accessorFn: (row) => new Date(row.createdAt),
+            id: "createdAt",
+            header: "Created At",
+            filterVariant: "date",
+            sortingFn: "datetime",
+            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(),
           },
           {
-            accessorFn: (row) => new Date(row.startDate), //convert to Date for sorting and filtering
-            id: "startDate",
-            header: "Start Date",
+            accessorFn: (row) => new Date(row.updatedAt),
+            id: "updatedAt",
+            header: "Updated At",
             filterVariant: "date",
-            filterFn: "lessThan",
             sortingFn: "datetime",
-            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(), //render Date as a string
-            Header: ({ column }) => <em>{column.columnDef.header}</em>, //custom header markup
-            muiFilterTextFieldProps: {
-              sx: {
-                minWidth: "250px",
-              },
-            },
+            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(),
           },
         ],
       },
     ],
-    []
+    [nameSuggestions, emailSuggestions]
   );
 
   const table = useMaterialReactTable({
     columns,
-    data,
+    data: users,
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -143,8 +222,11 @@ const UsersListTable = () => {
     enableRowActions: true,
     enableRowSelection: true,
     initialState: {
-      // showColumnFilters: true,
-      showGlobalFilter: true,
+      pagination: {
+        pageSize: 5,
+        pageIndex: 0,
+      },
+      showGlobalFilter: true, // This should be true
       columnPinning: {
         left: ["mrt-row-expand", "mrt-row-select"],
         right: ["mrt-row-actions"],
@@ -158,107 +240,108 @@ const UsersListTable = () => {
     },
     muiPaginationProps: {
       color: "secondary",
-      rowsPerPageOptions: [10, 20, 30],
+      rowsPerPageOptions: [5, 10, 20, 30],
       shape: "rounded",
       variant: "outlined",
     },
-
-    renderRowActionMenuItems: ({ closeMenu }) => [
+    renderRowActionMenuItems: ({ row, closeMenu }) => [
       <MenuItem
-        key={0}
+        key={`edit-${row.original._id}`}
         onClick={() => {
-          // View profile logic...
+          handleClickOpenEdit(row.original);
           closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <AccountCircle />
+          <PersonAddIcon />
         </ListItemIcon>
-        View Profile
+        Edit profile
       </MenuItem>,
       <MenuItem
-        key={1}
+        key={`reset-${row.original._id}`}
         onClick={() => {
-          // Send email logic...
+          handleClickOpenReset(row.original);
           closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <Send />
+          <VpnKeyIcon />
         </ListItemIcon>
-        Send Email
+        Reset Password
+      </MenuItem>,
+      <MenuItem
+        key={`delete-${row.original._id}`}
+        onClick={() => {
+          handleClickOpenDelete(row.original);
+          closeMenu();
+        }}
+        sx={{ m: 0 }}
+      >
+        <ListItemIcon>
+          <DeleteForever />
+        </ListItemIcon>
+        Delete
       </MenuItem>,
     ],
-    renderTopToolbar: ({ table }) => {
-      const handleDeactivate = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert("deactivating " + row.getValue("name"));
-        });
-      };
 
-      const handleActivate = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert("activating " + row.getValue("name"));
-        });
-      };
-
-      const handleContact = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert("contact " + row.getValue("name"));
-        });
-      };
-
-      return (
-        <Box
-          sx={(theme) => ({
-            backgroundColor: lighten(theme.palette.background.default, 0.05),
-            display: "flex",
-            gap: "0.5rem",
-            p: "8px",
-            justifyContent: "space-between",
-          })}
-        >
-          <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            {/* import MRT sub-components */}
-            <MRT_GlobalFilterTextField table={table} />
-            <MRT_ToggleFiltersButton table={table} />
-          </Box>
-          <Box>
-            <Box sx={{ display: "flex", gap: "0.5rem" }}>
-              <Button
-                color="error"
-                disabled={!table.getIsSomeRowsSelected()}
-                onClick={handleDeactivate}
-                variant="contained"
-              >
-                Deactivate
-              </Button>
-              <Button
-                color="success"
-                disabled={!table.getIsSomeRowsSelected()}
-                onClick={handleActivate}
-                variant="contained"
-              >
-                Activate
-              </Button>
-              <Button
-                color="info"
-                disabled={!table.getIsSomeRowsSelected()}
-                onClick={handleContact}
-                variant="contained"
-              >
-                Contact
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      );
-    },
+    renderTopToolbar: () => (
+      <Box
+        sx={(theme) => ({
+          backgroundColor: lighten(theme.palette.background.default, 0.05),
+          display: "flex",
+          gap: "0.5rem",
+          p: "8px",
+          justifyContent: "space-between",
+        })}
+      >
+        <Autocomplete
+          options={allSuggestions}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Search..."
+              variant="outlined"
+              size="small"
+              sx={{ width: "300px" }} // Adjust the width as needed
+            />
+          )}
+          onChange={(_event, value) => {
+            // Set global filter based on the selected suggestion
+            table.setGlobalFilter(value);
+          }}
+        />
+      </Box>
+    ),
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <Box>
+      <MaterialReactTable table={table} />
+      <Dialog open={openEdit}>
+        <EditProfile
+          handleClose={handleCloseEdit}
+          selectedRowData={selectedRowData}
+        />
+      </Dialog>
+      <Dialog open={openReset}>
+        <ResetPassword
+          handleClose={handleCloseReset}
+          selectedRowData={selectedRowData}
+        />
+      </Dialog>
+      <Dialog open={openDelete}>
+        <Warning
+          handleClose={handleCloseDelete}
+          handleAction={handleDeleteUser}
+          message={`Are you sure you want to delete ${selectedRowData?.firstName} ${selectedRowData?.lastName}?`}
+          isLoading={isLoading}
+          isSuccess={isSuccess}
+        />
+      </Dialog>
+    </Box>
+  );
 };
 
 export default UsersListTable;

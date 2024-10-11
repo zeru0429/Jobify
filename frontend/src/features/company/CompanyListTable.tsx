@@ -1,32 +1,132 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 // MRT Imports
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
-  MRT_GlobalFilterTextField,
-  MRT_ToggleFiltersButton,
 } from "material-react-table";
 
 // Material UI Imports
-import { Box, ListItemIcon, MenuItem, lighten } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  Dialog,
+  ListItemIcon,
+  MenuItem,
+  TextField,
+  lighten,
+} from "@mui/material";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { DeleteForever } from "@mui/icons-material";
+import { useToast } from "../../context/ToastContext";
+import { useDeleteCompanyMutation } from "../../services/company_service";
+import { ErrorResponseType } from "../../_types/form_types";
 
+import Warning from "../../component/Warning";
+import UpdateCompany from "./form/UpdateCompany";
+import ChangeCompanyLogo from "./form/ChangeCompanyLogo";
 // Icons Imports
-import { AccountCircle, Send } from "@mui/icons-material";
-import { companyData } from "../../demo/demo_company";
 
 // Mock Data
 
 export type CompanyListType = {
+  _id: string;
   name: string;
-  logo: string;
-  createdAt: Date;
-  updatedAt: Date;
+  logo?: string;
+  avatar?: string;
   admin: string;
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  type?: string;
+  companyType?: string;
+  address?: string;
+  description?: string;
 };
 
-const CompanyListTable = () => {
+interface CompanyListTableProps {
+  companies: CompanyListType[];
+}
+
+const CompanyListTable: React.FC<CompanyListTableProps> = ({ companies }) => {
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openChangeLogo, setOpenChangeLogo] = useState(false);
+  const { setToastData } = useToast();
+  const [selectedRowData, setSelectedRowData] =
+    useState<CompanyListType | null>(null);
+
+  const [deleteCompany, { isLoading, isSuccess }] = useDeleteCompanyMutation();
+  const handleClickOpenDelete = (row: CompanyListType) => {
+    setSelectedRowData(row);
+    setOpenDelete(true);
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
+
+  const handleClickOpenEdit = (row: CompanyListType) => {
+    setSelectedRowData(row);
+    setOpenEdit(true);
+  };
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
+
+  const handleClickOpenChangeLogo = (row: CompanyListType) => {
+    setSelectedRowData(row);
+    setOpenChangeLogo(true);
+  };
+  const handleCloseChangeLogo = () => {
+    setOpenChangeLogo(false);
+  };
+
+  const handleDeleteCompany = async () => {
+    if (selectedRowData?._id != null) {
+      try {
+        await deleteCompany({ params: selectedRowData?._id }).unwrap();
+        setToastData({
+          message: "User deleted successfully",
+          success: true,
+        });
+        handleCloseDelete();
+      } catch (error: any) {
+        handleCloseDelete();
+        const res: ErrorResponseType = error;
+        setToastData({
+          message: res.data.message,
+          success: false,
+        });
+      }
+    } else {
+      handleCloseDelete();
+      setToastData({
+        message: "User not selected is missing",
+        success: false,
+      });
+    }
+  };
+  const nameSuggestions = companies.map((company) => company.name);
+  const typeSuggestions = Array.from(
+    new Set(companies.map((company) => company.type))
+  );
+  const addressSuggestions = Array.from(
+    new Set(companies.map((company) => company.address))
+  );
+  const companyTypeSuggestions = Array.from(
+    new Set(companies.map((company) => company.companyType))
+  );
+  const allSuggestions = Array.from(
+    new Set([
+      ...nameSuggestions,
+      ...typeSuggestions,
+      ...companyTypeSuggestions,
+      ...addressSuggestions,
+    ])
+  );
   const columns = useMemo<MRT_ColumnDef<CompanyListType>[]>(
     () => [
       {
@@ -37,16 +137,97 @@ const CompanyListTable = () => {
             accessorKey: "name",
             header: "Company Name",
             size: 250,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={nameSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Name"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
           },
           {
-            accessorKey: "logo",
-            header: "Logo",
+            accessorKey: "avatar",
+            header: "Avatar",
             size: 100,
-            Cell: ({ cell }) => (
-              <img
-                src={cell.getValue<string>()}
-                alt="Company Logo"
-                style={{ width: "50px", height: "50px", borderRadius: "4px" }}
+            enableSorting: false,
+            enableColumnFilter: false,
+            Cell: ({ cell }) => {
+              const avatarUrl = cell.getValue<string>();
+              const isValidUrl = avatarUrl && !avatarUrl.includes("undefined");
+              return (
+                <img
+                  src={
+                    isValidUrl
+                      ? avatarUrl
+                      : "https://via.placeholder.com/50x50?text=No+Avatar"
+                  }
+                  alt="Company Avatar"
+                  style={{ width: "50px", height: "50px", borderRadius: "4px" }}
+                />
+              );
+            },
+          },
+          {
+            accessorKey: "address",
+            header: "Address",
+            size: 200,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={addressSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Address"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
+          },
+          {
+            accessorKey: "type",
+            header: "Type",
+            size: 150,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={typeSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by type"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
+              />
+            ),
+          },
+          {
+            accessorKey: "companyType",
+            header: "Company Type",
+            size: 150,
+            Filter: ({ column }) => (
+              <Autocomplete
+                options={companyTypeSuggestions}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Filter by Company type"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
+                onChange={(_event, value) => column.setFilterValue(value)}
               />
             ),
           },
@@ -57,18 +238,12 @@ const CompanyListTable = () => {
         header: "Additional Info",
         columns: [
           {
-            accessorFn: (row) => new Date(row.createdAt), // Convert to Date for sorting and filtering
-            id: "createdAt",
+            accessorKey: "createdAt",
             header: "Created At",
             filterVariant: "date",
-            filterFn: "lessThan",
             sortingFn: "datetime",
-            Cell: ({ cell }) => cell.getValue<Date>()?.toLocaleDateString(), // Render Date as a string
-          },
-          {
-            accessorKey: "admin",
-            header: "Admin ID",
-            size: 200,
+            Cell: ({ cell }) =>
+              new Date(cell.getValue<string>()).toLocaleDateString(),
           },
         ],
       },
@@ -78,7 +253,7 @@ const CompanyListTable = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data: companyData,
+    data: companies,
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -87,6 +262,10 @@ const CompanyListTable = () => {
     enableRowActions: true,
     enableRowSelection: true,
     initialState: {
+      pagination: {
+        pageSize: 5,
+        pageIndex: 0,
+      },
       showGlobalFilter: true,
       columnPinning: {
         left: ["mrt-row-expand", "mrt-row-select"],
@@ -101,39 +280,53 @@ const CompanyListTable = () => {
     },
     muiPaginationProps: {
       color: "secondary",
-      rowsPerPageOptions: [10, 20, 30],
+      rowsPerPageOptions: [5, 10, 20, 30],
       shape: "rounded",
       variant: "outlined",
     },
 
-    renderRowActionMenuItems: ({ closeMenu }) => [
+    renderRowActionMenuItems: ({ row, closeMenu }) => [
       <MenuItem
-        key={0}
+        key={`edit-${row.original._id}`}
         onClick={() => {
-          // View company details logic...
+          handleClickOpenEdit(row.original);
           closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <AccountCircle />
+          <PersonAddIcon />
         </ListItemIcon>
-        View Details
+        Edit company profile
       </MenuItem>,
       <MenuItem
-        key={1}
+        key={`changeLogo-${row.original._id}`}
         onClick={() => {
-          // Send email logic...
+          handleClickOpenChangeLogo(row.original);
           closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <Send />
+          <VpnKeyIcon />
         </ListItemIcon>
-        Send Email
+        changeLogo Password
+      </MenuItem>,
+      <MenuItem
+        key={`delete-${row.original._id}`}
+        onClick={() => {
+          handleClickOpenDelete(row.original);
+          closeMenu();
+        }}
+        sx={{ m: 0 }}
+      >
+        <ListItemIcon>
+          <DeleteForever />
+        </ListItemIcon>
+        Delete
       </MenuItem>,
     ],
+
     renderTopToolbar: ({ table }) => (
       <Box
         sx={(theme) => ({
@@ -144,15 +337,65 @@ const CompanyListTable = () => {
           justifyContent: "space-between",
         })}
       >
-        <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-          <MRT_GlobalFilterTextField table={table} />
-          <MRT_ToggleFiltersButton table={table} />
-        </Box>
+        <Autocomplete
+          options={allSuggestions}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Search..."
+              variant="outlined"
+              size="small"
+              sx={{ width: "300px" }} // Adjust the width as needed
+            />
+          )}
+          onChange={(_event, value) => {
+            // Set global filter based on the selected suggestion
+            table.setGlobalFilter(value);
+          }}
+          onInputChange={(_event, value) => {
+            // Update the global filter as the user types
+            table.setGlobalFilter(value);
+          }}
+          clearOnEscape
+          freeSolo // Allows users to input values that are not in the options
+        />
       </Box>
     ),
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <>
+      <Box>
+        <MaterialReactTable table={table} />
+      </Box>
+      <Box>
+        {/* Dialog for update Company Profile */}
+        <Dialog open={openEdit}>
+          <UpdateCompany
+            handleClose={handleCloseEdit}
+            selectedRowData={selectedRowData}
+          />
+        </Dialog>
+        {/* Dialog for change logo */}
+        <Dialog open={openChangeLogo}>
+          <ChangeCompanyLogo
+            handleClose={handleCloseChangeLogo}
+            selectedRowData={selectedRowData}
+          />
+        </Dialog>
+        {/* Delete */}
+        <Dialog open={openDelete}>
+          <Warning
+            handleClose={handleCloseDelete}
+            handleAction={handleDeleteCompany}
+            message={`Are You Sure Do You Want to delete ${selectedRowData?.name}`}
+            isLoading={isLoading}
+            isSuccess={isSuccess}
+          />
+        </Dialog>
+      </Box>
+    </>
+  );
 };
 
 export default CompanyListTable;

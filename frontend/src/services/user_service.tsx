@@ -1,12 +1,12 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { axiosBaseQuery } from "../util/axios_base_query";
+import { axiosBaseQuery } from "../util/axios/axios_base_query";
 import { BASE_URL } from "../util/secrete";
 import { RegisterUserFormType } from "../_types/form_types";
 
 // Create API service
 export const userApi = createApi({
   reducerPath: "userApi",
-  baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/user/` }),
+  baseQuery: axiosBaseQuery({ baseUrl: `${BASE_URL}/api/user` }),
   tagTypes: ["User"], // Tag for refetching when data is updated
   endpoints: (builder) => ({
     createUser: builder.mutation<any, RegisterUserFormType>({
@@ -17,6 +17,29 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    updateUserProfile: builder.mutation<
+      any,
+      { body: RegisterUserFormType; params: string }
+    >({
+      query: ({ body, params }) => ({
+        url: `/${params}/profile`,
+        method: "PATCH",
+        data: body,
+      }),
+      invalidatesTags: ["User"],
+    }),
+    resetUserPassword: builder.mutation<
+      any,
+      { body: RegisterUserFormType; params: string }
+    >({
+      query: ({ body, params }) => ({
+        url: `/${params}/password`,
+        method: "PATCH",
+        data: body,
+      }),
+      invalidatesTags: ["User"],
+    }),
+
     getAllUsers: builder.query({
       query: () => ({
         url: "/",
@@ -31,9 +54,9 @@ export const userApi = createApi({
       }),
       providesTags: (_result, _error, id) => [{ type: "User", id }],
     }),
-    deleteUser: builder.mutation<any, string>({
-      query: (id: string) => ({
-        url: `/${id}`,
+    deleteUser: builder.mutation<any, { params: string }>({
+      query: ({ params }) => ({
+        url: `/${params}`,
         method: "DELETE",
       }),
       invalidatesTags: ["User"],
@@ -45,6 +68,9 @@ export const userApi = createApi({
 export const {
   useCreateUserMutation,
   useGetAllUsersQuery,
+  useLazyGetAllUsersQuery,
   useGetSingleUserQuery,
+  useResetUserPasswordMutation,
+  useUpdateUserProfileMutation,
   useDeleteUserMutation,
 } = userApi;

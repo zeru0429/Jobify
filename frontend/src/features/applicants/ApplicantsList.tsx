@@ -1,33 +1,52 @@
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { Box, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import ApplicantListTable from "./ApplicantListTable";
+import { useLazyGetAllApplicantQuery } from "../../services/applicants_service";
+import Loader from "../../component/Loading";
 
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useEffect } from "react";
 const ApplicantsList = () => {
-  const navigator = useNavigate();
-  const handleClick = () => {
-    navigator("/admin/add-applicant");
-  };
+  const location = useLocation();
+  const jobId = location.state;
+  console.log(jobId);
+
+  const [trigger, { data: applicants, isError, isLoading, isSuccess, error }] =
+    useLazyGetAllApplicantQuery();
+
+  useEffect(() => {
+    trigger({ params: jobId });
+  }, [trigger]);
+  // Navigation to add applicant form
+  console.log(applicants);
   return (
     <div>
-      <Box>
-        <Button
-          className="dark:text-white dark:bg-slate-600 text-white bg-[#011e32] "
-          onClick={handleClick}
-          variant="contained"
-        >
-          Add Applicants
-        </Button>
-        <br />
-        <br />
-        <br />
+      {/* Close icon to close the modal */}
+      <ArrowBackIcon onClick={() => window.history.back()} />
+      <br />
+      <br />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "end",
+          placeItems: "end",
+        }}
+      >
+        <p className="text-2xl font-bold">List of Applicants</p>
       </Box>
-      <Box>
+      <br />
+      <br />
+      {isLoading && <Loader />}
+      {isError && <div>Error loading applicants: {error.toString()}</div>}{" "}
+      {/* Error handling */}
+      {isSuccess && applicants && (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <ApplicantListTable />
+          <ApplicantListTable applicants={applicants} />
         </LocalizationProvider>
-      </Box>
+      )}
     </div>
   );
 };

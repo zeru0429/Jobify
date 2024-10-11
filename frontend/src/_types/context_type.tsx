@@ -1,19 +1,10 @@
 export type AuthContextType = {
   isAdmin: boolean;
-  isDH: boolean;
-  isLS: boolean;
-  isFinance: boolean;
-  isGM: boolean;
-  isEmployee: boolean;
-  isStoreKeeper: boolean;
+  isSuperAdmin: boolean;
   userData: UserDataType;
   setUserData: React.Dispatch<React.SetStateAction<UserDataType>>;
   setIsAdmin: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsDH: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsFinance: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsGM: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsLS: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsStoreKeeper: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSuperAdmin: React.Dispatch<React.SetStateAction<boolean>>;
   fetchData: () => void;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
   isLoggedIn: boolean;

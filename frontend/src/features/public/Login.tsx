@@ -10,6 +10,7 @@ import { useToast } from "../../context/ToastContext";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useLoginMutation } from "../../services/public_service";
 import { ErrorResponseType, LoginFormType } from "../../_types/form_types";
+import { Box, Button } from "@mui/material";
 
 // Define the LoginResponseType type
 type LoginResponseType = {
@@ -28,18 +29,17 @@ function Login() {
   const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
   const { setToastData } = useToast();
-
+  const { isLoggedIn, setUserData } = useAuth();
   useEffect(() => {
     if (userData.token != null) {
       switch (userData.role) {
-        case "ADMIN":
+        case "admin":
           navigate("/admin");
           break;
-        case "SUPER_ADMIN":
+        case "super_admin":
           navigate("/admin");
           break;
         default:
-          navigate("/admin");
           break;
       }
     }
@@ -48,8 +48,7 @@ function Login() {
   const onSubmit: SubmitHandler<LoginFormType> = async (data) => {
     try {
       const response: LoginResponseType = await login(data).unwrap();
-      console.log(response);
-      localStorage.setItem("token", "JSON.stringify(response)");
+      localStorage.setItem("token", JSON.stringify({ token: response.token }));
       fetchData();
       setToastData({
         message: "login successful",
@@ -84,17 +83,41 @@ function Login() {
     }
   };
 
+  const handleLogOut = () => {
+    localStorage.removeItem("token");
+    setUserData({ firstName: "", id: 0, role: "", token: null });
+    // reload page
+    window.location.reload();
+  };
+
   return (
     <>
       <div className="bg-[#002A47] text-white dark:bg-[#1C1E22] dark:text-[#B7E4FF] w-full h-screen">
         <div className="ms-10 pt-2 flex justify-between me-10 items-center">
           <LogoContainer />
-          <IconContainer
-            handler={toggleThemeData}
-            Icon={getThemeIcon()}
-            iconsClassName="my-custom-icon-class"
-            children={null}
-          />
+          <Box>
+            <IconContainer
+              handler={toggleThemeData}
+              Icon={getThemeIcon()}
+              iconsClassName="my-custom-icon-class"
+              children={null}
+            />
+            <Button
+              className=" bg-[#002A47] hover:dark:bg-[#5a5a5a] dark:text-gray-200 px-3 py-1 text-white rounded-md"
+              onClick={() => navigate("/")}
+            >
+              Home
+            </Button>
+          </Box>
+
+          {isLoggedIn && (
+            <Button
+              className=" bg-[#002A47] hover:dark:bg-[#5a5a5a] dark:text-gray-200 px-3 py-1 text-white rounded-md"
+              onClick={() => handleLogOut()}
+            >
+              Logout
+            </Button>
+          )}
         </div>
         <div className="w-full max-w-md p-6 shadow-md rounded-lg text-center m-auto">
           <div className="flex flex-col items-center justify-center text-center mb-8">

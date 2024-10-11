@@ -1,10 +1,10 @@
 export type UserListType = {
+  _id: string;
   firstName: string;
   lastName: string;
+  role: "admin" | "super_admin" | undefined;
   email: string;
-  jobTitle: string;
-  salary: number;
-  startDate: string;
-  signatureCatchPhrase: string;
-  avatar: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 };

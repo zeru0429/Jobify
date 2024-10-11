@@ -16,23 +16,24 @@ import LogOutButton from "../LogOutButton";
 import Login from "../../features/public/Login";
 export const AdminLayout = () => {
   const [open, setOpen] = useState(false);
-  const { isAdmin, userData } = useAuth();
+  const { isAdmin, isLoggedIn, isSuperAdmin } = useAuth();
 
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  if (userData != null) {
+
+  if (!isLoggedIn) {
     return <Login />;
   }
-  if (isAdmin) {
+  if (isAdmin || isSuperAdmin) {
     return (
       <>
         <Box
           sx={{
             marginLeft: open ? `${drawerWidth}px` : "0",
-            height: "100vh", // Full screen height
+            height: "100vh",
             display: "flex",
-            flexDirection: "column", // Makes sure content below header is stacked
+            flexDirection: "column",
           }}
         >
           <CssBaseline />
@@ -80,9 +81,9 @@ export const AdminLayout = () => {
           {/* Main content area */}
           <Box
             sx={{
-              flex: 1, // Ensure it takes all remaining space
-              overflowY: "auto", // Scrollable content
-              width: open ? `calc(100vw - ${drawerWidth}px)` : "100vw", // Adjust for sidebar
+              flex: 1,
+              overflowY: "auto",
+              width: open ? `calc(100vw - ${drawerWidth}px)` : "100vw",
             }}
           >
             <div className={`mt-24 px-10`}>
