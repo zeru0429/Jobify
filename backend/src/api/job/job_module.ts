@@ -2,6 +2,11 @@ import mongoose, { Schema } from "mongoose";
 import { JobType } from "../../types/job_type.js";
 
 const jobSchema: Schema<JobType> = new Schema({
+  isAvailable: {
+    required: true,
+    type: Boolean,
+    default: true,
+  },
   title: {
     required: true,
     type: String,

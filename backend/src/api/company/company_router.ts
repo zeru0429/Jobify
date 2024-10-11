@@ -1,35 +1,41 @@
-import express from "express";
-import { Request, Response } from "express";
+import express, { NextFunction } from "express";
 import companyController from "./company_controller.js";
-import uploadOriginal from "../../config/multer.js";
+import { upload } from "../../middlewares/multer.js";
+import { errorHandlerMethod } from "../../config/errorHandler.js";
+
 const companyRouter = express.Router();
-const uploadDestination = "dist/uploads/company-logo";
 
 // Create a new company
 companyRouter.post(
   "/",
-  uploadOriginal(uploadDestination),
-  (req: Request, res: Response) => {
-    companyController.createCompany(req, res);
-  }
+  upload.single("file"),
+  errorHandlerMethod(companyController.createCompany)
 );
 
 // Get all companies
-companyRouter.get("/", companyController.getAllCompanies);
+companyRouter.get("/", errorHandlerMethod(companyController.getAllCompanies));
 
 // Get a single company by ID
-companyRouter.get("/:id", (req: Request, res: Response) => {
-  companyController.getSingleCompany;
-});
+companyRouter.get(
+  "/:id",
+  errorHandlerMethod(companyController.getSingleCompany)
+);
 
 // Update a company by ID
-companyRouter.put("/:id", (req: Request, res: Response) => {
-  companyController.updateCompany;
-});
+companyRouter.patch(
+  "/:id/profile",
+  errorHandlerMethod(companyController.updateCompanyProfile)
+);
+companyRouter.patch(
+  "/:id/change-logo",
+  upload.single("file"),
+  errorHandlerMethod(companyController.updateCompanyLogo)
+);
 
 // Delete a company by ID
-companyRouter.delete("/:id", (req: Request, res: Response) => {
-  companyController.deleteCompany;
-});
+companyRouter.delete(
+  "/:id",
+  errorHandlerMethod(companyController.deleteCompany)
+);
 
 export default companyRouter;

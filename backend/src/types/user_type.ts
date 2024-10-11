@@ -5,6 +5,7 @@ export enum Role {
   SUPER_ADMIN = "super_admin",
 }
 export interface UserType extends Document {
+  _id: string;
   firstName: string;
   lastName: string;
   role: Role | Role.ADMIN;

@@ -1,30 +1,44 @@
 import express from "express";
-import { Request, Response } from "express";
 import applicationController from "./application_controller.js";
+import { isAuth } from "../../middlewares/auth.js";
+import { uploadMulti } from "../../middlewares/multer.js";
+import { errorHandlerMethod } from "../../config/errorHandler.js";
 
 const applicationRouter = express.Router();
 
 // Create a new application
-applicationRouter.post("/", (req: Request, res: Response) => {
-  applicationController.createApplication;
-});
+applicationRouter.post(
+  "/apply-job",
+  uploadMulti,
+  errorHandlerMethod(applicationController.createApplication)
+);
 
 // Get all applications
-applicationRouter.get("/", applicationController.getAllApplications);
+applicationRouter.get(
+  "/job/:id",
+  [isAuth],
+  errorHandlerMethod(applicationController.getAllApplications)
+);
 
 // Get a single application by ID
-applicationRouter.get("/:id", (req: Request, res: Response) => {
-  applicationController.getSingleApplication;
-});
+applicationRouter.get(
+  "/:id",
+  [isAuth],
+  errorHandlerMethod(applicationController.getSingleApplication)
+);
 
 // Update an application by ID
-applicationRouter.put("/:id", (req: Request, res: Response) => {
-  applicationController.updateApplication;
-});
+applicationRouter.patch(
+  "/:id",
+  [isAuth],
+  errorHandlerMethod(applicationController.updateApplicationStatus)
+);
 
 // Delete an application by ID
-applicationRouter.delete("/:id", (req: Request, res: Response) => {
-  applicationController.deleteApplication;
-});
+applicationRouter.delete(
+  "/:id",
+  [isAuth],
+  errorHandlerMethod(applicationController.deleteApplication)
+);
 
 export default applicationRouter;

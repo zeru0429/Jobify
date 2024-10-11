@@ -1,30 +1,21 @@
 import express from "express";
-import { Request, Response } from "express";
 import jobController from "./job_controller.js";
+import { errorHandlerMethod } from "../../config/errorHandler.js";
 
 const jobRouter = express.Router();
 
 // Create a new job
-jobRouter.post("/", (req: Request, res: Response) => {
-  jobController.createJob;
-});
-
-// Get all jobs
-jobRouter.get("/", jobController.getAllJob);
+jobRouter.post("/", errorHandlerMethod(jobController.createJob));
 
 // Get a single job by ID
-jobRouter.get("/:id", (req: Request, res: Response) => {
-  jobController.getSingleJob;
-});
+jobRouter.get("/:id", errorHandlerMethod(jobController.getSingleJob));
+// Get all jobs
+jobRouter.get("/", errorHandlerMethod(jobController.getAllJob));
 
 // Update a job by ID
-jobRouter.put("/:id", (req: Request, res: Response) => {
-  jobController.updateJob;
-});
+jobRouter.patch("/:id", errorHandlerMethod(jobController.updateJob));
 
 // Delete a job by ID
-jobRouter.delete("/:id", (req: Request, res: Response) => {
-  jobController.deleteJob;
-});
+jobRouter.delete("/:id", errorHandlerMethod(jobController.deleteJob));
 
 export default jobRouter;
