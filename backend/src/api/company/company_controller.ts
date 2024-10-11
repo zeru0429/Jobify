@@ -1,181 +1,271 @@
 import mongoose from "mongoose";
 import User from "../user/user_module.js";
-import Company from "./company_module.js"; // Adjust the path as needed
-import { Request, Response } from "express";
-import { BASE_URL } from "../../config/secrete.js";
+import Company from "./company_module.js";
+import { NextFunction, Request, Response } from "express";
+import { v2 as cloudinary } from "cloudinary";
+import { formatImage } from "../../middlewares/multer.js";
+import companyValidator from "./company_validator.js";
 
 const companyController = {
   // Create a new company
   createCompany: async (req: Request, res: Response) => {
-    try {
-      const { name, admin } = req.body;
+    // validator
+    companyValidator.create.parse(req.body);
+    req.body.admin = req.user?._id;
+    const { name, type, companyType, address, admin, description } = req.body;
+    // Check if all required fields are provided
 
-      // Check if all required fields are provided
-      if (!name || !admin) {
-        return res.status(400).json({
-          success: false,
-          message: "Name and admin are required fields.",
-        });
-      }
-      console.log(admin);
+    // Check if the file path exists
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Logo file is required.",
+      });
+    }
 
-      // Check if the admin ID is valid
-      if (!mongoose.Types.ObjectId.isValid(admin)) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid admin ID.",
-        });
-      }
-      //check if the name exist before
-      const companyExist = await Company.findOne({ name });
-      if (companyExist) {
+    // Check if the admin ID is valid
+    if (!mongoose.Types.ObjectId.isValid(admin)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid admin ID.",
+      });
+    }
+
+    // Check if the name exists before
+    const companyExist = await Company.findOne({ name });
+    if (companyExist) {
+      return res.status(400).json({
+        success: false,
+        message: "Company already exists.",
+      });
+    }
+
+    // Format image
+    const file = formatImage(req.file);
+    if (!file) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid image file.",
+      });
+    }
+
+    // Check if the admin exists
+    const user = await User.findById(admin);
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Admin not found.",
+      });
+    }
+
+    // Upload the logo to Cloudinary
+    const cloudinaryResponse = await cloudinary.uploader.upload(file);
+
+    // Create new company instance
+    const company = new Company({
+      name,
+      type,
+      companyType,
+      address,
+      admin,
+      description,
+      avatar: cloudinaryResponse.secure_url,
+      avatarPublicId: cloudinaryResponse.public_id,
+    });
+
+    await company.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Company created successfully.",
+      data: company,
+    });
+  },
+
+  // Get all companies
+  getAllCompanies: async (req: Request, res: Response, next: NextFunction) => {
+    const adminId = req.user?._id;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        message: "Admin ID is required.",
+      });
+    }
+    const companies = await Company.find({
+      admin: adminId,
+    });
+    res.status(200).json({
+      success: true,
+      data: companies,
+    });
+  },
+
+  // Get a single company by ID
+  getSingleCompany: async (req: Request, res: Response, next: NextFunction) => {
+    const adminId = req.user?._id;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        message: "Admin ID is required.",
+      });
+    }
+    const company = await Company.findOne({
+      admin: adminId,
+      _id: req.params.id,
+    });
+
+    if (!company) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: company,
+    });
+  },
+
+  // Update a company by ID
+  updateCompanyProfile: async (req: Request, res: Response) => {
+    const adminId = req.user?._id;
+    // validator
+    companyValidator.updateCompanyProfile.parse(req.body);
+    const { name, type, companyType, address, description } = req.body;
+    // check id is valid object id
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid company ID.",
+      });
+    }
+    // Check if company exists
+    const company = await Company.findOne({
+      admin: adminId,
+      _id: req.params.id,
+    });
+    if (!company) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found.",
+      });
+    }
+    // Check if the name exists before
+    const companyExist = await Company.findOne({ name });
+    if (companyExist) {
+      if (`${companyExist._id}`.toString() !== req.params.id.toString())
         return res.status(400).json({
           success: false,
           message: "Company already exists.",
         });
-      }
-      // check if the file path exist
-      if (!req.filePath) {
-        return res.status(400).json({
-          success: false,
-          message: "Logo file is required.",
-        });
-      }
-      var logoPath = req.filePath; // Get the path of the uploaded file
-      // Check if the file was uploaded
-      if (!logoPath) {
-        return res.status(400).json({
-          success: false,
-          message: "Logo file is required.",
-        });
-      }
-
-      //check if the admin exist
-      const user = await User.findById(admin);
-      if (!user) {
-        return res.status(400).json({
-          success: false,
-          message: "Admin not found.",
-        });
-      }
-
-      // Create and save the company, using the logo path
-      const company = new Company({ name, logo: logoPath, admin });
-      await company.save();
-
-      return res.status(201).json({
-        success: true,
-        message: "Company created successfully.",
-        data: company,
-      });
-    } catch (error: any) {
-      console.error(error);
-      res.status(500).json({
-        success: false,
-        message: "An error occurred while creating the company.",
-      });
     }
+
+    // Update company fields
+
+    company.description =
+      description !== undefined ? description : company.description;
+    company.name = name !== undefined ? name : company.name;
+    company.type = type !== undefined ? type : company.type;
+    company.companyType =
+      companyType !== undefined ? companyType : company.companyType;
+    company.address = address !== undefined ? address : company.address;
+    company.updatedAt = new Date();
+    await company.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Company updated successfully.",
+      data: company,
+    });
   },
-  // Get all companies
-  getAllCompanies: async (req: Request, res: Response) => {
-    try {
-      const companies = await Company.find();
-      res.status(200).json({
-        success: true,
-        data: companies,
-      });
-    } catch (error: any) {
-      console.error(error);
-      res.status(500).json({
+  updateCompanyLogo: async (req: Request, res: Response) => {
+    const adminId = req.user?._id;
+
+    // check id is valid object id
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
         success: false,
-        message: "An error occurred while fetching companies.",
+        message: "Invalid company ID.",
       });
     }
-  },
-
-  // Get a single company by ID
-  getSingleCompany: async (req: Request, res: Response) => {
-    try {
-      const company = await Company.findById(req.params.id);
-
-      if (!company) {
-        return res.status(404).json({
-          success: false,
-          message: "Company not found.",
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        data: company,
-      });
-    } catch (error: any) {
-      console.error(error);
-      res.status(500).json({
+    // Check if the file path exists
+    if (!req.file) {
+      return res.status(400).json({
         success: false,
-        message: "An error occurred while fetching the company.",
+        message: "Logo file is required.",
       });
     }
-  },
-
-  // Update a company by ID
-  updateCompany: async (req: Request, res: Response) => {
-    try {
-      const { name, logo } = req.body;
-
-      // Check if company exists
-      const company = await Company.findById(req.params.id);
-      if (!company) {
-        return res.status(404).json({
-          success: false,
-          message: "Company not found.",
-        });
-      }
-
-      // Update company fields
-      company.name = name !== undefined ? name : company.name;
-      company.logo = logo !== undefined ? logo : company.logo;
-      company.updatedAt = new Date(); // Create a new Date object
-
-      await company.save();
-
-      res.status(200).json({
-        success: true,
-        message: "Company updated successfully.",
-        data: company,
-      });
-    } catch (error: any) {
-      console.error(error);
-      res.status(500).json({
+    // Check if company exists
+    const company = await Company.findOne({
+      admin: adminId,
+      _id: req.params.id,
+    });
+    if (!company) {
+      return res.status(404).json({
         success: false,
-        message: "An error occurred while updating the company.",
+        message: "Company not found.",
       });
     }
+    // Format image
+    const file = formatImage(req.file);
+    if (!file) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid image file.",
+      });
+    }
+    // Upload the logo to Cloudinary
+    const cloudinaryResponse = await cloudinary.uploader.upload(file);
+    // Update company fields
+    company.avatar = cloudinaryResponse.secure_url;
+    company.avatarPublicId = cloudinaryResponse.public_id;
+    await company.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Company updated successfully.",
+      data: company,
+    });
   },
 
   // Delete a company by ID
   deleteCompany: async (req: Request, res: Response) => {
-    try {
-      const company = await Company.findByIdAndDelete(req.params.id);
+    const adminId = req.user?._id;
 
-      if (!company) {
-        return res.status(404).json({
-          success: false,
-          message: "Company not found.",
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        message: "Company deleted successfully.",
-      });
-    } catch (error: any) {
-      console.error(error);
-      res.status(500).json({
+    // check id is valid object id
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
         success: false,
-        message: "An error occurred while deleting the company.",
+        message: "Invalid company ID.",
       });
     }
+    // Check if company exists
+    const company = await Company.findOne({
+      admin: adminId,
+      _id: req.params.id,
+    });
+    if (!company) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found.",
+      });
+    }
+    const deleteCompany = await Company.findByIdAndDelete(req.params.id);
+
+    if (!deleteCompany) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Company deleted successfully.",
+    });
   },
 };
 

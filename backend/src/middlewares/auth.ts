@@ -12,15 +12,13 @@ const isAuth = async (
 ): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
-
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       res.status(403).json({
         success: false,
-        message: "Not authorized",
+        message: "Not authorized token not found",
       });
       return; // Ensure to return here to avoid further execution
     }
-
     const token = authHeader.split(" ")[1]; // Get the token part after "Bearer "
 
     // Verify the token
@@ -30,25 +28,32 @@ const isAuth = async (
       const user = await User.findById(payload.id);
 
       if (user) {
-        req.user = user as UserType; // Cast to UserType since user is not null
-        next(); // Call the next middleware
+        req.user = user as UserType;
+        next();
       } else {
-        res.status(404).json({
+        res.status(401).json({
           success: false,
-          message: "User not found",
+          message: "invalid toke user not found",
         });
       }
     } else {
-      res.status(403).json({
+      res.status(401).json({
         success: false,
-        message: "Not authorized",
+        message: "Not authorized invalid token",
       });
     }
-  } catch (error) {
-    res.status(403).json({
-      success: false,
-      message: "Not authorized",
-    });
+  } catch (error: any) {
+    if (error.name === "TokenExpiredError") {
+      res.status(401).json({
+        success: false,
+        message: "Token expired",
+      });
+    } else {
+      res.status(403).json({
+        success: false,
+        message: "Not authorized invalid token",
+      });
+    }
   }
 };
 
@@ -85,21 +90,5 @@ const isSuperAdmin = async (
     }
   }
 };
-const isAdminOrSuperAdmin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  if (req.user && req.user.role) {
-    if (req.user.role === Role.ADMIN || req.user.role === Role.SUPER_ADMIN) {
-      next();
-    } else {
-      res.status(403).json({
-        success: false,
-        message: "Not authorized",
-      });
-    }
-  }
-};
 
-export { isAuth, isAdmin, isSuperAdmin, isAdminOrSuperAdmin };
+export { isAuth, isAdmin, isSuperAdmin };

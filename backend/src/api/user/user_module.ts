@@ -40,14 +40,6 @@ const userSchema: Schema<UserType> = new Schema({
     required: true,
     type: String,
     trim: true,
-    validate: {
-      validator: (value: string) => {
-        const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,15}$/;
-        return re.test(String(value));
-      },
-      message: (props: { value: string }) =>
-        `${props.value} is not a valid password`,
-    },
   },
   createdAt: {
     type: Date,
