@@ -96,8 +96,12 @@ app.use("/api", cacheMiddleware, appRouter);
 //   res.send(`Express + TypeScript Server `);
 // });
 // Catch-all route for handling React routes
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../../frontend/dist", "index.html"));
+app.get("*", (req, res, next) => {
+  if (req.accepts("html") && !req.path.includes(".")) {
+    res.sendFile(path.join(__dirname, "../../frontend/dist", "index.html"));
+  } else {
+    next();
+  }
 });
 
 app.listen(PORT, () => {
