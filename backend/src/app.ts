@@ -39,39 +39,39 @@ const limiter = rateLimit({
 });
 
 //  Content Security Policy
-const csp = {
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "https://trusted.cdn.com"],
-    styleSrc: ["'self'", "https://trusted.styles.com"],
-    imgSrc: ["'self'", "data:", "https://trusted.images.com"],
-    connectSrc: ["'self'", "https://api.trusted.com"],
-    fontSrc: ["'self'", "https://fonts.googleapis.com"],
-    objectSrc: ["'none'"],
-    frameSrc: ["'self'"],
-    upgradeInsecureRequests: [],
-  },
-};
+// const csp = {
+//   directives: {
+//     defaultSrc: ["'self'"],
+//     scriptSrc: ["'self'", "https://trusted.cdn.com"],
+//     styleSrc: ["'self'", "https://trusted.styles.com"],
+//     imgSrc: ["'self'", "data:", "https://trusted.images.com"],
+//     connectSrc: ["'self'", "https://api.trusted.com"],
+//     fontSrc: ["'self'", "https://fonts.googleapis.com"],
+//     objectSrc: ["'none'"],
+//     frameSrc: ["'self'"],
+//     upgradeInsecureRequests: [],
+//   },
+// };
 app.use(cors(corsOptions));
 app.use(limiter);
-app.use(helmet());
+// app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(errorHandlerMiddleware);
-app.use(
-  helmet({
-    contentSecurityPolicy: csp,
-    crossOriginEmbedderPolicy: true,
-    crossOriginResourcePolicy: { policy: "same-origin" },
-    referrerPolicy: { policy: "no-referrer" },
-    hsts: {
-      maxAge: 31536000,
-      includeSubDomains: true,
-      preload: true,
-    },
-    xssFilter: false,
-  })
-);
+// app.use(
+//   helmet({
+//     contentSecurityPolicy: csp,
+//     crossOriginEmbedderPolicy: true,
+//     crossOriginResourcePolicy: { policy: "same-origin" },
+//     referrerPolicy: { policy: "no-referrer" },
+//     hsts: {
+//       maxAge: 31536000,
+//       includeSubDomains: true,
+//       preload: true,
+//     },
+//     xssFilter: false,
+//   })
+// );
 cloudinary.config({
   cloud_name: CLOUD_NAME,
   api_key: CLOUD_API_KEY,
@@ -79,6 +79,8 @@ cloudinary.config({
 });
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(express.static(path.join(__dirname, "../../frontend/dist")));
+
 import appRouter from "./router/index.js";
 import userController from "./api/user/user_controller.js";
 import { errorHandlerMiddleware } from "./middlewares/errorHandlerMiddleware.js";
@@ -90,8 +92,12 @@ app.post("/login", (req: Request, res: Response) => {
 //api
 app.use("/api", cacheMiddleware, appRouter);
 
-app.get("/", (req: Request, res: Response) => {
-  res.send(`Express + TypeScript Server `);
+// app.get("/", (req: Request, res: Response) => {
+//   res.send(`Express + TypeScript Server `);
+// });
+// Catch-all route for handling React routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../frontend/dist", "index.html"));
 });
 
 app.listen(PORT, () => {

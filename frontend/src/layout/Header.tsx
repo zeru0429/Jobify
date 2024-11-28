@@ -4,7 +4,7 @@ import { MdNightlight, MdLightMode, MdBrightnessAuto } from "react-icons/md";
 import IconContainer from "../component/icon/Icon_container";
 import { useThemeData } from "../context/them_context";
 import LogoContainer from "../component/LogoContainer";
-import { AppBar, Button } from "@mui/material";
+import { AppBar } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
