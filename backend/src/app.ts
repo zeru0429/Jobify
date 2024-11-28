@@ -25,7 +25,11 @@ const app: Express = express();
 
 // middle ware
 const corsOptions = {
-  origin: true,
+  origin: [
+    "https://jobify.huludelala.com/",
+    "https://jobify-zeru.netlify.app/",
+    "",
+  ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
