@@ -90,12 +90,12 @@ app.post("/login", (req: Request, res: Response) => {
 });
 //api
 app.use("/api", cacheMiddleware, appRouter);
-app.get("/", (req, res, next) => {
-  res.json({
-    success: true,
-    massage: "Hello world",
-  });
-});
+// app.get("/", (req, res, next) => {
+//   res.json({
+//     success: true,
+//     massage: "Hello world",
+//   });
+// });
 app.get("*", (req, res, next) => {
   res.sendFile(path.join(__dirname, "../../frontend/dist", "index.html"));
 });
