@@ -77,7 +77,7 @@ cloudinary.config({
   api_key: CLOUD_API_KEY,
   api_secret: CLOUD_API_SECRET,
 });
-app.use(express.static(path.join(__dirname, "../../frontend/dist")));
+// app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
 // app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 import appRouter from "./router/index.js";
@@ -90,10 +90,15 @@ app.post("/login", (req: Request, res: Response) => {
 });
 //api
 app.use("/api", cacheMiddleware, appRouter);
-
-app.get("*", (req, res, next) => {
-  res.sendFile(path.join(__dirname, "../../frontend/dist", "index.html"));
+app.get("/", (req, res, next) => {
+  res.json({
+    success: true,
+    massage: "Hello world",
+  });
 });
+// app.get("*", (req, res, next) => {
+//   res.sendFile(path.join(__dirname, "../../frontend/dist", "index.html"));
+// });
 
 app.listen(PORT, () => {
   mongoose
