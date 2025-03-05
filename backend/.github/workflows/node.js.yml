@@ -1,0 +1,76 @@
+name: Deploy Next.js Project to CPanel
+on:
+  push:
+    branches:
+      - main # Deploy on push to the 'main' branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20" # Specify the Node.js version
+
+      # Step 3: Install Dependencies
+      - name: Install dependencies
+        run: |
+          npm install --legacy-peer-deps
+          npm install --save-dev @types/node --legacy-peer-deps
+
+      # Step 4: Build the Project
+      - name: Build Project
+        run: npm run build
+        env:
+          PORT: 6565
+          MONGO_URI: "mongodb+srv://zeru:BPhgUEtbWZDcbfSS@cluster0.yiex2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+          JWT_SECRET: "tsehay"
+          BASE_URL: "https://jobify.huludelala.com"
+          GEMINI_API_KEY: AIzaSyDw2MmHnzvv7wwak0zUJC3CdQUSQUcdUag
+          CLOUD_API_KEY: 581891482999266
+          CLOUD_API_SECRET: OYTQBlN2OaWAQyB7RggmtYTvOAE
+          CLOUD_NAME: demxdya38
+          CLOUDINARY_URL: cloudinary://581891482999266:OYTQBlN2OaWAQyB7RggmtYTvOAE@demxdya38
+
+      # Step 5: Prepare Deployment Package
+      - name: Archive Build Folder
+        run: tar -czf build.tar.gz dist package.json package-lock.json
+
+      # # Step 6: Install lftp
+      # - name: Install lftp
+      #   run: sudo apt-get install -y lftp
+      # step 7  Deployment Steps
+      - name: FTP-Deploy-Action
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          server: ftp.huludelala.com
+          username: frontend@jobify.api.huludelala.com
+          password: OpenAi@2023
+          local-dir: dist/
+
+      # Step 8: Deploy Build to Remote SSH Server
+      - name: Deploy with tar over SSH
+        env:
+          SSH_USERNAME: huludeig
+          SSH_HOST: 185.73.8.1
+          SSH_PORT: 22
+          REMOTE_PATH: ~/jobify.api.huludelala.com/
+        run: |
+          # Ensure the SSH key is available
+          echo "${{ secrets.SSH_PRIVATE }}" > private_key.pem
+          chmod 600 private_key.pem
+
+          # Run commands on the server
+          ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
+            cd /home/huludeig/jobify.api.huludelala.com &&
+            cloudlinux-selector install-modules --json --interpreter nodejs --user huludeig --app-root jobify.api.huludelala.com"
+
+          # Clean up the private key
+          rm -f private_key.pem
