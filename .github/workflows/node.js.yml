@@ -37,12 +37,10 @@ jobs:
           VITE_GEMINI_BASE_URL: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent
           VITE_API_KEY: AIzaSyD_y54LwZb2fKeOwpyuW9eu_Zlzj2aLUg4
 
-      # Step 5: Create Frontend Folder & Archive Build
-      - name: Create Frontend Folder & Archive Build
+      # Step 5: Archive Frontend Build
+      - name: Archive Frontend Build Folder
         run: |
-          mkdir -p frontend-dist
-          cp -r frontend/dist frontend-dist/
-          tar -czf frontend-dist.tar.gz -C frontend-dist .
+          tar --exclude='node_modules' -czf frontend.tar.gz -C frontend/dist .
 
       # ========================== BACKEND BUILD ========================== #
       # Step 6: Install Backend Dependencies
@@ -67,12 +65,10 @@ jobs:
           CLOUD_NAME: demxdya38
           CLOUDINARY_URL: cloudinary://581891482999266:OYTQBlN2OaWAQyB7RggmtYTvOAE@demxdya38
 
-      # Step 8: Create Backend Folder & Archive Build
-      - name: Create Backend Folder & Archive Build
+      # Step 8: Archive Backend Build Folder (Excluding node_modules)
+      - name: Archive Backend Build Folder
         run: |
-          mkdir -p backend-dist
-          cp -r backend/dist backend-dist/
-          tar --exclude='node_modules' -czf backend-dist.tar.gz -C backend-dist .
+          tar --exclude='node_modules' -czf backend.tar.gz -C backend/dist .
 
       # ========================== DEPLOYMENT ========================== #
       # Step 9: Deploy Frontend via FTP
@@ -82,16 +78,34 @@ jobs:
           server: ftp.huludelala.com
           username: jobify@jobify.huludelala.com
           password: OpenAi@2023
-          local-dir: frontend-dist/
+          local-dir: frontend/dist/
 
-      # Step 10: Deploy Backend via FTP
-      - name: Deploy Backend via FTP
-        uses: SamKirkland/FTP-Deploy-Action@4.3.3
-        with:
-          server: ftp.huludelala.com
-          username: jobify@jobify.huludelala.com
-          password: OpenAi@2023
-          local-dir: backend-dist/
+      # Step 10: Deploy Backend via SSH
+      - name: Deploy Backend via SSH
+        env:
+          SSH_USERNAME: huludeig
+          SSH_HOST: 185.73.8.1
+          SSH_PORT: 22
+          REMOTE_PATH: ~/jobify.huludelala.com/
+        run: |
+          # Ensure the SSH key is available
+          echo "${{ secrets.SSH_PRIVATE }}" > private_key.pem
+          chmod 600 private_key.pem
+
+          # Transfer frontend and backend builds to server
+          scp -i private_key.pem -P "$SSH_PORT" -o StrictHostKeyChecking=no frontend.tar.gz $SSH_USERNAME@$SSH_HOST:$REMOTE_PATH
+          scp -i private_key.pem -P "$SSH_PORT" -o StrictHostKeyChecking=no backend.tar.gz $SSH_USERNAME@$SSH_HOST:$REMOTE_PATH
+
+          # Extract frontend and backend files without overwriting existing ones
+          ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
+            cd $REMOTE_PATH &&
+            tar -xzf frontend.tar.gz -C . &&
+            tar -xzf backend.tar.gz -C . &&
+            pm2 restart backend-app || pm2 start dist/server.js --name backend-app
+          "
+
+          # Clean up the private key
+          rm -f private_key.pem
 
       # - name: Deploy Backend via SSH
       #   env:
