@@ -76,33 +76,57 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: ftp.huludelala.com
-          username: frontend@versalinkfe.huludelala.com
+          username: jobify@jobify.huludelala.com
           password: OpenAi@2023
           local-dir: frontend/dist/
 
-      # Deploy Backend via SSH
+      # Step 10: Deploy Backend via SSH
       - name: Deploy Backend via SSH
         env:
           SSH_USERNAME: huludeig
           SSH_HOST: 185.73.8.1
           SSH_PORT: 22
-          REMOTE_PATH: ~/jobify.api.huludelala.com/
+          REMOTE_PATH: ~/jobify.huludelala.com/
         run: |
           # Ensure the SSH key is available
           echo "${{ secrets.SSH_PRIVATE }}" > private_key.pem
           chmod 600 private_key.pem
 
-          # List backend directory to verify the file exists
-          ls -la backend
+          # Install Node.js modules on the server
+          ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
+            cd /home/huludeig/jobify.huludelala.com &&
+            cloudlinux-selector install-modules --json --interpreter nodejs --user huludeig --app-root jobify.huludelala.com
+          "
 
-          # Transfer backend build to server (disable strict host key checking)
+          # Transfer backend build to server
           scp -i private_key.pem -P "$SSH_PORT" -o StrictHostKeyChecking=no ./backend/backend.tar.gz $SSH_USERNAME@$SSH_HOST:$REMOTE_PATH
 
-          # Extract backend files and restart server (disable strict host key checking)
+          # Extract backend files and restart server
           ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
             cd $REMOTE_PATH &&
             tar -xzf backend.tar.gz &&
             pm2 restart backend-app || pm2 start dist/server.js --name backend-app
+          "
+
+          # Clean up the private key
+          rm -f private_key.pem
+
+      # Step 11: Deploy Build to Remote SSH Server
+      - name: Deploy with tar over SSH
+        env:
+          SSH_USERNAME: huludeig
+          SSH_HOST: 185.73.8.1
+          SSH_PORT: 22
+          REMOTE_PATH: ~/versalinkfe.huludelala.com/
+        run: |
+          # Ensure the SSH key is available
+          echo "${{ secrets.SSH_PRIVATE }}" > private_key.pem
+          chmod 600 private_key.pem
+
+          # Run commands on the server
+          ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
+            cd /home/huludeig/versalinkfe.huludelala.com &&
+            cloudlinux-selector install-modules --json --interpreter nodejs --user huludeig --app-root versalinkfe.huludelala.com
           "
 
           # Clean up the private key
