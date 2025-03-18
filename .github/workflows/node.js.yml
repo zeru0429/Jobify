@@ -92,9 +92,15 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE }}" > private_key.pem
           chmod 600 private_key.pem
 
-          # Install Node.js modules on the server
+          # Check if the app venv exists and install modules if needed
           ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
-            cd /home/huludeig/jobify.huludelala.com &&
+            if [ -d /home/huludeig/nodevenv/jobify.huludelala.com ]; then
+              echo 'Virtual environment found. Installing Node.js modules...'
+              cd /home/huludeig/jobify.huludelala.com &&
+              npm install
+            else
+              echo 'Virtual environment not found. Please create it manually or check your application configuration.'
+            fi &&
             cloudlinux-selector install-modules --json --interpreter nodejs --user huludeig --app-root jobify.huludelala.com
           "
 
@@ -106,27 +112,6 @@ jobs:
             cd $REMOTE_PATH &&
             tar -xzf backend.tar.gz &&
             pm2 restart backend-app || pm2 start dist/server.js --name backend-app
-          "
-
-          # Clean up the private key
-          rm -f private_key.pem
-
-      # Step 11: Deploy Build to Remote SSH Server
-      - name: Deploy with tar over SSH
-        env:
-          SSH_USERNAME: huludeig
-          SSH_HOST: 185.73.8.1
-          SSH_PORT: 22
-          REMOTE_PATH: ~/versalinkfe.huludelala.com/
-        run: |
-          # Ensure the SSH key is available
-          echo "${{ secrets.SSH_PRIVATE }}" > private_key.pem
-          chmod 600 private_key.pem
-
-          # Run commands on the server
-          ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
-            cd /home/huludeig/versalinkfe.huludelala.com &&
-            cloudlinux-selector install-modules --json --interpreter nodejs --user huludeig --app-root versalinkfe.huludelala.com
           "
 
           # Clean up the private key
