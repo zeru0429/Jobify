@@ -80,6 +80,15 @@ jobs:
           password: OpenAi@2023
           local-dir: frontend/dist/
 
+      # Step 10: Deploy Backend via FTP
+      - name: Deploy Backend via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          server: ftp.huludelala.com
+          username: jobify@jobify.huludelala.com
+          password: OpenAi@2023
+          local-dir: backend/dist/
+
       # - name: Deploy Backend via SSH
       #   env:
       #     SSH_USERNAME: huludeig
