@@ -80,7 +80,6 @@ jobs:
           password: OpenAi@2023
           local-dir: frontend/dist/
 
-      # Step 10: Deploy Backend via SSH
       - name: Deploy Backend via SSH
         env:
           SSH_USERNAME: huludeig
@@ -92,16 +91,22 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE }}" > private_key.pem
           chmod 600 private_key.pem
 
-          # Check if the app venv exists and install modules if needed
+          # Debugging: Check application directory
           ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
-            if [ -d /home/huludeig/nodevenv/jobify.huludelala.com ]; then
-              echo 'Virtual environment found. Installing Node.js modules...'
-              cd /home/huludeig/jobify.huludelala.com &&
-              npm install
-            else
-              echo 'Virtual environment not found. Please create it manually or check your application configuration.'
-            fi &&
-            cloudlinux-selector install-modules --json --interpreter nodejs --user huludeig --app-root jobify.huludelala.com
+            echo 'Checking application directory...' &&
+            ls -la $REMOTE_PATH
+          "
+
+          # Recreate virtual environment if necessary
+          ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
+            cloudlinux-selector destroy --json --interpreter nodejs --user $SSH_USERNAME --app-root $REMOTE_PATH || true &&
+            cloudlinux-selector create --json --interpreter nodejs --user $SSH_USERNAME --app-root $REMOTE_PATH
+          "
+
+          # Install Node.js modules
+          ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
+            cd $REMOTE_PATH &&
+            npm install
           "
 
           # Transfer backend build to server
