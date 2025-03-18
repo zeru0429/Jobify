@@ -18,8 +18,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "20" # Specify the Node.js version
-        # ========================== FRONTEND BUILD ========================== #
-        # Step 3: Install Frontend Dependencies
+
+      # ========================== FRONTEND BUILD ========================== #
+      # Step 3: Install Frontend Dependencies
       - name: Install Frontend Dependencies
         run: |
           cd frontend
@@ -40,8 +41,7 @@ jobs:
       - name: Archive Frontend Build Folder
         run: tar -czf frontend.tar.gz -C frontend/dist .
 
-        # ========================== BACKEND BUILD ========================== #
-
+      # ========================== BACKEND BUILD ========================== #
       # Step 6: Install Backend Dependencies
       - name: Install Backend Dependencies
         run: |
@@ -55,35 +55,29 @@ jobs:
           npm run build
         env:
           PORT: 6565
-          MONGO_URI: mongodb+srv://zeru:BPhgUEtbWZDcbfSS@cluster0.yiex2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-          JWT_SECRET: tsehay
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
           BASE_URL: https://cms.kiyatilahun.com/api/form/contacts
-          GEMINI_API_KEY: AIzaSyDw2MmHnzvv7wwak0zUJC3CdQUSQUcdUag
-          CLOUD_API_KEY: 581891482999266
-          CLOUD_API_SECRET: OYTQBlN2OaWAQyB7RggmtYTvOAE
-          CLOUD_NAME: demxdya38
-          CLOUDINARY_URL: cloudinary://581891482999266:OYTQBlN2OaWAQyB7RggmtYTvOAE@demxdya38
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLOUD_API_KEY: ${{ secrets.CLOUD_API_KEY }}
+          CLOUD_API_SECRET: ${{ secrets.CLOUD_API_SECRET }}
+          CLOUD_NAME: ${{ secrets.CLOUD_NAME }}
+          CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
 
-      # Step 8: Archive Backend Build
+      # Step 8: Archive Backend Build Folder (Excluding node_modules)
       - name: Archive Backend Build Folder
-        run: tar -czf backend.tar.gz -C backend/dist .
+        run: |
+          cd backend
+          tar --exclude='node_modules' -czf backend.tar.gz -C dist .
 
-      # step 7  Deployment Steps
-      - name: FTP-Deploy-Action
-        uses: SamKirkland/FTP-Deploy-Action@4.3.3
-        with:
-          server: ftp.huludelala.com
-          username: frontend@jobify.huludelala.com
-          password: OpenAi@2023
-          local-dir: dist/
-
-          # Step 9: Deploy Frontend via FTP
+      # ========================== DEPLOYMENT ========================== #
+      # Step 9: Deploy Frontend via FTP
       - name: Deploy Frontend via FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: ftp.huludelala.com
           username: frontend@versalinkfe.huludelala.com
-          password: OpenAi@2023
+          password: ${{ secrets.FTP_PASSWORD }}
           local-dir: frontend/dist/
 
       # Step 10: Deploy Backend over SSH
