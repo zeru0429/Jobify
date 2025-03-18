@@ -77,7 +77,7 @@ jobs:
         with:
           server: ftp.huludelala.com
           username: frontend@versalinkfe.huludelala.com
-          password: ${{ secrets.FTP_PASSWORD }}
+          password: OpenAi@2023
           local-dir: frontend/dist/
 
       # Step 10: Deploy Backend over SSH
