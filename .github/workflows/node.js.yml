@@ -55,14 +55,14 @@ jobs:
           npm run build
         env:
           PORT: 6565
-          MONGO_URI: ${{ secrets.MONGO_URI }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MONGO_URI: mongodb+srv://zeru:BPhgUEtbWZDcbfSS@cluster0.yiex2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+          JWT_SECRET: tsehay
           BASE_URL: https://cms.kiyatilahun.com/api/form/contacts
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          CLOUD_API_KEY: ${{ secrets.CLOUD_API_KEY }}
-          CLOUD_API_SECRET: ${{ secrets.CLOUD_API_SECRET }}
-          CLOUD_NAME: ${{ secrets.CLOUD_NAME }}
-          CLOUDINARY_URL: ${{ secrets.CLOUDINARY_URL }}
+          GEMINI_API_KEY: AIzaSyDw2MmHnzvv7wwak0zUJC3CdQUSQUcdUag
+          CLOUD_API_KEY: 581891482999266
+          CLOUD_API_SECRET: OYTQBlN2OaWAQyB7RggmtYTvOAE
+          CLOUD_NAME: demxdya38
+          CLOUDINARY_URL: cloudinary://581891482999266:OYTQBlN2OaWAQyB7RggmtYTvOAE@demxdya38
 
       # Step 8: Archive Backend Build Folder (Excluding node_modules)
       - name: Archive Backend Build Folder
@@ -91,6 +91,9 @@ jobs:
           # Ensure the SSH key is available
           echo "${{ secrets.SSH_PRIVATE }}" > private_key.pem
           chmod 600 private_key.pem
+
+          # List backend directory to verify the file exists
+          ls -la backend
 
           # Transfer backend build to server
           scp -i private_key.pem -P "$SSH_PORT" backend.tar.gz $SSH_USERNAME@$SSH_HOST:$REMOTE_PATH
