@@ -23,16 +23,14 @@ jobs:
       # Step 3: Install Backend Dependencies
       - name: Install Backend Dependencies
         run: |
+          cd backend
           npm install --legacy-peer-deps
 
-      # Step 4: Build Backend (if TypeScript → JavaScript)
+      # Step 4: Build Backend (TypeScript → JavaScript)
       - name: Build Backend
         run: |
-          if [ -f "tsconfig.json" ]; then
-            npm run build
-          else
-            echo "No build step needed for plain JavaScript project"
-          fi
+          cd backend
+          npm run build
         env:
           PORT: 5050
           MONGO_URI: mongodb+srv://zeru:whg8NE2ltiCMB4qI@hrms.ipb1k.mongodb.net/
@@ -55,12 +53,8 @@ jobs:
       # Step 5: Archive Backend Build Folder (Excluding node_modules)
       - name: Archive Backend Build Folder
         run: |
-          # Create dist folder if it doesn't exist (for plain JS projects)
-          if [ ! -d "dist" ]; then
-            mkdir -p dist
-            cp -r *.js *.json routes models controllers middleware config utils dist/ 2>/dev/null || true
-          fi
-          tar --exclude='node_modules' -czf backend.tar.gz -C dist .
+          cd backend
+          tar --exclude='node_modules' -czf ../backend.tar.gz -C dist .
 
       # ========================== DEPLOYMENT ========================== #
       # Step 6: Deploy Backend via SSH
@@ -89,6 +83,9 @@ jobs:
               rm -rf node_modules_backup 2>/dev/null || true
               mv node_modules node_modules_backup
             fi
+            
+            # Remove existing files (except potential node_modules_backup)
+            find . -maxdepth 1 ! -name '.' ! -name 'node_modules_backup' ! -name '..' -exec rm -rf {} + 2>/dev/null || true
             
             # Extract new files
             echo 'Extracting new build...'
@@ -129,7 +126,16 @@ jobs:
             # Restart application with PM2
             echo 'Restarting application...'
             pm2 delete express-app 2>/dev/null || true
-            pm2 start server.js --name express-app
+            if [ -f 'server.js' ]; then
+              pm2 start server.js --name express-app
+            elif [ -f 'dist/server.js' ]; then
+              pm2 start dist/server.js --name express-app
+            elif [ -f 'app.js' ]; then
+              pm2 start app.js --name express-app
+            else
+              echo 'Error: Could not find main application file (server.js, dist/server.js, or app.js)'
+              exit 1
+            fi
             pm2 save
             pm2 list
           "
