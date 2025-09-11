@@ -1,4 +1,4 @@
-name: Deploy Next.js Project to CPanel
+name: Deploy Express Project to CPanel
 on:
   push:
     branches:
@@ -11,140 +11,149 @@ jobs:
     steps:
       # Step 1: Check out the code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Step 2: Set up Node.js
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "20" # Specify the Node.js version
 
-      # ========================== FRONTEND BUILD ========================== #
-      # Step 3: Install Frontend Dependencies
-      - name: Install Frontend Dependencies
-        run: |
-          cd frontend
-          npm install --legacy-peer-deps
-
-      # Step 4: Build Frontend Project
-      - name: Build Frontend
-        run: |
-          cd frontend
-          npm run build
-        env:
-          VITE_REACT_APP_PUBLIC_API_URL: https://jobify.api.huludelala.com/
-          VITE_REACT_APP_SERVER_URL: https://jobify.api.huludelala.com/
-          VITE_GEMINI_BASE_URL: https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent
-          VITE_API_KEY: AIzaSyD_y54LwZb2fKeOwpyuW9eu_Zlzj2aLUg4
-
-      # Step 5: Archive Frontend Build
-      - name: Archive Frontend Build Folder
-        run: |
-          tar --exclude='node_modules' -czf frontend.tar.gz -C frontend/dist .
-
       # ========================== BACKEND BUILD ========================== #
-      # Step 6: Install Backend Dependencies
+      # Step 3: Install Backend Dependencies
       - name: Install Backend Dependencies
         run: |
-          cd backend
           npm install --legacy-peer-deps
 
-      # Step 7: Build Backend (TypeScript → JavaScript)
+      # Step 4: Build Backend (if TypeScript → JavaScript)
       - name: Build Backend
         run: |
-          cd backend
-          npm run build
+          if [ -f "tsconfig.json" ]; then
+            npm run build
+          else
+            echo "No build step needed for plain JavaScript project"
+          fi
         env:
-          PORT: 6565
-          MONGO_URI: mongodb+srv://zeru:BPhgUEtbWZDcbfSS@cluster0.yiex2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-          JWT_SECRET: tsehay
-          BASE_URL: https://cms.kiyatilahun.com/api/form/contacts
-          GEMINI_API_KEY: AIzaSyDw2MmHnzvv7wwak0zUJC3CdQUSQUcdUag
-          CLOUD_API_KEY: 581891482999266
-          CLOUD_API_SECRET: OYTQBlN2OaWAQyB7RggmtYTvOAE
-          CLOUD_NAME: demxdya38
-          CLOUDINARY_URL: cloudinary://581891482999266:OYTQBlN2OaWAQyB7RggmtYTvOAE@demxdya38
+          PORT: 5050
+          MONGO_URI: mongodb+srv://zeru:whg8NE2ltiCMB4qI@hrms.ipb1k.mongodb.net/
+          JWT_SECRET: mamaelij
+          JWT_REFRESH_SECRET: your-super-secret-refresh-key
+          JWT_EXPIRES_IN: 15m
+          JWT_REFRESH_EXPIRES_IN: 7d
+          FRONTEND_URL: http://localhost:5173
+          FRONTEND_URL_CORS: http://localhost:5173,http://localhost:3000,http://localhost:5173,http://192.168.43.69
+          OPENAI_API_KEY: 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
+          COOKIE_SECRET: tsehaymemartiwedalech
+          CLEAR_EXISTING_DATA: true
+          ACCESS_TOKEN_SECRET: supersecretaccesskey
+          ACCESS_TOKEN_LIFE: 1h
+          REFRESH_TOKEN_SECRET: supersecretrefreshkey
+          REFRESH_TOKEN_LIFE: 7d
+          INVITE_TOKEN_SECRET: supersecretinvitekey
+          INVITE_TOKEN_LIFE: 3d
 
-      # Step 8: Archive Backend Build Folder (Excluding node_modules)
+      # Step 5: Archive Backend Build Folder (Excluding node_modules)
       - name: Archive Backend Build Folder
         run: |
-          tar --exclude='node_modules' -czf backend.tar.gz -C backend/dist .
+          # Create dist folder if it doesn't exist (for plain JS projects)
+          if [ ! -d "dist" ]; then
+            mkdir -p dist
+            cp -r *.js *.json routes models controllers middleware config utils dist/ 2>/dev/null || true
+          fi
+          tar --exclude='node_modules' -czf backend.tar.gz -C dist .
 
       # ========================== DEPLOYMENT ========================== #
-      # Step 9: Deploy Frontend via FTP
-      - name: Deploy Frontend via FTP
-        uses: SamKirkland/FTP-Deploy-Action@4.3.3
-        with:
-          server: ftp.huludelala.com
-          username: jobify@jobify.huludelala.com
-          password: OpenAi@2023
-          local-dir: frontend/dist/
-
-      # Step 10: Deploy Backend via SSH
+      # Step 6: Deploy Backend via SSH
       - name: Deploy Backend via SSH
         env:
-          SSH_USERNAME: huludeig
-          SSH_HOST: 185.73.8.1
-          SSH_PORT: 22
-          REMOTE_PATH: ~/jobify.huludelala.com/
+          SSH_USERNAME: ${{ secrets.VPS_USERNAME }}
+          SSH_HOST: ${{ secrets.VPS_HOST }}
+          SSH_PORT: ${{ secrets.VPS_PORT }}
+          REMOTE_PATH: ${{ secrets.VPS_REMOTE_PATH }}
         run: |
           # Ensure the SSH key is available
-          echo "${{ secrets.SSH_PRIVATE }}" > private_key.pem
+          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
 
-          # Transfer frontend and backend builds to server
-          scp -i private_key.pem -P "$SSH_PORT" -o StrictHostKeyChecking=no frontend.tar.gz $SSH_USERNAME@$SSH_HOST:$REMOTE_PATH
+          # Transfer backend build to server
           scp -i private_key.pem -P "$SSH_PORT" -o StrictHostKeyChecking=no backend.tar.gz $SSH_USERNAME@$SSH_HOST:$REMOTE_PATH
 
-          # Extract frontend and backend files without overwriting existing ones
+          # Extract backend files and restart application
           ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
-            cd $REMOTE_PATH &&
-            tar -xzf frontend.tar.gz -C . &&
-            tar -xzf backend.tar.gz -C . &&
-            pm2 restart backend-app || pm2 start dist/server.js --name backend-app
+            set -e
+            cd $REMOTE_PATH
+            
+            # Backup node_modules if it exists
+            if [ -d 'node_modules' ]; then
+              echo 'Backing up node_modules...'
+              rm -rf node_modules_backup 2>/dev/null || true
+              mv node_modules node_modules_backup
+            fi
+            
+            # Extract new files
+            echo 'Extracting new build...'
+            tar -xzf backend.tar.gz -C . --overwrite
+            
+            # Restore or install node_modules
+            if [ -d 'node_modules_backup' ]; then
+              echo 'Restoring node_modules...'
+              rm -rf node_modules 2>/dev/null || true
+              mv node_modules_backup node_modules
+            else
+              echo 'Installing production dependencies...'
+              npm install --production
+            fi
+            
+            # Create .env file with all environment variables
+            cat > .env << 'ENV_EOF'
+            PORT=5050
+            MONGO_URI=mongodb+srv://zeru:whg8NE2ltiCMB4qI@hrms.ipb1k.mongodb.net/
+            NODE_ENV=development
+            JWT_SECRET=mamaelij
+            JWT_REFRESH_SECRET=your-super-secret-refresh-key
+            JWT_EXPIRES_IN=15m
+            JWT_REFRESH_EXPIRES_IN=7d
+            FRONTEND_URL=http://localhost:5173
+            FRONTEND_URL_CORS=http://localhost:5173,http://localhost:3000,http://localhost:5173,http://192.168.43.69
+            OPENAI_API_KEY=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
+            COOKIE_SECRET=tsehaymemartiwedalech
+            CLEAR_EXISTING_DATA=true
+            ACCESS_TOKEN_SECRET=supersecretaccesskey
+            ACCESS_TOKEN_LIFE=1h
+            REFRESH_TOKEN_SECRET=supersecretrefreshkey
+            REFRESH_TOKEN_LIFE=7d
+            INVITE_TOKEN_SECRET=supersecretinvitekey
+            INVITE_TOKEN_LIFE=3d
+            ENV_EOF
+
+            # Restart application with PM2
+            echo 'Restarting application...'
+            pm2 delete express-app 2>/dev/null || true
+            pm2 start server.js --name express-app
+            pm2 save
+            pm2 list
           "
 
           # Clean up the private key
           rm -f private_key.pem
 
-      # - name: Deploy Backend via SSH
-      #   env:
-      #     SSH_USERNAME: huludeig
-      #     SSH_HOST: 185.73.8.1
-      #     SSH_PORT: 22
-      #     REMOTE_PATH: ~/jobify.huludelala.com/
-      #   run: |
-      #     # Ensure the SSH key is available
-      #     echo "${{ secrets.SSH_PRIVATE }}" > private_key.pem
-      #     chmod 600 private_key.pem
+      # Step 7: Verify Deployment
+      - name: Verify Deployment
+        env:
+          SSH_USERNAME: ${{ secrets.VPS_USERNAME }}
+          SSH_HOST: ${{ secrets.VPS_HOST }}
+          SSH_PORT: ${{ secrets.VPS_PORT }}
+          REMOTE_PATH: ${{ secrets.VPS_REMOTE_PATH }}
+        run: |
+          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
 
-      #     # Debugging: Check application directory
-      #     ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
-      #       echo 'Checking application directory...' &&
-      #       ls -la $REMOTE_PATH
-      #     "
+          ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
+            cd $REMOTE_PATH
+            echo '=== PM2 Status ==='
+            pm2 list
+            echo '=== Application Logs (last 10 lines) ==='
+            pm2 logs express-app --lines 10 --nostream || echo 'Logs not available yet'
+          "
 
-      #     # Recreate virtual environment if necessary
-      #     ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
-      #       cloudlinux-selector destroy --json --interpreter nodejs --user $SSH_USERNAME --app-root $REMOTE_PATH || true &&
-      #       cloudlinux-selector create --json --interpreter nodejs --user $SSH_USERNAME --app-root $REMOTE_PATH
-      #     "
-
-      #     # Install Node.js modules
-      #     ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
-      #       cd $REMOTE_PATH &&
-      #       npm install
-      #     "
-
-      #     # Transfer backend build to server
-      #     scp -i private_key.pem -P "$SSH_PORT" -o StrictHostKeyChecking=no ./backend/backend.tar.gz $SSH_USERNAME@$SSH_HOST:$REMOTE_PATH
-
-      #     # Extract backend files and restart server
-      #     ssh -i private_key.pem -p "$SSH_PORT" -o StrictHostKeyChecking=no $SSH_USERNAME@$SSH_HOST "
-      #       cd $REMOTE_PATH &&
-      #       tar -xzf backend.tar.gz &&
-      #       pm2 restart backend-app || pm2 start dist/server.js --name backend-app
-      #     "
-
-      #     # Clean up the private key
-      #     rm -f private_key.pem
+          rm -f private_key.pem
